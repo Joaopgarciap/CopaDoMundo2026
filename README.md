@@ -1,0 +1,1 @@
+# CopaDoMundo2026
