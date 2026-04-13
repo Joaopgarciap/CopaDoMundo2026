@@ -294,6 +294,14 @@ const maiorArtilheiroHistorico = {
     "Maior artilheiro da história da Copa do Mundo, superando Ronaldo Fenômeno em 2014 no Brasil.",
 };
 
+const topArtilheirosHistoricos = [
+  { nome: "Miroslav Klose", selecao: "Alemanha", gols: 16, status: "Aposentado", destaque: true },
+  { nome: "Ronaldo", selecao: "Brasil", gols: 15, status: "Aposentado" },
+  { nome: "Gerd Müller", selecao: "Alemanha", gols: 14, status: "Aposentado" },
+  { nome: "Just Fontaine", selecao: "França", gols: 13, status: "Aposentado" },
+  { nome: "Lionel Messi", selecao: "Argentina", gols: 13, status: "Em atividade" },
+];
+
 // ——— JOGOS FASE DE GRUPOS (horário de Brasília) ———
 // Fontes: ESPN, Lance, 365Scores, Olympics.com (confirmados)
 const jogos = [
@@ -743,9 +751,16 @@ function renderRankings(){
 function renderHistoriaCopas() {
   const destaquesRoot = document.getElementById("history-summary-grid");
   const artilheiroRoot = document.getElementById("history-top-scorer");
+  const topArtilheirosRoot = document.getElementById("history-top-5-scorers");
   const estreantesRoot = document.getElementById("history-first-timers");
   const campeoesRoot = document.getElementById("history-champions-grid");
-  if (!destaquesRoot || !artilheiroRoot || !estreantesRoot || !campeoesRoot) return;
+  if (
+    !destaquesRoot ||
+    !artilheiroRoot ||
+    !topArtilheirosRoot ||
+    !estreantesRoot ||
+    !campeoesRoot
+  ) return;
 
   destaquesRoot.innerHTML = destaquesHistoricos
     .map(
@@ -759,24 +774,45 @@ function renderHistoriaCopas() {
     )
     .join("");
 
+  const liderArtilharia = topArtilheirosHistoricos[0];
   artilheiroRoot.innerHTML = `
     <article class="history-top-player-card">
       <img
         src="${maiorArtilheiroHistorico.foto}"
-        alt="${maiorArtilheiroHistorico.nome}"
+        alt="${liderArtilharia.nome}"
         loading="lazy"
         referrerpolicy="no-referrer"
         onerror="this.onerror=null;this.src='${fallbackImagemJogador}'"
       />
       <div>
-        <h3>${maiorArtilheiroHistorico.nome}</h3>
-        <p><strong>Seleção:</strong> ${flag(maiorArtilheiroHistorico.selecao, 18)} ${maiorArtilheiroHistorico.selecao}</p>
-        <p><strong>Gols em Copas:</strong> ${maiorArtilheiroHistorico.gols}</p>
+        <h3>${liderArtilharia.nome}</h3>
+        <p><strong>Seleção:</strong> ${flag(liderArtilharia.selecao, 18)} ${liderArtilharia.selecao}</p>
+        <p><strong>Gols em Copas:</strong> ${liderArtilharia.gols}</p>
         <p><strong>Edições:</strong> ${maiorArtilheiroHistorico.copas}</p>
         <p class="history-top-player-desc">${maiorArtilheiroHistorico.descricao}</p>
       </div>
     </article>
   `;
+
+  topArtilheirosRoot.innerHTML = topArtilheirosHistoricos
+    .map(
+      (jogador, indice) => `
+      <li class="history-top5-item ${indice === 0 ? "leader" : ""}">
+        <div class="history-top5-left">
+          <span class="history-top5-rank">#${indice + 1}</span>
+          <span class="history-top5-name">${jogador.nome}</span>
+          <span class="history-top5-meta">${flag(jogador.selecao, 18)} ${jogador.selecao}</span>
+        </div>
+        <div class="history-top5-right">
+          <span class="history-top5-goals">${jogador.gols} gols</span>
+          <span class="history-top5-status ${jogador.status === "Em atividade" ? "active" : "inactive"}">
+            ${jogador.status}
+          </span>
+        </div>
+      </li>
+    `
+    )
+    .join("");
 
   estreantesRoot.innerHTML = selecoesEstreantes2026
     .map(
