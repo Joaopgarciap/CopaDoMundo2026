@@ -226,26 +226,30 @@ if (typeof window !== "undefined") {
   window.__fallbackImagemBola = fallbackImagemBola;
 }
 
-const fotosEstadiosLocais = [
-  "assets/stadium-1.jpg",
-  "assets/stadium-2.jpg",
-  "assets/stadium-3.jpg",
-  "assets/stadium-4.jpg",
-];
-
 const fotosEstadiosPorNome = {
-  "Mercedes-Benz Stadium": "assets/mercedes-benz-stadium.jpg",
-  "Hard Rock Stadium": "assets/hard-rock-stadium.jpg",
-  "MetLife Stadium": "assets/metlife-stadium.jpg",
+  "Estádio Azteca": "assets/stadiums/est-dio-azteca.jpg",
+  "MetLife Stadium": "assets/stadiums/metlife-stadium.jpg",
+  "AT&T Stadium": "assets/stadiums/at-t-stadium.jpg",
+  "SoFi Stadium": "assets/stadiums/sofi-stadium.jpg",
+  "Mercedes-Benz Stadium": "assets/stadiums/mercedes-benz-stadium.jpg",
+  "Hard Rock Stadium": "assets/stadiums/hard-rock-stadium.jpg",
+  "Levi's Stadium": "assets/stadiums/levi-s-stadium.jpg",
+  "Gillette Stadium": "assets/stadiums/gillette-stadium.jpg",
+  "Lincoln Financial Field": "assets/stadiums/lincoln-financial-field.jpg",
+  "NRG Stadium": "assets/stadiums/nrg-stadium.jpg",
+  "Arrowhead Stadium": "assets/stadiums/arrowhead-stadium.jpg",
+  "Lumen Field": "assets/stadiums/lumen-field.jpg",
+  "BC Place": "assets/stadiums/bc-place.jpg",
+  "BMO Field": "assets/stadiums/bmo-field.jpg",
+  "Estádio Akron": "assets/stadiums/est-dio-akron.jpg",
+  "Estádio BBVA": "assets/stadiums/est-dio-bbva.jpg",
 };
 
-estadiosData.forEach((estadio, indice) => {
-  estadio.foto =
-    fotosEstadiosPorNome[estadio.nome] ||
-    fotosEstadiosLocais[indice % fotosEstadiosLocais.length];
+estadiosData.forEach((estadio) => {
+  estadio.foto = fotosEstadiosPorNome[estadio.nome] || fallbackImagemEstadio;
 });
 
-const imagemBolaOficial = "assets/ball-official.jpg";
+const imagemBolaOficial = "assets/ball-official.png";
 
 // ——— FATOS DA COPA ———
 const fatosCopa = [
