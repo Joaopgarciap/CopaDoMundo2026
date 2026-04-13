@@ -325,6 +325,11 @@ const topArtilheirosHistoricos = [
   { nome: "Gerd Müller", selecao: "Alemanha", gols: 14, status: "Aposentado" },
   { nome: "Just Fontaine", selecao: "França", gols: 13, status: "Aposentado" },
   { nome: "Lionel Messi", selecao: "Argentina", gols: 13, status: "Em atividade" },
+  { nome: "Pelé", selecao: "Brasil", gols: 12, status: "Aposentado" },
+  { nome: "Kylian Mbappé", selecao: "França", gols: 12, status: "Em atividade" },
+  { nome: "Sándor Kocsis", selecao: "Hungria", gols: 11, status: "Aposentado" },
+  { nome: "Jürgen Klinsmann", selecao: "Alemanha", gols: 11, status: "Aposentado" },
+  { nome: "Helmut Rahn", selecao: "Alemanha", gols: 10, status: "Aposentado" },
 ];
 
 // ——— JOGOS FASE DE GRUPOS (horário de Brasília) ———
@@ -776,7 +781,7 @@ function renderRankings(){
 function renderHistoriaCopas() {
   const destaquesRoot = document.getElementById("history-summary-grid");
   const artilheiroRoot = document.getElementById("history-top-scorer");
-  const topArtilheirosRoot = document.getElementById("history-top-5-scorers");
+  const topArtilheirosRoot = document.getElementById("history-top-scorers");
   const estreantesRoot = document.getElementById("history-first-timers");
   const campeoesRoot = document.getElementById("history-champions-grid");
   if (
