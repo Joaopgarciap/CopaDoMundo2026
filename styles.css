@@ -395,6 +395,10 @@ select:focus,input:focus { border-color:rgba(245,200,66,.4); }
   font-size: 1.5rem;
   color: var(--gold);
   line-height: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
 }
 .history-card-detail {
   margin-top: 0.4rem;
