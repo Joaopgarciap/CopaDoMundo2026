@@ -174,14 +174,7 @@ const estadiosData = [
   },
 ];
 
-// Alguns hosts de imagem bloqueiam hotlink (403/404); estas URLs evitam cards sem foto.
-const fotosEstadiosConfiaveis = Array.from(
-  { length: estadiosData.length },
-  (_, indice) => `https://picsum.photos/seed/copa-estadio-${indice + 1}/1200/700`
-);
-estadiosData.forEach((estadio, indice) => {
-  estadio.foto = fotosEstadiosConfiaveis[indice];
-});
+const fallbackImagemEstadio = "assets/stadium-placeholder.svg";
 
 // ——— FATOS DA COPA ———
 const fatosCopa = [
@@ -246,8 +239,7 @@ const maiorArtilheiroHistorico = {
   selecao: "Alemanha",
   gols: 16,
   copas: "2002, 2006, 2010 e 2014",
-  foto:
-    "https://images.pexels.com/photos/114296/pexels-photo-114296.jpeg?auto=compress&cs=tinysrgb&w=800",
+  foto: "assets/player-placeholder.svg",
   descricao:
     "Maior artilheiro da história da Copa do Mundo, superando Ronaldo Fenômeno em 2014 no Brasil.",
 };
@@ -566,7 +558,7 @@ function renderEstadios(){
             alt="${e.nome}"
             loading="lazy"
             referrerpolicy="no-referrer"
-            onerror="this.onerror=null;this.src='https://picsum.photos/seed/estadio-fallback/1200/700'">
+            onerror="this.onerror=null;this.src='${fallbackImagemEstadio}'">
           <div class="stadium-photo-overlay"></div>
           <div class="stadium-country-badge">${flag(e.cidade.includes("México")||e.cidade.includes("Monterrey")||e.cidade.includes("Guadalajara")?"México":e.pais==="Canadá"?"Canadá":"Estados Unidos",18)} ${e.pais}</div>
         </div>
@@ -724,7 +716,7 @@ function renderHistoriaCopas() {
         alt="${maiorArtilheiroHistorico.nome}"
         loading="lazy"
         referrerpolicy="no-referrer"
-        onerror="this.onerror=null;this.src='https://picsum.photos/seed/klose-fallback/800/800'"
+        onerror="this.onerror=null;this.src='assets/player-placeholder.svg'"
       />
       <div>
         <h3>${maiorArtilheiroHistorico.nome}</h3>

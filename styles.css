@@ -216,10 +216,12 @@ select:focus,input:focus { border-color:rgba(245,200,66,.4); }
 .stat-value.highlight { color:var(--green); font-family:'Bebas Neue',sans-serif; font-size:1rem; }
 
 /* ——— RANKINGS ——— */
-.ranking-grid {
+.ranking-grid,
+.rankings-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1rem;
+  align-items: start;
 }
 
 .ranking-panel {
@@ -525,7 +527,8 @@ footer code { background:rgba(255,255,255,.07); padding:.1rem .4rem; border-radi
   .stadium-photo-wrap { height:200px; }
   .tab { padding:.85rem .85rem; font-size:.78rem; }
   .copa-section-title h2 { font-size:1.5rem; }
-  .ranking-grid { grid-template-columns: 1fr; }
+  .ranking-grid,
+  .rankings-grid { grid-template-columns: 1fr; }
   .history-columns { grid-template-columns: 1fr; }
   .history-top-player-card { grid-template-columns: 1fr; }
   .history-top-player-card img { height: 260px; }

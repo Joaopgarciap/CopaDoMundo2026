@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" role="img" aria-labelledby="title desc">
+  <title id="title">Imagem ilustrativa de estadio</title>
+  <desc id="desc">Placeholder para fotos de estadios da Copa.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#0b1732" />
+      <stop offset="100%" stop-color="#162b57" />
+    </linearGradient>
+    <linearGradient id="field" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#1a8f56" />
+      <stop offset="100%" stop-color="#0b5a36" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="700" fill="url(#bg)" />
+  <ellipse cx="600" cy="350" rx="470" ry="170" fill="#203b72" opacity="0.55" />
+  <ellipse cx="600" cy="350" rx="380" ry="130" fill="#2b4f94" opacity="0.55" />
+  <rect x="170" y="420" width="860" height="180" rx="24" fill="url(#field)" />
+  <rect x="580" y="420" width="40" height="180" fill="#d8f3df" opacity="0.6" />
+  <circle cx="600" cy="510" r="54" fill="none" stroke="#d8f3df" stroke-width="4" opacity="0.6" />
+  <text x="600" y="255" font-family="Arial, Helvetica, sans-serif" font-size="56" text-anchor="middle" fill="#f5c842" font-weight="700">
+    ESTADIO DA COPA
+  </text>
+  <text x="600" y="300" font-family="Arial, Helvetica, sans-serif" font-size="28" text-anchor="middle" fill="#d7e4ff" opacity="0.9">
+    Imagem ilustrativa local
+  </text>
+</svg>
