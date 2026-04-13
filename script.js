@@ -1104,10 +1104,7 @@ function renderDetalhesJogo(idx){
       <section class="match-detail-panel">
         <h4>Resumo da partida</h4>
         <p class="match-detail-note">${api.resultText||"Sem resumo disponível no momento. O sistema tenta atualizar automaticamente enquanto a janela estiver aberta."}</p>
-        <div class="match-detail-refresh-row">
-          <span class="match-detail-refresh">${atualizacaoAutomatica}</span>
-          <button class="api-sync-btn" onclick="sincronizarDetalhesJogoApi(${idx},true)">🔄 Atualizar agora</button>
-        </div>
+        <p class="match-detail-refresh">${atualizacaoAutomatica}</p>
       </section>
     </div>`;
 }
