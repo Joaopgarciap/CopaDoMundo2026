@@ -233,8 +233,16 @@ const fotosEstadiosLocais = [
   "assets/stadium-4.jpg",
 ];
 
+const fotosEstadiosPorNome = {
+  "Mercedes-Benz Stadium": "assets/mercedes-benz-stadium.jpg",
+  "Hard Rock Stadium": "assets/hard-rock-stadium.jpg",
+  "MetLife Stadium": "assets/metlife-stadium.jpg",
+};
+
 estadiosData.forEach((estadio, indice) => {
-  estadio.foto = fotosEstadiosLocais[indice % fotosEstadiosLocais.length];
+  estadio.foto =
+    fotosEstadiosPorNome[estadio.nome] ||
+    fotosEstadiosLocais[indice % fotosEstadiosLocais.length];
 });
 
 const imagemBolaOficial = "assets/ball-official.jpg";
