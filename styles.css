@@ -736,6 +736,16 @@ select:focus,input:focus { border-color:rgba(245,200,66,.4); }
 
 .history-list li strong { color:var(--text); }
 .history-list li span { color:var(--muted); font-size:.74rem; }
+.history-left { display:flex; flex-direction:column; gap:.1rem; min-width:0; flex:1; }
+.history-right { display:flex; align-items:center; gap:.5rem; white-space:nowrap; }
+.history-player-main { display:flex; align-items:center; gap:.4rem; min-width:0; }
+.history-player-rank { font-weight:700; color:var(--text); }
+.history-player-flag { display:inline-flex; align-items:center; }
+.history-player-main strong { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.history-player-main span:last-child { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.history-champion-main { display:flex; align-items:center; gap:.5rem; min-width:0; }
+.history-champion-main > div { min-width:0; }
+.history-player-flag .flag-img { border:1px solid var(--border); }
 
 .history-ordered { counter-reset:history-order; }
 .history-ordered li { counter-increment:history-order; }
