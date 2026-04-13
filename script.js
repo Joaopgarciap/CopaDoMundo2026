@@ -307,37 +307,176 @@ const getJogos=()=>{
   return BASE_JOGOS.map((j,i)=>({...j,...(scores[i]||{}),_idx:i}));
 };
 
+const ESTADIOS_JOGOS=[
+  "Estádio Azteca, Cidade do México",
+  "BMO Field, Toronto",
+  "AT&T Stadium, Arlington (TX)",
+  "BC Place, Vancouver",
+  "Estádio BBVA, Monterrey",
+  "MetLife Stadium, Nova Jersey",
+  "Lincoln Financial Field, Filadélfia",
+  "Lumen Field, Seattle",
+  "Mercedes-Benz Stadium, Atlanta",
+  "SoFi Stadium, Inglewood (L.A.)",
+  "Arrowhead Stadium, Kansas City",
+  "NRG Stadium, Houston",
+  "Estádio Akron, Guadalajara",
+  "Levi's Stadium, Santa Clara (S.F.)",
+  "Gillette Stadium, Boston",
+  "Hard Rock Stadium, Miami",
+];
+const HORARIOS_PADRAO=["13:00","16:00","19:00","22:00"];
+
+function dataComOffset(dataInicio,offsetDias){
+  const dt=new Date(`${dataInicio}T00:00:00Z`);
+  dt.setUTCDate(dt.getUTCDate()+offsetDias);
+  return dt.toISOString().slice(0,10);
+}
+
+function estadioPorIndice(indice){
+  return ESTADIOS_JOGOS[indice%ESTADIOS_JOGOS.length];
+}
+
+function gerarJogosFaseGrupos(){
+  const jogos=[];
+  let contador=0;
+  const rodadas=[
+    [[0,1],[2,3]],
+    [[0,2],[3,1]],
+    [[0,3],[1,2]],
+  ];
+
+  for(let rodada=0;rodada<rodadas.length;rodada++){
+    for(const [grupo,times] of Object.entries(grupos)){
+      for(const [a,b] of rodadas[rodada]){
+        const diaOffset=Math.floor(contador/HORARIOS_PADRAO.length);
+        const horario=HORARIOS_PADRAO[contador%HORARIOS_PADRAO.length];
+        jogos.push({
+          data:`${dataComOffset("2026-06-11",diaOffset)} ${horario}`,
+          fase:"Fase de Grupos",
+          grupo,
+          casa:times[a],
+          fora:times[b],
+          golsCasa:null,
+          golsFora:null,
+          estadio:estadioPorIndice(contador),
+        });
+        contador++;
+      }
+    }
+  }
+
+  return jogos;
+}
+
+function gerarJogosMataMata(indiceInicialEstadio){
+  const jogos=[];
+  let contador=0;
+
+  const cabecasChave=[
+    ...Object.keys(grupos).map((grupo)=>`1º Grupo ${grupo}`),
+    "2º Grupo A","2º Grupo B","2º Grupo C","2º Grupo D",
+  ];
+  const desafiantes=[
+    "2º Grupo E","2º Grupo F","2º Grupo G","2º Grupo H",
+    "2º Grupo I","2º Grupo J","2º Grupo K","2º Grupo L",
+    "Melhor 3º #1","Melhor 3º #2","Melhor 3º #3","Melhor 3º #4",
+    "Melhor 3º #5","Melhor 3º #6","Melhor 3º #7","Melhor 3º #8",
+  ];
+
+  for(let i=0;i<16;i++){
+    const diaOffset=Math.floor(i/4);
+    const horario=HORARIOS_PADRAO[i%HORARIOS_PADRAO.length];
+    jogos.push({
+      data:`${dataComOffset("2026-07-01",diaOffset)} ${horario}`,
+      fase:"16 avos de Final",
+      casa:cabecasChave[i],
+      fora:desafiantes[i],
+      golsCasa:null,
+      golsFora:null,
+      estadio:estadioPorIndice(indiceInicialEstadio+contador),
+    });
+    contador++;
+  }
+
+  const horariosOitavas=["16:00","20:00"];
+  for(let i=0;i<8;i++){
+    const diaOffset=Math.floor(i/2);
+    jogos.push({
+      data:`${dataComOffset("2026-07-07",diaOffset)} ${horariosOitavas[i%2]}`,
+      fase:"Oitavas de Final",
+      casa:`Vencedor 16A${i+1}`,
+      fora:`Vencedor 16A${16-i}`,
+      golsCasa:null,
+      golsFora:null,
+      estadio:estadioPorIndice(indiceInicialEstadio+contador),
+    });
+    contador++;
+  }
+
+  const horariosQuartas=["17:00","21:00"];
+  for(let i=0;i<4;i++){
+    const diaOffset=Math.floor(i/2);
+    jogos.push({
+      data:`${dataComOffset("2026-07-13",diaOffset)} ${horariosQuartas[i%2]}`,
+      fase:"Quartas de Final",
+      casa:`Vencedor O${(i*2)+1}`,
+      fora:`Vencedor O${(i*2)+2}`,
+      golsCasa:null,
+      golsFora:null,
+      estadio:estadioPorIndice(indiceInicialEstadio+contador),
+    });
+    contador++;
+  }
+
+  jogos.push({
+    data:"2026-07-16 20:00",
+    fase:"Semifinal",
+    casa:"Vencedor Q1",
+    fora:"Vencedor Q2",
+    golsCasa:null,
+    golsFora:null,
+    estadio:estadioPorIndice(indiceInicialEstadio+contador),
+  });
+  contador++;
+
+  jogos.push({
+    data:"2026-07-17 20:00",
+    fase:"Semifinal",
+    casa:"Vencedor Q3",
+    fora:"Vencedor Q4",
+    golsCasa:null,
+    golsFora:null,
+    estadio:estadioPorIndice(indiceInicialEstadio+contador),
+  });
+  contador++;
+
+  jogos.push({
+    data:"2026-07-18 17:00",
+    fase:"Terceiro Lugar",
+    casa:"Perdedor SF1",
+    fora:"Perdedor SF2",
+    golsCasa:null,
+    golsFora:null,
+    estadio:"Hard Rock Stadium, Miami",
+  });
+
+  jogos.push({
+    data:"2026-07-19 16:00",
+    fase:"Final",
+    casa:"Vencedor SF1",
+    fora:"Vencedor SF2",
+    golsCasa:null,
+    golsFora:null,
+    estadio:"MetLife Stadium, Nova Jersey",
+  });
+
+  return jogos;
+}
+
 const BASE_JOGOS=[
-  {data:"2026-06-11 16:00",fase:"Fase de Grupos",grupo:"A",casa:"México",fora:"África do Sul",golsCasa:null,golsFora:null,estadio:"Estádio Azteca, Cidade do México"},
-  {data:"2026-06-11 22:00",fase:"Fase de Grupos",grupo:"B",casa:"Canadá",fora:"Bósnia e Herzegovina",golsCasa:null,golsFora:null,estadio:"BMO Field, Toronto"},
-  {data:"2026-06-12 16:00",fase:"Fase de Grupos",grupo:"D",casa:"Estados Unidos",fora:"Paraguai",golsCasa:null,golsFora:null,estadio:"AT&T Stadium, Arlington (TX)"},
-  {data:"2026-06-12 19:00",fase:"Fase de Grupos",grupo:"A",casa:"Coreia do Sul",fora:"República Tcheca",golsCasa:null,golsFora:null,estadio:"BC Place, Vancouver"},
-  {data:"2026-06-13 16:00",fase:"Fase de Grupos",grupo:"B",casa:"Catar",fora:"Suíça",golsCasa:null,golsFora:null,estadio:"Estádio BBVA, Monterrey"},
-  {data:"2026-06-13 19:00",fase:"Fase de Grupos",grupo:"C",casa:"Brasil",fora:"Marrocos",golsCasa:null,golsFora:null,estadio:"MetLife Stadium, Nova Jersey"},
-  {data:"2026-06-13 22:00",fase:"Fase de Grupos",grupo:"C",casa:"Haiti",fora:"Escócia",golsCasa:null,golsFora:null,estadio:"Lincoln Financial Field, Filadélfia"},
-  {data:"2026-06-14 01:00",fase:"Fase de Grupos",grupo:"D",casa:"Austrália",fora:"Turquia",golsCasa:null,golsFora:null,estadio:"Lumen Field, Seattle"},
-  {data:"2026-06-14 14:00",fase:"Fase de Grupos",grupo:"E",casa:"Alemanha",fora:"Curaçao",golsCasa:null,golsFora:null,estadio:"Mercedes-Benz Stadium, Atlanta"},
-  {data:"2026-06-14 17:00",fase:"Fase de Grupos",grupo:"F",casa:"Holanda",fora:"Japão",golsCasa:null,golsFora:null,estadio:"SoFi Stadium, Inglewood (L.A.)"},
-  {data:"2026-06-14 20:00",fase:"Fase de Grupos",grupo:"E",casa:"Costa do Marfim",fora:"Equador",golsCasa:null,golsFora:null,estadio:"Arrowhead Stadium, Kansas City"},
-  {data:"2026-06-14 23:00",fase:"Fase de Grupos",grupo:"F",casa:"Suécia",fora:"Tunísia",golsCasa:null,golsFora:null,estadio:"NRG Stadium, Houston"},
-  {data:"2026-06-15 13:00",fase:"Fase de Grupos",grupo:"H",casa:"Espanha",fora:"Arábia Saudita",golsCasa:null,golsFora:null,estadio:"Estádio Akron, Guadalajara"},
-  {data:"2026-06-15 16:00",fase:"Fase de Grupos",grupo:"G",casa:"Bélgica",fora:"Irã",golsCasa:null,golsFora:null,estadio:"Levi's Stadium, Santa Clara (S.F.)"},
-  {data:"2026-06-15 19:00",fase:"Fase de Grupos",grupo:"H",casa:"Uruguai",fora:"Cabo Verde",golsCasa:null,golsFora:null,estadio:"Gillette Stadium, Boston"},
-  {data:"2026-06-15 23:00",fase:"Fase de Grupos",grupo:"G",casa:"Nova Zelândia",fora:"Egito",golsCasa:null,golsFora:null,estadio:"Hard Rock Stadium, Miami"},
-  {data:"2026-06-16 14:00",fase:"Fase de Grupos",grupo:"J",casa:"Argentina",fora:"Áustria",golsCasa:null,golsFora:null,estadio:"MetLife Stadium, Nova Jersey"},
-  {data:"2026-06-16 18:00",fase:"Fase de Grupos",grupo:"I",casa:"França",fora:"Iraque",golsCasa:null,golsFora:null,estadio:"Estádio Azteca, Cidade do México"},
-  {data:"2026-06-16 21:00",fase:"Fase de Grupos",grupo:"I",casa:"Noruega",fora:"Senegal",golsCasa:null,golsFora:null,estadio:"AT&T Stadium, Arlington (TX)"},
-  {data:"2026-06-17 14:00",fase:"Fase de Grupos",grupo:"K",casa:"Portugal",fora:"Uzbequistão",golsCasa:null,golsFora:null,estadio:"Mercedes-Benz Stadium, Atlanta"},
-  {data:"2026-06-17 17:00",fase:"Fase de Grupos",grupo:"L",casa:"Inglaterra",fora:"Gana",golsCasa:null,golsFora:null,estadio:"NRG Stadium, Houston"},
-  {data:"2026-06-19 19:00",fase:"Fase de Grupos",grupo:"C",casa:"Escócia",fora:"Marrocos",golsCasa:null,golsFora:null,estadio:"AT&T Stadium, Arlington (TX)"},
-  {data:"2026-06-19 22:00",fase:"Fase de Grupos",grupo:"C",casa:"Brasil",fora:"Haiti",golsCasa:null,golsFora:null,estadio:"Lincoln Financial Field, Filadélfia"},
-  {data:"2026-06-24 19:00",fase:"Fase de Grupos",grupo:"C",casa:"Escócia",fora:"Brasil",golsCasa:null,golsFora:null,estadio:"Hard Rock Stadium, Miami"},
-  {data:"2026-07-01 17:00",fase:"16 avos de Final",casa:"1º Grupo A",fora:"3º melhor",golsCasa:null,golsFora:null,estadio:"AT&T Stadium, Arlington (TX)"},
-  {data:"2026-07-10 17:00",fase:"Oitavas de Final",casa:"Vencedor J1",fora:"Vencedor J2",golsCasa:null,golsFora:null,estadio:"AT&T Stadium, Arlington (TX)"},
-  {data:"2026-07-14 19:00",fase:"Quartas de Final",casa:"A definir",fora:"A definir",golsCasa:null,golsFora:null,estadio:"AT&T Stadium, Arlington (TX)"},
-  {data:"2026-07-15 19:00",fase:"Semifinal",casa:"A definir",fora:"A definir",golsCasa:null,golsFora:null,estadio:"Mercedes-Benz Stadium, Atlanta"},
-  {data:"2026-07-18 17:00",fase:"Terceiro Lugar",casa:"A definir",fora:"A definir",golsCasa:null,golsFora:null,estadio:"Hard Rock Stadium, Miami"},
-  {data:"2026-07-19 16:00",fase:"Final",casa:"A definir",fora:"A definir",golsCasa:null,golsFora:null,estadio:"MetLife Stadium, Nova Jersey"},
+  ...gerarJogosFaseGrupos(),
+  ...gerarJogosMataMata(72),
 ];
 
 // ═══ ESTÁDIOS ═══
