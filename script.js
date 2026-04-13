@@ -16,6 +16,7 @@ const isoCodes = {
   "Argentina":"ar","Argélia":"dz","Áustria":"at","Jordânia":"jo",
   "Portugal":"pt","RD do Congo":"cd","Uzbequistão":"uz","Colômbia":"co",
   "Inglaterra":"gb-eng","Croácia":"hr","Gana":"gh","Panamá":"pa",
+  "Itália":"it","Dinamarca":"dk",
 };
 
 const grupos = {
@@ -183,6 +184,41 @@ const fatosCopa = [
   {num:"8",label:"Jogos até o título",desc:"Um a mais que nas edições anteriores",cor:"var(--gold)"},
   {num:"87.523",label:"Estádio Azteca",desc:"Maior capacidade da Copa, palco da abertura",cor:"var(--green)"},
   {num:"1966",label:"Inaugurado em",desc:"O Azteca é o mais antigo estádio da Copa 2026",cor:"var(--muted)"},
+];
+
+// ——— RANKINGS ———
+const rankingFifa = [
+  { pos: 1, selecao: "França", pontos: "—", variacao: "↑2" },
+  { pos: 2, selecao: "Espanha", pontos: "—", variacao: "↓1" },
+  { pos: 3, selecao: "Argentina", pontos: "—", variacao: "↓1" },
+  { pos: 4, selecao: "Inglaterra", pontos: "—", variacao: "→0" },
+  { pos: 5, selecao: "Portugal", pontos: "—", variacao: "↑1" },
+  { pos: 6, selecao: "Brasil", pontos: "—", variacao: "↓1" },
+  { pos: 7, selecao: "Holanda", pontos: "—", variacao: "→0" },
+  { pos: 8, selecao: "Marrocos", pontos: "—", variacao: "→0" },
+  { pos: 9, selecao: "Bélgica", pontos: "—", variacao: "→0" },
+  { pos: 10, selecao: "Alemanha", pontos: "—", variacao: "→0" },
+  { pos: 11, selecao: "Croácia", pontos: "—", variacao: "→0" },
+  { pos: 12, selecao: "Itália", pontos: "—", variacao: "↑1" },
+  { pos: 13, selecao: "Colômbia", pontos: "—", variacao: "↑1" },
+  { pos: 14, selecao: "Senegal", pontos: "—", variacao: "↓2" },
+  { pos: 15, selecao: "México", pontos: "—", variacao: "↑1" },
+  { pos: 16, selecao: "Estados Unidos", pontos: "—", variacao: "↓1" },
+  { pos: 17, selecao: "Uruguai", pontos: "—", variacao: "→0" },
+  { pos: 18, selecao: "Japão", pontos: "—", variacao: "↑1" },
+  { pos: 19, selecao: "Suíça", pontos: "—", variacao: "↓1" },
+  { pos: 20, selecao: "Dinamarca", pontos: "—", variacao: "↑1" },
+];
+
+const rankingCampeoes = [
+  { selecao: "Brasil", titulos: 5, anos: "1958, 1962, 1970, 1994, 2002" },
+  { selecao: "Alemanha", titulos: 4, anos: "1954, 1974, 1990, 2014" },
+  { selecao: "Itália", titulos: 4, anos: "1934, 1938, 1982, 2006" },
+  { selecao: "Argentina", titulos: 3, anos: "1978, 1986, 2022" },
+  { selecao: "França", titulos: 2, anos: "1998, 2018" },
+  { selecao: "Uruguai", titulos: 2, anos: "1930, 1950" },
+  { selecao: "Inglaterra", titulos: 1, anos: "1966" },
+  { selecao: "Espanha", titulos: 1, anos: "2010" },
 ];
 
 // ——— JOGOS FASE DE GRUPOS (horário de Brasília) ———
@@ -583,6 +619,51 @@ function renderEstatisticas(){
 }
 
 // =============================================
+//  RENDER: RANKINGS
+// =============================================
+function variacaoClasse(variacao){
+  if(variacao.startsWith("↑")) return "up";
+  if(variacao.startsWith("↓")) return "down";
+  return "same";
+}
+
+function renderRankings(){
+  const fifaRoot=document.getElementById("fifa-ranking-list");
+  const campeoesRoot=document.getElementById("world-cup-winners-list");
+  if(!fifaRoot||!campeoesRoot) return;
+
+  fifaRoot.innerHTML=rankingFifa.map(item=>`
+    <li class="ranking-row">
+      <div class="ranking-left">
+        <span class="ranking-pos">#${item.pos}</span>
+        <span class="ranking-flag">${flag(item.selecao,22)}</span>
+        <span class="ranking-team">${item.selecao}</span>
+      </div>
+      <div class="ranking-right">
+        <span class="ranking-points">${item.pontos}</span>
+        <span class="ranking-move ${variacaoClasse(item.variacao)}">${item.variacao}</span>
+      </div>
+    </li>
+  `).join("");
+
+  campeoesRoot.innerHTML=rankingCampeoes
+    .sort((a,b)=>b.titulos-a.titulos||a.selecao.localeCompare(b.selecao))
+    .map((item,idx)=>`
+      <li class="ranking-row">
+        <div class="ranking-left">
+          <span class="ranking-pos">#${idx+1}</span>
+          <span class="ranking-flag">${flag(item.selecao,22)}</span>
+          <span class="ranking-team">${item.selecao}</span>
+        </div>
+        <div class="champions-meta">
+          <span class="champions-titles">${item.titulos} título${item.titulos>1?"s":""}</span>
+          <span class="champions-years">${item.anos}</span>
+        </div>
+      </li>
+    `).join("");
+}
+
+// =============================================
 //  TABS & INICIALIZAR
 // =============================================
 function iniciarTabs(){
@@ -613,6 +694,7 @@ function inicializar(){
   renderEstadios();
   renderFatos();
   renderEstatisticas();
+  renderRankings();
 }
 
 inicializar();

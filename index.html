@@ -30,6 +30,7 @@
       <button class="tab" data-tab="jogos">📅 Jogos</button>
       <button class="tab" data-tab="artilheiros">🥇 Artilheiros</button>
       <button class="tab" data-tab="copa">🏟️ Copa 2026</button>
+      <button class="tab" data-tab="ranking">🌍 Rankings</button>
       <button class="tab" data-tab="estatisticas">📊 Estatísticas</button>
     </nav>
 
@@ -139,6 +140,30 @@
         </div>
         <div class="facts-grid" id="facts-grid"></div>
 
+      </section>
+
+      <section class="tab-pane" id="tab-ranking">
+        <div class="rankings-grid">
+          <article class="ranking-panel">
+            <div class="ranking-panel-header">
+              <h2>Ranking FIFA Masculino</h2>
+              <p>Atualização: 1º de abril de 2026</p>
+            </div>
+            <ol id="fifa-ranking-list" class="ranking-list"></ol>
+            <p class="ranking-source">
+              Fonte: <a href="https://inside.fifa.com/fifa-world-ranking/men" target="_blank" rel="noopener noreferrer">FIFA</a>
+            </p>
+          </article>
+
+          <article class="ranking-panel">
+            <div class="ranking-panel-header">
+              <h2>Ranking de Campeões da Copa</h2>
+              <p>Total de títulos por seleção (1930-2022)</p>
+            </div>
+            <ol id="world-cup-winners-list" class="ranking-list"></ol>
+            <p class="ranking-source">Fonte: histórico da FIFA World Cup.</p>
+          </article>
+        </div>
       </section>
 
       <section class="tab-pane" id="tab-estatisticas">
