@@ -1037,22 +1037,6 @@ function salvarPlacarAPISeDisponivel(idx,api){
   }
 }
 
-function textoStatusAPI(api){
-  if(!api||!api.status)return"Dados automáticos ainda não consultados.";
-  if(api.status==="loading")return"Buscando dados automáticos na API...";
-  if(api.status==="ok")return`Dados automáticos via ${api.provider} · atualizado em ${new Date(api.fetchedAt).toLocaleString("pt-BR")}`;
-  if(api.status==="no-data")return api.message||"API sem dados detalhados para este jogo.";
-  return api.message||"Falha ao consultar API. Tente atualizar novamente.";
-}
-
-function classeStatusAPI(api){
-  if(!api||!api.status)return"is-idle";
-  if(api.status==="loading")return"is-loading";
-  if(api.status==="ok")return"is-ok";
-  if(api.status==="no-data")return"is-empty";
-  return"is-error";
-}
-
 function rotuloEventoPartida(tipo){
   if(tipo==="gol")return"Gol";
   if(tipo==="amarelo")return"Cartão amarelo";
@@ -1093,6 +1077,7 @@ function renderDetalhesJogo(idx){
   const eventos=[...eventosFonte].sort((a,b)=>minutoOrdenavel(a.minuto)-minutoOrdenavel(b.minuto));
   const placar=jogoTemPlacar(jogo)?`${jogo.golsCasa} × ${jogo.golsFora}`:"– × –";
   const statusPartida=jogoTemPlacar(jogo)?"Placar disponível":"Sem placar disponível";
+  const atualizacaoAutomatica=api?.fetchedAt?`Atualizado em ${new Date(api.fetchedAt).toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"})}`:"Atualizando automaticamente a cada 1 minuto.";
   const eventosHtml=eventos.length?eventos.map((evento)=>`<li class="match-event-item">
       <div class="match-event-main">
         <span class="match-event-minute">${evento.minuto}'</span>
@@ -1113,17 +1098,21 @@ function renderDetalhesJogo(idx){
     </div>
     <div class="match-detail-grid">
       <section class="match-detail-panel">
-        <h4>Eventos automáticos</h4>
+        <h4>Eventos da partida</h4>
         <ul class="match-events-list">${eventosHtml}</ul>
       </section>
       <section class="match-detail-panel">
-        <h4>Fonte de dados</h4>
-        <p class="api-status-chip ${classeStatusAPI(api)}">${textoStatusAPI(api)}</p>
-        <button class="api-sync-btn" onclick="sincronizarDetalhesJogoApi(${idx},true)">🔄 Atualizar dados da API</button>
-        ${api.resultText?`<p class="api-summary">${api.resultText}</p>`:"<p class='api-summary'>Quando houver narrativa oficial da partida, ela aparece aqui automaticamente.</p>"}
+        <h4>Resumo da partida</h4>
+        <p class="match-detail-note">${api.resultText||"Sem resumo disponível no momento. O sistema tenta atualizar automaticamente enquanto a janela estiver aberta."}</p>
+        <div class="match-detail-refresh-row">
+          <span class="match-detail-refresh">${atualizacaoAutomatica}</span>
+          <button class="api-sync-btn" onclick="sincronizarDetalhesJogoApi(${idx},true)">🔄 Atualizar agora</button>
+        </div>
       </section>
     </div>`;
 }
+
+let detalheJogoAutoRefreshHandle=null;
 
 async function sincronizarDetalhesJogoApi(idx,forcar=false){
   const jogo=getJogos()[idx];
@@ -1168,6 +1157,8 @@ function abrirDetalhesJogo(idx){
   renderDetalhesJogo(idx);
   document.getElementById("match-detail-overlay").classList.add("open");
   sincronizarDetalhesJogoApi(idx,false);
+  if(detalheJogoAutoRefreshHandle)clearInterval(detalheJogoAutoRefreshHandle);
+  detalheJogoAutoRefreshHandle=setInterval(()=>sincronizarDetalhesJogoApi(idx,true),60000);
 }
 
 // ═══════ TIMELINE ═══════
@@ -1404,8 +1395,16 @@ function initModals(){
   document.getElementById("stat-modal-overlay").addEventListener("click",e=>{if(e.target.id==="stat-modal-overlay")document.getElementById("stat-modal-overlay").classList.remove("open");});
   document.getElementById("score-modal-close").addEventListener("click",()=>document.getElementById("score-modal-overlay").classList.remove("open"));
   document.getElementById("score-modal-overlay").addEventListener("click",e=>{if(e.target.id==="score-modal-overlay")document.getElementById("score-modal-overlay").classList.remove("open");});
-  document.getElementById("match-detail-close").addEventListener("click",()=>document.getElementById("match-detail-overlay").classList.remove("open"));
-  document.getElementById("match-detail-overlay").addEventListener("click",e=>{if(e.target.id==="match-detail-overlay")document.getElementById("match-detail-overlay").classList.remove("open");});
+  document.getElementById("match-detail-close").addEventListener("click",()=>{
+    document.getElementById("match-detail-overlay").classList.remove("open");
+    if(detalheJogoAutoRefreshHandle){clearInterval(detalheJogoAutoRefreshHandle);detalheJogoAutoRefreshHandle=null;}
+  });
+  document.getElementById("match-detail-overlay").addEventListener("click",e=>{
+    if(e.target.id==="match-detail-overlay"){
+      document.getElementById("match-detail-overlay").classList.remove("open");
+      if(detalheJogoAutoRefreshHandle){clearInterval(detalheJogoAutoRefreshHandle);detalheJogoAutoRefreshHandle=null;}
+    }
+  });
   document.addEventListener("keydown",e=>{if(e.key==="Escape"){document.querySelectorAll(".modal-overlay").forEach(o=>o.classList.remove("open"));}});
   document.getElementById("btn-open-stat-modal").addEventListener("click",abrirStatModal);
   document.getElementById("theme-toggle").addEventListener("click",toggleTheme);
