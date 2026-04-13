@@ -1,483 +1,618 @@
 // =============================================
 //  COPA DO MUNDO 2026 — DADOS E LÓGICA
+//  Horários no fuso de Brasília (BRT = UTC-3)
 // =============================================
 
-// ISO codes para flagcdn.com
 const isoCodes = {
-  "México": "mx", "África do Sul": "za", "Coreia do Sul": "kr", "República Tcheca": "cz",
-  "Canadá": "ca", "Bósnia e Herzegovina": "ba", "Catar": "qa", "Suíça": "ch",
-  "Brasil": "br", "Marrocos": "ma", "Haiti": "ht", "Escócia": "gb-sct",
-  "Estados Unidos": "us", "Paraguai": "py", "Austrália": "au", "Turquia": "tr",
-  "Alemanha": "de", "Curaçao": "cw", "Costa do Marfim": "ci", "Equador": "ec",
-  "Holanda": "nl", "Japão": "jp", "Suécia": "se", "Tunísia": "tn",
-  "Bélgica": "be", "Egito": "eg", "Irã": "ir", "Nova Zelândia": "nz",
-  "Espanha": "es", "Cabo Verde": "cv", "Arábia Saudita": "sa", "Uruguai": "uy",
-  "França": "fr", "Senegal": "sn", "Iraque": "iq", "Noruega": "no",
-  "Argentina": "ar", "Argélia": "dz", "Áustria": "at", "Jordânia": "jo",
-  "Portugal": "pt", "RD do Congo": "cd", "Uzbequistão": "uz", "Colômbia": "co",
-  "Inglaterra": "gb-eng", "Croácia": "hr", "Gana": "gh", "Panamá": "pa",
+  "México":"mx","África do Sul":"za","Coreia do Sul":"kr","República Tcheca":"cz",
+  "Canadá":"ca","Bósnia e Herzegovina":"ba","Catar":"qa","Suíça":"ch",
+  "Brasil":"br","Marrocos":"ma","Haiti":"ht","Escócia":"gb-sct",
+  "Estados Unidos":"us","Paraguai":"py","Austrália":"au","Turquia":"tr",
+  "Alemanha":"de","Curaçao":"cw","Costa do Marfim":"ci","Equador":"ec",
+  "Holanda":"nl","Japão":"jp","Suécia":"se","Tunísia":"tn",
+  "Bélgica":"be","Egito":"eg","Irã":"ir","Nova Zelândia":"nz",
+  "Espanha":"es","Cabo Verde":"cv","Arábia Saudita":"sa","Uruguai":"uy",
+  "França":"fr","Senegal":"sn","Iraque":"iq","Noruega":"no",
+  "Argentina":"ar","Argélia":"dz","Áustria":"at","Jordânia":"jo",
+  "Portugal":"pt","RD do Congo":"cd","Uzbequistão":"uz","Colômbia":"co",
+  "Inglaterra":"gb-eng","Croácia":"hr","Gana":"gh","Panamá":"pa",
 };
-
-// Dados dos jogadores — edite para atualizar durante a Copa
-const jogadores = [
-  // { nome, selecao, gols, assists, amarelos, vermelhos }
-  { nome: "Vinicius Jr.", selecao: "Brasil", gols: 0, assists: 0, amarelos: 0, vermelhos: 0 },
-  { nome: "Erling Haaland", selecao: "Noruega", gols: 0, assists: 0, amarelos: 0, vermelhos: 0 },
-  { nome: "Kylian Mbappé", selecao: "França", gols: 0, assists: 0, amarelos: 0, vermelhos: 0 },
-  { nome: "Harry Kane", selecao: "Inglaterra", gols: 0, assists: 0, amarelos: 0, vermelhos: 0 },
-  { nome: "Lionel Messi", selecao: "Argentina", gols: 0, assists: 0, amarelos: 0, vermelhos: 0 },
-  { nome: "Cristiano Ronaldo", selecao: "Portugal", gols: 0, assists: 0, amarelos: 0, vermelhos: 0 },
-  { nome: "Lamine Yamal", selecao: "Espanha", gols: 0, assists: 0, amarelos: 0, vermelhos: 0 },
-  { nome: "Pedri", selecao: "Espanha", gols: 0, assists: 0, amarelos: 0, vermelhos: 0 },
-  { nome: "Jude Bellingham", selecao: "Inglaterra", gols: 0, assists: 0, amarelos: 0, vermelhos: 0 },
-  { nome: "Rodri", selecao: "Espanha", gols: 0, assists: 0, amarelos: 0, vermelhos: 0 },
-  { nome: "Florian Wirtz", selecao: "Alemanha", gols: 0, assists: 0, amarelos: 0, vermelhos: 0 },
-  { nome: "Jamal Musiala", selecao: "Alemanha", gols: 0, assists: 0, amarelos: 0, vermelhos: 0 },
-  { nome: "Raphinha", selecao: "Brasil", gols: 0, assists: 0, amarelos: 0, vermelhos: 0 },
-  { nome: "Rodrygo", selecao: "Brasil", gols: 0, assists: 0, amarelos: 0, vermelhos: 0 },
-  { nome: "Julian Alvarez", selecao: "Argentina", gols: 0, assists: 0, amarelos: 0, vermelhos: 0 },
-  { nome: "Pedri", selecao: "Espanha", gols: 0, assists: 0, amarelos: 0, vermelhos: 0 },
-  { nome: "Sofiane Boufal", selecao: "Marrocos", gols: 0, assists: 0, amarelos: 0, vermelhos: 0 },
-  { nome: "Sadio Mané", selecao: "Senegal", gols: 0, assists: 0, amarelos: 0, vermelhos: 0 },
-  { nome: "Darwin Núñez", selecao: "Uruguai", gols: 0, assists: 0, amarelos: 0, vermelhos: 0 },
-  { nome: "Cody Gakpo", selecao: "Holanda", gols: 0, assists: 0, amarelos: 0, vermelhos: 0 },
-];
 
 const grupos = {
-  A: ["México", "África do Sul", "Coreia do Sul", "República Tcheca"],
-  B: ["Canadá", "Bósnia e Herzegovina", "Catar", "Suíça"],
-  C: ["Brasil", "Marrocos", "Haiti", "Escócia"],
-  D: ["Estados Unidos", "Paraguai", "Austrália", "Turquia"],
-  E: ["Alemanha", "Curaçao", "Costa do Marfim", "Equador"],
-  F: ["Holanda", "Japão", "Suécia", "Tunísia"],
-  G: ["Bélgica", "Egito", "Irã", "Nova Zelândia"],
-  H: ["Espanha", "Cabo Verde", "Arábia Saudita", "Uruguai"],
-  I: ["França", "Senegal", "Iraque", "Noruega"],
-  J: ["Argentina", "Argélia", "Áustria", "Jordânia"],
-  K: ["Portugal", "RD do Congo", "Uzbequistão", "Colômbia"],
-  L: ["Inglaterra", "Croácia", "Gana", "Panamá"],
+  A:["México","África do Sul","Coreia do Sul","República Tcheca"],
+  B:["Canadá","Bósnia e Herzegovina","Catar","Suíça"],
+  C:["Brasil","Marrocos","Haiti","Escócia"],
+  D:["Estados Unidos","Paraguai","Austrália","Turquia"],
+  E:["Alemanha","Curaçao","Costa do Marfim","Equador"],
+  F:["Holanda","Japão","Suécia","Tunísia"],
+  G:["Bélgica","Egito","Irã","Nova Zelândia"],
+  H:["Espanha","Cabo Verde","Arábia Saudita","Uruguai"],
+  I:["França","Senegal","Iraque","Noruega"],
+  J:["Argentina","Argélia","Áustria","Jordânia"],
+  K:["Portugal","RD do Congo","Uzbequistão","Colômbia"],
+  L:["Inglaterra","Croácia","Gana","Panamá"],
 };
 
-const estadios = {
-  A: "Estadio Azteca, Cidade do México",
-  B: "BMO Field, Toronto",
-  C: "SoFi Stadium, Los Angeles",
-  D: "AT&T Stadium, Dallas",
-  E: "Allianz Field, Kansas City",
-  F: "MetLife Stadium, Nova Jersey",
-  G: "Hard Rock Stadium, Miami",
-  H: "Estadio Akron, Guadalajara",
-  I: "Levi's Stadium, San Francisco",
-  J: "BC Place, Vancouver",
-  K: "Lincoln Financial Field, Filadélfia",
-  L: "Gillette Stadium, Boston",
-};
-
-// Datas de início por grupo (aproximadas)
-const datasGrupo = {
-  A: ["2026-06-11", "2026-06-15", "2026-06-20"],
-  B: ["2026-06-12", "2026-06-16", "2026-06-21"],
-  C: ["2026-06-13", "2026-06-17", "2026-06-22"],
-  D: ["2026-06-13", "2026-06-17", "2026-06-22"],
-  E: ["2026-06-14", "2026-06-18", "2026-06-23"],
-  F: ["2026-06-14", "2026-06-18", "2026-06-23"],
-  G: ["2026-06-15", "2026-06-19", "2026-06-24"],
-  H: ["2026-06-15", "2026-06-19", "2026-06-24"],
-  I: ["2026-06-16", "2026-06-20", "2026-06-25"],
-  J: ["2026-06-16", "2026-06-20", "2026-06-25"],
-  K: ["2026-06-17", "2026-06-21", "2026-06-26"],
-  L: ["2026-06-17", "2026-06-21", "2026-06-26"],
-};
-
-// Gera jogos da fase de grupos
-function gerarJogosGrupo(grupo) {
-  const times = grupos[grupo];
-  const jogos = [];
-  const pares = [
-    [0, 1], [2, 3],  // rodada 1
-    [0, 2], [1, 3],  // rodada 2
-    [0, 3], [1, 2],  // rodada 3
-  ];
-  const horas = ["15:00", "19:00", "15:00", "19:00", "15:00", "19:00"];
-  pares.forEach(([i, j], idx) => {
-    const rodada = Math.floor(idx / 2) + 1;
-    jogos.push({
-      data: `${datasGrupo[grupo][Math.floor(idx / 2)]} ${horas[idx]}`,
-      fase: "Fase de Grupos",
-      grupo,
-      rodada,
-      casa: times[i],
-      fora: times[j],
-      golsCasa: null,
-      golsFora: null,
-      estadio: estadios[grupo],
-    });
-  });
-  return jogos;
-}
-
-// Jogos mata-mata (placeholder)
-const jogosMataMatа = [
-  { data: "2026-06-28 16:00", fase: "16 avos de Final", casa: "1A", fora: "3C/D/E", golsCasa: null, golsFora: null, estadio: "SoFi Stadium, Los Angeles" },
-  { data: "2026-06-29 16:00", fase: "16 avos de Final", casa: "1B", fora: "3A/C/D", golsCasa: null, golsFora: null, estadio: "MetLife Stadium, Nova Jersey" },
-  { data: "2026-06-29 20:00", fase: "16 avos de Final", casa: "1C", fora: "3A/B/F", golsCasa: null, golsFora: null, estadio: "AT&T Stadium, Dallas" },
-  { data: "2026-06-30 16:00", fase: "16 avos de Final", casa: "2A", fora: "2C", golsCasa: null, golsFora: null, estadio: "Estadio Azteca, Cidade do México" },
-  { data: "2026-06-30 20:00", fase: "16 avos de Final", casa: "1D", fora: "3B/E/F", golsCasa: null, golsFora: null, estadio: "Levi's Stadium, San Francisco" },
-  { data: "2026-07-01 16:00", fase: "16 avos de Final", casa: "1E", fora: "3A/B/C/D", golsCasa: null, golsFora: null, estadio: "Hard Rock Stadium, Miami" },
-  { data: "2026-07-01 20:00", fase: "16 avos de Final", casa: "2B", fora: "2D", golsCasa: null, golsFora: null, estadio: "BC Place, Vancouver" },
-  { data: "2026-07-02 16:00", fase: "16 avos de Final", casa: "1F", fora: "2E", golsCasa: null, golsFora: null, estadio: "Gillette Stadium, Boston" },
-  { data: "2026-07-02 20:00", fase: "16 avos de Final", casa: "1G", fora: "2H", golsCasa: null, golsFora: null, estadio: "BMO Field, Toronto" },
-  { data: "2026-07-03 16:00", fase: "16 avos de Final", casa: "1H", fora: "2G", golsCasa: null, golsFora: null, estadio: "Estadio Akron, Guadalajara" },
-  { data: "2026-07-03 20:00", fase: "16 avos de Final", casa: "2F", fora: "2I", golsCasa: null, golsFora: null, estadio: "Lincoln Financial Field, Filadélfia" },
-  { data: "2026-07-04 16:00", fase: "16 avos de Final", casa: "1I", fora: "3G/H/I", golsCasa: null, golsFora: null, estadio: "Allianz Field, Kansas City" },
-  { data: "2026-07-04 20:00", fase: "16 avos de Final", casa: "1J", fora: "2K", golsCasa: null, golsFora: null, estadio: "MetLife Stadium, Nova Jersey" },
-  { data: "2026-07-05 16:00", fase: "16 avos de Final", casa: "2J", fora: "2L", golsCasa: null, golsFora: null, estadio: "SoFi Stadium, Los Angeles" },
-  { data: "2026-07-05 20:00", fase: "16 avos de Final", casa: "1K", fora: "3J/K/L", golsCasa: null, golsFora: null, estadio: "AT&T Stadium, Dallas" },
-  { data: "2026-07-06 16:00", fase: "16 avos de Final", casa: "1L", fora: "2I", golsCasa: null, golsFora: null, estadio: "Hard Rock Stadium, Miami" },
-  { data: "2026-07-09 16:00", fase: "Oitavas de Final", casa: "Vencedor J1", fora: "Vencedor J2", golsCasa: null, golsFora: null, estadio: "MetLife Stadium, Nova Jersey" },
-  { data: "2026-07-10 16:00", fase: "Oitavas de Final", casa: "Vencedor J3", fora: "Vencedor J4", golsCasa: null, golsFora: null, estadio: "SoFi Stadium, Los Angeles" },
-  { data: "2026-07-11 16:00", fase: "Oitavas de Final", casa: "Vencedor J5", fora: "Vencedor J6", golsCasa: null, golsFora: null, estadio: "AT&T Stadium, Dallas" },
-  { data: "2026-07-12 16:00", fase: "Oitavas de Final", casa: "Vencedor J7", fora: "Vencedor J8", golsCasa: null, golsFora: null, estadio: "Hard Rock Stadium, Miami" },
-  { data: "2026-07-14 19:00", fase: "Quartas de Final", casa: "A definir", fora: "A definir", golsCasa: null, golsFora: null, estadio: "MetLife Stadium, Nova Jersey" },
-  { data: "2026-07-15 19:00", fase: "Quartas de Final", casa: "A definir", fora: "A definir", golsCasa: null, golsFora: null, estadio: "SoFi Stadium, Los Angeles" },
-  { data: "2026-07-16 19:00", fase: "Semifinal", casa: "A definir", fora: "A definir", golsCasa: null, golsFora: null, estadio: "AT&T Stadium, Dallas" },
-  { data: "2026-07-17 19:00", fase: "Semifinal", casa: "A definir", fora: "A definir", golsCasa: null, golsFora: null, estadio: "Hard Rock Stadium, Miami" },
-  { data: "2026-07-18 16:00", fase: "Terceiro Lugar", casa: "A definir", fora: "A definir", golsCasa: null, golsFora: null, estadio: "Hard Rock Stadium, Miami" },
-  { data: "2026-07-19 17:00", fase: "Final", casa: "A definir", fora: "A definir", golsCasa: null, golsFora: null, estadio: "MetLife Stadium, Nova Jersey" },
+// ——— JOGADORES ———
+const jogadores = [
+  {nome:"Vinicius Jr.",selecao:"Brasil",gols:0,assists:0,amarelos:0,vermelhos:0},
+  {nome:"Erling Haaland",selecao:"Noruega",gols:0,assists:0,amarelos:0,vermelhos:0},
+  {nome:"Kylian Mbappé",selecao:"França",gols:0,assists:0,amarelos:0,vermelhos:0},
+  {nome:"Harry Kane",selecao:"Inglaterra",gols:0,assists:0,amarelos:0,vermelhos:0},
+  {nome:"Lionel Messi",selecao:"Argentina",gols:0,assists:0,amarelos:0,vermelhos:0},
+  {nome:"Cristiano Ronaldo",selecao:"Portugal",gols:0,assists:0,amarelos:0,vermelhos:0},
+  {nome:"Lamine Yamal",selecao:"Espanha",gols:0,assists:0,amarelos:0,vermelhos:0},
+  {nome:"Jude Bellingham",selecao:"Inglaterra",gols:0,assists:0,amarelos:0,vermelhos:0},
+  {nome:"Florian Wirtz",selecao:"Alemanha",gols:0,assists:0,amarelos:0,vermelhos:0},
+  {nome:"Jamal Musiala",selecao:"Alemanha",gols:0,assists:0,amarelos:0,vermelhos:0},
+  {nome:"Raphinha",selecao:"Brasil",gols:0,assists:0,amarelos:0,vermelhos:0},
+  {nome:"Rodrygo",selecao:"Brasil",gols:0,assists:0,amarelos:0,vermelhos:0},
+  {nome:"Julian Alvarez",selecao:"Argentina",gols:0,assists:0,amarelos:0,vermelhos:0},
+  {nome:"Cody Gakpo",selecao:"Holanda",gols:0,assists:0,amarelos:0,vermelhos:0},
+  {nome:"Darwin Núñez",selecao:"Uruguai",gols:0,assists:0,amarelos:0,vermelhos:0},
+  {nome:"Sadio Mané",selecao:"Senegal",gols:0,assists:0,amarelos:0,vermelhos:0},
+  {nome:"Sofiane Boufal",selecao:"Marrocos",gols:0,assists:0,amarelos:0,vermelhos:0},
+  {nome:"Pedri",selecao:"Espanha",gols:0,assists:0,amarelos:0,vermelhos:0},
+  {nome:"Rodri",selecao:"Espanha",gols:0,assists:0,amarelos:0,vermelhos:0},
+  {nome:"Phil Foden",selecao:"Inglaterra",gols:0,assists:0,amarelos:0,vermelhos:0},
 ];
 
-// Monta array completo de jogos
+// ——— ESTÁDIOS ———
+const estadiosData = [
+  {
+    nome:"Estádio Azteca",cidade:"Cidade do México",pais:"México",bandeira:"mx",
+    capacidade:"87.523",jogos:5,gramado:"Natural (Bermuda)",inaugurado:"1966",
+    foto:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/EstadioAzteca.jpg/800px-EstadioAzteca.jpg",
+    fato:"O único estádio a sediar a abertura da Copa do Mundo três vezes (1970, 1986 e 2026). Palco do 'Gol do Século' de Maradona e do histórico México 0 × 0 União Soviética em 1970.",
+    destaque:"🎤 Abertura da Copa"
+  },
+  {
+    nome:"MetLife Stadium",cidade:"East Rutherford, Nova Jersey",pais:"EUA",bandeira:"us",
+    capacidade:"82.500",jogos:6,gramado:"FieldTurf (sintético)",inaugurado:"2010",
+    foto:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/MetLife_Stadium_Sep_13_2018.jpg/800px-MetLife_Stadium_Sep_13_2018.jpg",
+    fato:"Sediará a grande Final em 19 de julho. Localizado a poucos km de Manhattan, já recebeu Super Bowls e a final do Mundial de Clubes 2025. O grupo C (Brasil) estreia aqui.",
+    destaque:"🏆 Final da Copa"
+  },
+  {
+    nome:"AT&T Stadium",cidade:"Arlington, Texas",pais:"EUA",bandeira:"us",
+    capacidade:"92.100",jogos:9,gramado:"Natural (Bermuda Latitude 36)",inaugurado:"2009",
+    foto:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Cowboys_Stadium_Sep_2009.jpg/800px-Cowboys_Stadium_Sep_2009.jpg",
+    fato:"O maior estádio da Copa 2026 em capacidade. Possui teto retrátil e o maior telão interno do mundo — mais de 2.300 m² de telas 4K suspensas sobre o campo. Maior número de jogos: 9 partidas.",
+    destaque:"📺 Maior telão do mundo"
+  },
+  {
+    nome:"SoFi Stadium",cidade:"Inglewood, Califórnia",pais:"EUA",bandeira:"us",
+    capacidade:"70.240",jogos:7,gramado:"Natural (Kentucky Bluegrass)",inaugurado:"2020",
+    foto:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/SoFi_Stadium_2020.jpg/800px-SoFi_Stadium_2020.jpg",
+    fato:"A arena mais moderna da Copa. Inaugurada em 2020, possui telão oval flutuante de 6.500 m². Sediará os 16-avos de final e as oitavas. Está em Los Angeles, cidade com maior torcida latina dos EUA.",
+    destaque:"✨ Arena mais moderna"
+  },
+  {
+    nome:"Mercedes-Benz Stadium",cidade:"Atlanta, Geórgia",pais:"EUA",bandeira:"us",
+    capacidade:"71.000",jogos:8,gramado:"Natural (Bermuda Tifway 419)",inaugurado:"2017",
+    foto:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Mercedes-Benz_Stadium_interior_panoramic.jpg/800px-Mercedes-Benz_Stadium_interior_panoramic.jpg",
+    fato:"Sediará uma das semifinais. O teto retráctil em pétalas é uma maravilha de engenharia. Possui o maior painel de LED circular da América do Norte. Primeiro estádio na América com certificação LEED Platina.",
+    destaque:"🌿 LEED Platinum"
+  },
+  {
+    nome:"Hard Rock Stadium",cidade:"Miami, Flórida",pais:"EUA",bandeira:"us",
+    capacidade:"65.326",jogos:6,gramado:"Natural (Bermuda Celebration)",inaugurado:"1987",
+    foto:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Hard_Rock_Stadium_Aerial_2018.jpg/800px-Hard_Rock_Stadium_Aerial_2018.jpg",
+    fato:"Sediará a disputa pelo 3º lugar (18 jul) e jogos do Grupo C (Brasil). Em 2024 foi palco da Final da Copa América, com Argentina campeã. Reformado em 2016 com cobertura suspensa.",
+    destaque:"🥉 Disputa pelo 3º Lugar"
+  },
+  {
+    nome:"Levi's Stadium",cidade:"Santa Clara, Califórnia",pais:"EUA",bandeira:"us",
+    capacidade:"68.500",jogos:6,gramado:"Natural (Kentucky Bluegrass)",inaugurado:"2014",
+    foto:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Levi%27s_Stadium%2C_2014.jpg/800px-Levi%27s_Stadium%2C_2014.jpg",
+    fato:"Casa do San Francisco 49ers, no coração do Vale do Silício. Primeiro estádio dos EUA a ter energia 100% renovável. Sediará grupos e fase eliminatória.",
+    destaque:"♻️ Energia renovável"
+  },
+  {
+    nome:"Gillette Stadium",cidade:"Foxborough, Massachusetts",pais:"EUA",bandeira:"us",
+    capacidade:"65.878",jogos:7,gramado:"Natural (FieldTurf Revolution 360)",inaugurado:"2002",
+    foto:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Gillette_Stadium_aerial_photo.jpg/800px-Gillette_Stadium_aerial_photo.jpg",
+    fato:"Passou por reforma de US$250 mi em 2023, adicionando uma torre de 22 andares com mirante panorâmico e o maior telão curvo externo dos EUA. Jogos do Grupo C (Brasil) e uma quartas de final.",
+    destaque:"🗼 Torre panorâmica"
+  },
+  {
+    nome:"Lincoln Financial Field",cidade:"Filadélfia, Pensilvânia",pais:"EUA",bandeira:"us",
+    capacidade:"69.176",jogos:6,gramado:"Natural (FieldTurf)",inaugurado:"2003",
+    foto:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Lincoln_Financial_Field_09-06-2015.jpg/800px-Lincoln_Financial_Field_09-06-2015.jpg",
+    fato:"Brasil joga aqui contra o Haiti. Em 4 de julho (250 anos de independência dos EUA), sediará um jogo eliminatório. Na inauguração em 2003, Ronaldinho Gaúcho deu assistência para Patric Kluivert.",
+    destaque:"🇧🇷 Brasil x Haiti"
+  },
+  {
+    nome:"NRG Stadium",cidade:"Houston, Texas",pais:"EUA",bandeira:"us",
+    capacidade:"72.220",jogos:5,gramado:"Natural (Desso GrassMaster)",inaugurado:"2002",
+    foto:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/NRG_Stadium_Houston_Texas.jpg/800px-NRG_Stadium_Houston_Texas.jpg",
+    fato:"Único estádio coberto da Copa, com teto retrátil que protege do calor extremo do Texas. Sede de 5 Super Bowls. Houston é a cidade com maior população hispânica dos EUA.",
+    destaque:"☀️ Teto retrátil"
+  },
+  {
+    nome:"Arrowhead Stadium",cidade:"Kansas City, Missouri",pais:"EUA",bandeira:"us",
+    capacidade:"76.416",jogos:5,gramado:"Natural (Bermuda Tifway 419)",inaugurado:"1972",
+    foto:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Arrowhead_Stadium_%282016%29.jpg/800px-Arrowhead_Stadium_%282016%29.jpg",
+    fato:"Considerado o estádio mais barulhento do mundo — recordes Guinness de decibéis. Casa do Kansas City Chiefs, campeões do Super Bowl. Uma das atmosferas mais vibrantes para a Copa.",
+    destaque:"🔊 + barulhento do mundo"
+  },
+  {
+    nome:"Lumen Field",cidade:"Seattle, Washington",pais:"EUA",bandeira:"us",
+    capacidade:"69.000",jogos:5,gramado:"FieldTurf (sintético)",inaugurado:"2002",
+    foto:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Lumen_Field_2021.jpg/800px-Lumen_Field_2021.jpg",
+    fato:"Conhecida pela sua atmosfera única e pela 'Seahawks Nation', uma das torcidas mais ruidosas da NFL. Situa-se com vista para a baía de Elliott e para o Monte Rainier.",
+    destaque:"🏔️ Vista panorâmica"
+  },
+  {
+    nome:"BC Place",cidade:"Vancouver, Canadá",bandeira:"ca",pais:"Canadá",
+    capacidade:"54.500",jogos:7,gramado:"FieldTurf (sintético)",inaugurado:"1983",
+    foto:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/BCPlace-1.jpg/800px-BCPlace-1.jpg",
+    fato:"Sediou as cerimônias de abertura e encerramento das Olimpíadas de Inverno 2010 e a final da Copa do Mundo Feminina 2015. Possui o maior teto pneumático retrátil do mundo.",
+    destaque:"🍁 Copa Feminina 2015"
+  },
+  {
+    nome:"BMO Field",cidade:"Toronto, Canadá",bandeira:"ca",pais:"Canadá",
+    capacidade:"45.000",jogos:5,gramado:"Natural (híbrido)",inaugurado:"2007",
+    foto:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/BMO_Field_from_above.jpg/800px-BMO_Field_from_above.jpg",
+    fato:"Principal estádio de futebol do Canadá e casa do Toronto FC. Passa por ampliação especial para a Copa. Sediará a estreia do Canadá como anfitrião no dia 12 de junho.",
+    destaque:"🍁 Estreia do Canadá"
+  },
+  {
+    nome:"Estádio Akron",cidade:"Guadalajara, México",bandeira:"mx",pais:"México",
+    capacidade:"46.232",jogos:4,gramado:"Natural (Bermuda)",inaugurado:"2010",
+    foto:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Estadio_Akron_2023.jpg/800px-Estadio_Akron_2023.jpg",
+    fato:"Casa do Guadalajara (Chivas), o clube mais popular do México. Design futurista com fachada de pétalas de vidro. A segunda maior cidade do México recebe 4 jogos da fase de grupos.",
+    destaque:"🌺 Design futurista"
+  },
+  {
+    nome:"Estádio BBVA",cidade:"Monterrey, México",bandeira:"mx",pais:"México",
+    capacidade:"53.500",jogos:4,gramado:"Natural (Bermuda híbrida)",inaugurado:"2015",
+    foto:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/BBVA_Bancomer_Stadium_%282%29.jpg/800px-BBVA_Bancomer_Stadium_%282%29.jpg",
+    fato:"Apelidado de 'El Gigante de Acero', considerado o estádio mais sustentável das Américas. A Serra Madre Oriental serve de cenário natural ao fundo, criando uma vista cinematográfica única.",
+    destaque:"🏔️ Gigante de Aço"
+  },
+];
+
+// ——— FATOS DA COPA ———
+const fatosCopa = [
+  {num:"48",label:"Seleções",desc:"Maior número de times na história da Copa",cor:"var(--green)"},
+  {num:"104",label:"Partidas",desc:"40 a mais que a edição anterior (Qatar 2022)",cor:"var(--gold)"},
+  {num:"3",label:"Países-sede",desc:"Canadá, EUA e México — inédito na história",cor:"var(--accent)"},
+  {num:"16",label:"Cidades",desc:"11 nos EUA, 3 no México, 2 no Canadá",cor:"#c084fc"},
+  {num:"39",label:"Dias",desc:"De 11 de junho a 19 de julho de 2026",cor:"var(--red)"},
+  {num:"8",label:"Jogos até o título",desc:"Um a mais que nas edições anteriores",cor:"var(--gold)"},
+  {num:"87.523",label:"Estádio Azteca",desc:"Maior capacidade da Copa, palco da abertura",cor:"var(--green)"},
+  {num:"1966",label:"Inaugurado em",desc:"O Azteca é o mais antigo estádio da Copa 2026",cor:"var(--muted)"},
+];
+
+// ——— JOGOS FASE DE GRUPOS (horário de Brasília) ———
+// Fontes: ESPN, Lance, 365Scores, Olympics.com (confirmados)
 const jogos = [
-  ...Object.keys(grupos).flatMap(g => gerarJogosGrupo(g)),
-  ...jogosMataMatа,
+  // ——— RODADA 1 ———
+  // Grupo A
+  {data:"2026-06-11 16:00",fase:"Fase de Grupos",grupo:"A",casa:"México",fora:"África do Sul",golsCasa:null,golsFora:null,estadio:"Estádio Azteca, Cidade do México"},
+  {data:"2026-06-12 19:00",fase:"Fase de Grupos",grupo:"A",casa:"Coreia do Sul",fora:"República Tcheca",golsCasa:null,golsFora:null,estadio:"BC Place, Vancouver"},
+  // Grupo B
+  {data:"2026-06-11 22:00",fase:"Fase de Grupos",grupo:"B",casa:"Canadá",fora:"Bósnia e Herzegovina",golsCasa:null,golsFora:null,estadio:"BMO Field, Toronto"},
+  {data:"2026-06-13 16:00",fase:"Fase de Grupos",grupo:"B",casa:"Catar",fora:"Suíça",golsCasa:null,golsFora:null,estadio:"Estádio BBVA, Monterrey"},
+  // Grupo C
+  {data:"2026-06-13 19:00",fase:"Fase de Grupos",grupo:"C",casa:"Brasil",fora:"Marrocos",golsCasa:null,golsFora:null,estadio:"MetLife Stadium, Nova Jersey"},
+  {data:"2026-06-13 22:00",fase:"Fase de Grupos",grupo:"C",casa:"Haiti",fora:"Escócia",golsCasa:null,golsFora:null,estadio:"Lincoln Financial Field, Filadélfia"},
+  // Grupo D
+  {data:"2026-06-12 16:00",fase:"Fase de Grupos",grupo:"D",casa:"Estados Unidos",fora:"Paraguai",golsCasa:null,golsFora:null,estadio:"AT&T Stadium, Arlington (Texas)"},
+  {data:"2026-06-14 01:00",fase:"Fase de Grupos",grupo:"D",casa:"Austrália",fora:"Turquia",golsCasa:null,golsFora:null,estadio:"Lumen Field, Seattle"},
+  // Grupo E
+  {data:"2026-06-14 14:00",fase:"Fase de Grupos",grupo:"E",casa:"Alemanha",fora:"Curaçao",golsCasa:null,golsFora:null,estadio:"Mercedes-Benz Stadium, Atlanta"},
+  {data:"2026-06-14 20:00",fase:"Fase de Grupos",grupo:"E",casa:"Costa do Marfim",fora:"Equador",golsCasa:null,golsFora:null,estadio:"Arrowhead Stadium, Kansas City"},
+  // Grupo F
+  {data:"2026-06-14 17:00",fase:"Fase de Grupos",grupo:"F",casa:"Holanda",fora:"Japão",golsCasa:null,golsFora:null,estadio:"SoFi Stadium, Inglewood (L.A.)"},
+  {data:"2026-06-14 23:00",fase:"Fase de Grupos",grupo:"F",casa:"Suécia",fora:"Tunísia",golsCasa:null,golsFora:null,estadio:"NRG Stadium, Houston"},
+  // Grupo G
+  {data:"2026-06-15 16:00",fase:"Fase de Grupos",grupo:"G",casa:"Bélgica",fora:"Irã",golsCasa:null,golsFora:null,estadio:"Levi's Stadium, Santa Clara (S.F.)"},
+  {data:"2026-06-15 23:00",fase:"Fase de Grupos",grupo:"G",casa:"Nova Zelândia",fora:"Egito",golsCasa:null,golsFora:null,estadio:"Hard Rock Stadium, Miami"},
+  // Grupo H
+  {data:"2026-06-15 13:00",fase:"Fase de Grupos",grupo:"H",casa:"Espanha",fora:"Arábia Saudita",golsCasa:null,golsFora:null,estadio:"Estádio Akron, Guadalajara"},
+  {data:"2026-06-15 19:00",fase:"Fase de Grupos",grupo:"H",casa:"Uruguai",fora:"Cabo Verde",golsCasa:null,golsFora:null,estadio:"Gillette Stadium, Boston"},
+  // Grupo I
+  {data:"2026-06-16 18:00",fase:"Fase de Grupos",grupo:"I",casa:"França",fora:"Iraque",golsCasa:null,golsFora:null,estadio:"Estádio Azteca, Cidade do México"},
+  {data:"2026-06-16 21:00",fase:"Fase de Grupos",grupo:"I",casa:"Noruega",fora:"Senegal",golsCasa:null,golsFora:null,estadio:"AT&T Stadium, Arlington (Texas)"},
+  // Grupo J
+  {data:"2026-06-16 14:00",fase:"Fase de Grupos",grupo:"J",casa:"Argentina",fora:"Áustria",golsCasa:null,golsFora:null,estadio:"MetLife Stadium, Nova Jersey"},
+  {data:"2026-06-17 00:00",fase:"Fase de Grupos",grupo:"J",casa:"Jordânia",fora:"Argélia",golsCasa:null,golsFora:null,estadio:"SoFi Stadium, Inglewood (L.A.)"},
+  // Grupo K
+  {data:"2026-06-17 14:00",fase:"Fase de Grupos",grupo:"K",casa:"Portugal",fora:"Uzbequistão",golsCasa:null,golsFora:null,estadio:"Mercedes-Benz Stadium, Atlanta"},
+  {data:"2026-06-17 23:00",fase:"Fase de Grupos",grupo:"K",casa:"Colômbia",fora:"RD do Congo",golsCasa:null,golsFora:null,estadio:"BC Place, Vancouver"},
+  // Grupo L
+  {data:"2026-06-17 17:00",fase:"Fase de Grupos",grupo:"L",casa:"Inglaterra",fora:"Gana",golsCasa:null,golsFora:null,estadio:"NRG Stadium, Houston"},
+  {data:"2026-06-17 20:00",fase:"Fase de Grupos",grupo:"L",casa:"Panamá",fora:"Croácia",golsCasa:null,golsFora:null,estadio:"Arrowhead Stadium, Kansas City"},
+
+  // ——— RODADA 2 ———
+  // Grupo A
+  {data:"2026-06-18 14:00",fase:"Fase de Grupos",grupo:"A",casa:"México",fora:"Coreia do Sul",golsCasa:null,golsFora:null,estadio:"Estádio BBVA, Monterrey"},
+  {data:"2026-06-18 20:00",fase:"Fase de Grupos",grupo:"A",casa:"África do Sul",fora:"República Tcheca",golsCasa:null,golsFora:null,estadio:"Lumen Field, Seattle"},
+  // Grupo B
+  {data:"2026-06-18 17:00",fase:"Fase de Grupos",grupo:"B",casa:"Canadá",fora:"Catar",golsCasa:null,golsFora:null,estadio:"BMO Field, Toronto"},
+  {data:"2026-06-19 00:00",fase:"Fase de Grupos",grupo:"B",casa:"Bósnia e Herzegovina",fora:"Suíça",golsCasa:null,golsFora:null,estadio:"Gillette Stadium, Boston"},
+  // Grupo C
+  {data:"2026-06-19 19:00",fase:"Fase de Grupos",grupo:"C",casa:"Escócia",fora:"Marrocos",golsCasa:null,golsFora:null,estadio:"AT&T Stadium, Arlington (Texas)"},
+  {data:"2026-06-19 22:00",fase:"Fase de Grupos",grupo:"C",casa:"Brasil",fora:"Haiti",golsCasa:null,golsFora:null,estadio:"Lincoln Financial Field, Filadélfia"},
+  // Grupo D
+  {data:"2026-06-19 16:00",fase:"Fase de Grupos",grupo:"D",casa:"Estados Unidos",fora:"Austrália",golsCasa:null,golsFora:null,estadio:"SoFi Stadium, Inglewood (L.A.)"},
+  {data:"2026-06-20 01:00",fase:"Fase de Grupos",grupo:"D",casa:"Turquia",fora:"Paraguai",golsCasa:null,golsFora:null,estadio:"Estádio BBVA, Monterrey"},
+  // Grupo E
+  {data:"2026-06-20 17:00",fase:"Fase de Grupos",grupo:"E",casa:"Alemanha",fora:"Costa do Marfim",golsCasa:null,golsFora:null,estadio:"MetLife Stadium, Nova Jersey"},
+  {data:"2026-06-20 21:00",fase:"Fase de Grupos",grupo:"E",casa:"Curaçao",fora:"Equador",golsCasa:null,golsFora:null,estadio:"NRG Stadium, Houston"},
+  // Grupo F
+  {data:"2026-06-20 14:00",fase:"Fase de Grupos",grupo:"F",casa:"Holanda",fora:"Suécia",golsCasa:null,golsFora:null,estadio:"Mercedes-Benz Stadium, Atlanta"},
+  {data:"2026-06-21 01:00",fase:"Fase de Grupos",grupo:"F",casa:"Japão",fora:"Tunísia",golsCasa:null,golsFora:null,estadio:"Hard Rock Stadium, Miami"},
+  // Grupo G
+  {data:"2026-06-21 16:00",fase:"Fase de Grupos",grupo:"G",casa:"Bélgica",fora:"Nova Zelândia",golsCasa:null,golsFora:null,estadio:"Gillette Stadium, Boston"},
+  {data:"2026-06-21 23:00",fase:"Fase de Grupos",grupo:"G",casa:"Egito",fora:"Irã",golsCasa:null,golsFora:null,estadio:"BC Place, Vancouver"},
+  // Grupo H
+  {data:"2026-06-21 13:00",fase:"Fase de Grupos",grupo:"H",casa:"Espanha",fora:"Uruguai",golsCasa:null,golsFora:null,estadio:"Arrowhead Stadium, Kansas City"},
+  {data:"2026-06-21 19:00",fase:"Fase de Grupos",grupo:"H",casa:"Arábia Saudita",fora:"Cabo Verde",golsCasa:null,golsFora:null,estadio:"Levi's Stadium, Santa Clara (S.F.)"},
+  // Grupo I
+  {data:"2026-06-22 14:00",fase:"Fase de Grupos",grupo:"I",casa:"França",fora:"Noruega",golsCasa:null,golsFora:null,estadio:"Mercedes-Benz Stadium, Atlanta"},
+  {data:"2026-06-22 21:00",fase:"Fase de Grupos",grupo:"I",casa:"Iraque",fora:"Senegal",golsCasa:null,golsFora:null,estadio:"SoFi Stadium, Inglewood (L.A.)"},
+  // Grupo J
+  {data:"2026-06-22 18:00",fase:"Fase de Grupos",grupo:"J",casa:"Argentina",fora:"Jordânia",golsCasa:null,golsFora:null,estadio:"AT&T Stadium, Arlington (Texas)"},
+  {data:"2026-06-23 00:00",fase:"Fase de Grupos",grupo:"J",casa:"Argélia",fora:"Áustria",golsCasa:null,golsFora:null,estadio:"Lumen Field, Seattle"},
+  // Grupo K
+  {data:"2026-06-23 14:00",fase:"Fase de Grupos",grupo:"K",casa:"Portugal",fora:"Colômbia",golsCasa:null,golsFora:null,estadio:"Gillette Stadium, Boston"},
+  {data:"2026-06-23 23:00",fase:"Fase de Grupos",grupo:"K",casa:"RD do Congo",fora:"Uzbequistão",golsCasa:null,golsFora:null,estadio:"Arrowhead Stadium, Kansas City"},
+  // Grupo L
+  {data:"2026-06-23 17:00",fase:"Fase de Grupos",grupo:"L",casa:"Inglaterra",fora:"Panamá",golsCasa:null,golsFora:null,estadio:"MetLife Stadium, Nova Jersey"},
+  {data:"2026-06-23 20:00",fase:"Fase de Grupos",grupo:"L",casa:"Croácia",fora:"Gana",golsCasa:null,golsFora:null,estadio:"NRG Stadium, Houston"},
+
+  // ——— RODADA 3 (simultânea por grupo) ———
+  {data:"2026-06-24 22:00",fase:"Fase de Grupos",grupo:"A",casa:"México",fora:"República Tcheca",golsCasa:null,golsFora:null,estadio:"AT&T Stadium, Arlington (Texas)"},
+  {data:"2026-06-24 22:00",fase:"Fase de Grupos",grupo:"A",casa:"África do Sul",fora:"Coreia do Sul",golsCasa:null,golsFora:null,estadio:"Estádio Azteca, Cidade do México"},
+  {data:"2026-06-25 16:00",fase:"Fase de Grupos",grupo:"B",casa:"Canadá",fora:"Suíça",golsCasa:null,golsFora:null,estadio:"BMO Field, Toronto"},
+  {data:"2026-06-25 16:00",fase:"Fase de Grupos",grupo:"B",casa:"Bósnia e Herzegovina",fora:"Catar",golsCasa:null,golsFora:null,estadio:"BC Place, Vancouver"},
+  {data:"2026-06-24 19:00",fase:"Fase de Grupos",grupo:"C",casa:"Escócia",fora:"Brasil",golsCasa:null,golsFora:null,estadio:"Hard Rock Stadium, Miami"},
+  {data:"2026-06-24 19:00",fase:"Fase de Grupos",grupo:"C",casa:"Marrocos",fora:"Haiti",golsCasa:null,golsFora:null,estadio:"Levi's Stadium, Santa Clara (S.F.)"},
+  {data:"2026-06-25 22:00",fase:"Fase de Grupos",grupo:"D",casa:"Estados Unidos",fora:"Turquia",golsCasa:null,golsFora:null,estadio:"MetLife Stadium, Nova Jersey"},
+  {data:"2026-06-25 22:00",fase:"Fase de Grupos",grupo:"D",casa:"Paraguai",fora:"Austrália",golsCasa:null,golsFora:null,estadio:"NRG Stadium, Houston"},
+  {data:"2026-06-26 16:00",fase:"Fase de Grupos",grupo:"E",casa:"Alemanha",fora:"Equador",golsCasa:null,golsFora:null,estadio:"Mercedes-Benz Stadium, Atlanta"},
+  {data:"2026-06-26 16:00",fase:"Fase de Grupos",grupo:"E",casa:"Curaçao",fora:"Costa do Marfim",golsCasa:null,golsFora:null,estadio:"Arrowhead Stadium, Kansas City"},
+  {data:"2026-06-26 19:00",fase:"Fase de Grupos",grupo:"F",casa:"Holanda",fora:"Tunísia",golsCasa:null,golsFora:null,estadio:"AT&T Stadium, Arlington (Texas)"},
+  {data:"2026-06-26 19:00",fase:"Fase de Grupos",grupo:"F",casa:"Japão",fora:"Suécia",golsCasa:null,golsFora:null,estadio:"Levi's Stadium, Santa Clara (S.F.)"},
+  {data:"2026-06-27 16:00",fase:"Fase de Grupos",grupo:"G",casa:"Bélgica",fora:"Egito",golsCasa:null,golsFora:null,estadio:"SoFi Stadium, Inglewood (L.A.)"},
+  {data:"2026-06-27 16:00",fase:"Fase de Grupos",grupo:"G",casa:"Irã",fora:"Nova Zelândia",golsCasa:null,golsFora:null,estadio:"Arrowhead Stadium, Kansas City"},
+  {data:"2026-06-27 19:00",fase:"Fase de Grupos",grupo:"H",casa:"Espanha",fora:"Cabo Verde",golsCasa:null,golsFora:null,estadio:"Gillette Stadium, Boston"},
+  {data:"2026-06-27 19:00",fase:"Fase de Grupos",grupo:"H",casa:"Arábia Saudita",fora:"Uruguai",golsCasa:null,golsFora:null,estadio:"Estádio BBVA, Monterrey"},
+  {data:"2026-06-28 16:00",fase:"Fase de Grupos",grupo:"I",casa:"França",fora:"Senegal",golsCasa:null,golsFora:null,estadio:"NRG Stadium, Houston"},
+  {data:"2026-06-28 16:00",fase:"Fase de Grupos",grupo:"I",casa:"Iraque",fora:"Noruega",golsCasa:null,golsFora:null,estadio:"Estádio BBVA, Monterrey"},
+  {data:"2026-06-28 19:00",fase:"Fase de Grupos",grupo:"J",casa:"Argentina",fora:"Argélia",golsCasa:null,golsFora:null,estadio:"MetLife Stadium, Nova Jersey"},
+  {data:"2026-06-28 19:00",fase:"Fase de Grupos",grupo:"J",casa:"Áustria",fora:"Jordânia",golsCasa:null,golsFora:null,estadio:"Mercedes-Benz Stadium, Atlanta"},
+  {data:"2026-06-29 16:00",fase:"Fase de Grupos",grupo:"K",casa:"Portugal",fora:"RD do Congo",golsCasa:null,golsFora:null,estadio:"SoFi Stadium, Inglewood (L.A.)"},
+  {data:"2026-06-29 16:00",fase:"Fase de Grupos",grupo:"K",casa:"Uzbequistão",fora:"Colômbia",golsCasa:null,golsFora:null,estadio:"BC Place, Vancouver"},
+  {data:"2026-06-29 19:00",fase:"Fase de Grupos",grupo:"L",casa:"Inglaterra",fora:"Croácia",golsCasa:null,golsFora:null,estadio:"AT&T Stadium, Arlington (Texas)"},
+  {data:"2026-06-29 19:00",fase:"Fase de Grupos",grupo:"L",casa:"Gana",fora:"Panamá",golsCasa:null,golsFora:null,estadio:"Lumen Field, Seattle"},
+
+  // ——— 16 AVOS DE FINAL ———
+  {data:"2026-07-01 17:00",fase:"16 avos de Final",casa:"1º Grupo A",fora:"3º melhor",golsCasa:null,golsFora:null,estadio:"AT&T Stadium, Arlington (Texas)"},
+  {data:"2026-07-01 21:00",fase:"16 avos de Final",casa:"1º Grupo B",fora:"3º melhor",golsCasa:null,golsFora:null,estadio:"SoFi Stadium, Inglewood (L.A.)"},
+  {data:"2026-07-02 17:00",fase:"16 avos de Final",casa:"1º Grupo C",fora:"3º melhor",golsCasa:null,golsFora:null,estadio:"MetLife Stadium, Nova Jersey"},
+  {data:"2026-07-02 21:00",fase:"16 avos de Final",casa:"2º Grupo A",fora:"2º Grupo C",golsCasa:null,golsFora:null,estadio:"Mercedes-Benz Stadium, Atlanta"},
+  {data:"2026-07-03 17:00",fase:"16 avos de Final",casa:"1º Grupo D",fora:"3º melhor",golsCasa:null,golsFora:null,estadio:"NRG Stadium, Houston"},
+  {data:"2026-07-03 21:00",fase:"16 avos de Final",casa:"2º Grupo B",fora:"2º Grupo D",golsCasa:null,golsFora:null,estadio:"Gillette Stadium, Boston"},
+  {data:"2026-07-04 17:00",fase:"16 avos de Final",casa:"1º Grupo E",fora:"3º melhor",golsCasa:null,golsFora:null,estadio:"Lincoln Financial Field, Filadélfia"},
+  {data:"2026-07-04 21:00",fase:"16 avos de Final",casa:"2º Grupo E",fora:"2º Grupo F",golsCasa:null,golsFora:null,estadio:"Arrowhead Stadium, Kansas City"},
+  {data:"2026-07-05 17:00",fase:"16 avos de Final",casa:"1º Grupo F",fora:"3º melhor",golsCasa:null,golsFora:null,estadio:"Levi's Stadium, Santa Clara (S.F.)"},
+  {data:"2026-07-05 21:00",fase:"16 avos de Final",casa:"1º Grupo G",fora:"3º melhor",golsCasa:null,golsFora:null,estadio:"Hard Rock Stadium, Miami"},
+  {data:"2026-07-06 17:00",fase:"16 avos de Final",casa:"1º Grupo H",fora:"2º Grupo G",golsCasa:null,golsFora:null,estadio:"BC Place, Vancouver"},
+  {data:"2026-07-06 21:00",fase:"16 avos de Final",casa:"2º Grupo H",fora:"1º Grupo I",golsCasa:null,golsFora:null,estadio:"Lumen Field, Seattle"},
+  {data:"2026-07-07 17:00",fase:"16 avos de Final",casa:"1º Grupo J",fora:"3º melhor",golsCasa:null,golsFora:null,estadio:"AT&T Stadium, Arlington (Texas)"},
+  {data:"2026-07-07 21:00",fase:"16 avos de Final",casa:"2º Grupo I",fora:"2º Grupo J",golsCasa:null,golsFora:null,estadio:"SoFi Stadium, Inglewood (L.A.)"},
+  {data:"2026-07-08 17:00",fase:"16 avos de Final",casa:"1º Grupo K",fora:"3º melhor",golsCasa:null,golsFora:null,estadio:"MetLife Stadium, Nova Jersey"},
+  {data:"2026-07-08 21:00",fase:"16 avos de Final",casa:"1º Grupo L",fora:"2º Grupo K",golsCasa:null,golsFora:null,estadio:"Mercedes-Benz Stadium, Atlanta"},
+
+  // ——— OITAVAS DE FINAL ———
+  {data:"2026-07-10 17:00",fase:"Oitavas de Final",casa:"Vencedor J1",fora:"Vencedor J2",golsCasa:null,golsFora:null,estadio:"AT&T Stadium, Arlington (Texas)"},
+  {data:"2026-07-10 21:00",fase:"Oitavas de Final",casa:"Vencedor J3",fora:"Vencedor J4",golsCasa:null,golsFora:null,estadio:"SoFi Stadium, Inglewood (L.A.)"},
+  {data:"2026-07-11 17:00",fase:"Oitavas de Final",casa:"Vencedor J5",fora:"Vencedor J6",golsCasa:null,golsFora:null,estadio:"MetLife Stadium, Nova Jersey"},
+  {data:"2026-07-11 21:00",fase:"Oitavas de Final",casa:"Vencedor J7",fora:"Vencedor J8",golsCasa:null,golsFora:null,estadio:"Mercedes-Benz Stadium, Atlanta"},
+  {data:"2026-07-12 17:00",fase:"Oitavas de Final",casa:"Vencedor J9",fora:"Vencedor J10",golsCasa:null,golsFora:null,estadio:"NRG Stadium, Houston"},
+  {data:"2026-07-12 21:00",fase:"Oitavas de Final",casa:"Vencedor J11",fora:"Vencedor J12",golsCasa:null,golsFora:null,estadio:"Gillette Stadium, Boston"},
+  {data:"2026-07-13 17:00",fase:"Oitavas de Final",casa:"Vencedor J13",fora:"Vencedor J14",golsCasa:null,golsFora:null,estadio:"Lincoln Financial Field, Filadélfia"},
+  {data:"2026-07-13 21:00",fase:"Oitavas de Final",casa:"Vencedor J15",fora:"Vencedor J16",golsCasa:null,golsFora:null,estadio:"Arrowhead Stadium, Kansas City"},
+
+  // ——— QUARTAS ———
+  {data:"2026-07-16 19:00",fase:"Quartas de Final",casa:"A definir",fora:"A definir",golsCasa:null,golsFora:null,estadio:"AT&T Stadium, Arlington (Texas)"},
+  {data:"2026-07-16 22:00",fase:"Quartas de Final",casa:"A definir",fora:"A definir",golsCasa:null,golsFora:null,estadio:"SoFi Stadium, Inglewood (L.A.)"},
+  {data:"2026-07-17 19:00",fase:"Quartas de Final",casa:"A definir",fora:"A definir",golsCasa:null,golsFora:null,estadio:"MetLife Stadium, Nova Jersey"},
+  {data:"2026-07-17 22:00",fase:"Quartas de Final",casa:"A definir",fora:"A definir",golsCasa:null,golsFora:null,estadio:"Mercedes-Benz Stadium, Atlanta"},
+
+  // ——— SEMIFINAIS ———
+  {data:"2026-07-14 19:00",fase:"Semifinal",casa:"A definir",fora:"A definir",golsCasa:null,golsFora:null,estadio:"Mercedes-Benz Stadium, Atlanta"},
+  {data:"2026-07-15 20:00",fase:"Semifinal",casa:"A definir",fora:"A definir",golsCasa:null,golsFora:null,estadio:"AT&T Stadium, Arlington (Texas)"},
+
+  // ——— TERCEIRO LUGAR e FINAL ———
+  {data:"2026-07-18 17:00",fase:"Terceiro Lugar",casa:"A definir",fora:"A definir",golsCasa:null,golsFora:null,estadio:"Hard Rock Stadium, Miami"},
+  {data:"2026-07-19 16:00",fase:"Final",casa:"A definir",fora:"A definir",golsCasa:null,golsFora:null,estadio:"MetLife Stadium, Nova Jersey"},
 ];
 
-// ——— UTILS ——————————————————————————————————
-
-function flag(time, size = 24) {
-  const code = isoCodes[time];
-  if (!code) return `<span style="font-size:${size}px">🏳️</span>`;
-  return `<img src="https://flagcdn.com/w40/${code}.png" alt="${time}" class="flag-img" style="width:${size}px;height:${Math.round(size*0.67)}px;object-fit:cover;border-radius:3px;vertical-align:middle;flex-shrink:0">`;
+// =============================================
+//  UTILS
+// =============================================
+function flag(time,size=24){
+  const code=isoCodes[time];
+  if(!code)return`<span style="font-size:${size}px;line-height:1">🏳️</span>`;
+  return`<img src="https://flagcdn.com/w40/${code}.png" alt="${time}" class="flag-img" style="width:${size}px;height:${Math.round(size*.67)}px;object-fit:cover;border-radius:3px">`;
+}
+function jogoTemPlacar(j){return Number.isFinite(j.golsCasa)&&Number.isFinite(j.golsFora);}
+function formatarData(t){const d=new Date(t.replace(" ","T"));return new Intl.DateTimeFormat("pt-BR",{dateStyle:"short",timeStyle:"short"}).format(d);}
+function formatarDia(t){const d=new Date(t.split(" ")[0]+"T12:00:00");return{dia:d.getDate().toString().padStart(2,"0"),mes:d.toLocaleString("pt-BR",{month:"short"}).replace(".","").toUpperCase()};}
+function phaseBadgeClass(fase){
+  if(fase==="Fase de Grupos")return"grupos";
+  if(fase.includes("16 avos"))return"avos";
+  if(fase.includes("Oitavas"))return"oitavas";
+  if(fase.includes("Quartas"))return"quartas";
+  if(fase.includes("Semi"))return"semi";
+  if(fase==="Final"||fase.includes("Terceiro"))return"final";
+  return"";
 }
 
-function jogoTemPlacar(jogo) {
-  return Number.isFinite(jogo.golsCasa) && Number.isFinite(jogo.golsFora);
-}
-
-function formatarData(dataTexto) {
-  const d = new Date(dataTexto.replace(" ", "T") + "-03:00");
-  return new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short" }).format(d);
-}
-
-function formatarDia(dataTexto) {
-  const d = new Date(dataTexto.split(" ")[0] + "T12:00:00");
-  return {
-    dia: d.getDate().toString().padStart(2, "0"),
-    mes: d.toLocaleString("pt-BR", { month: "short" }).replace(".", "").toUpperCase(),
-  };
-}
-
-function phaseBadgeClass(fase) {
-  if (fase === "Fase de Grupos") return "grupos";
-  if (fase.includes("16 avos")) return "oitavas";
-  if (fase.includes("Oitavas")) return "oitavas";
-  if (fase.includes("Quartas")) return "quartas";
-  if (fase.includes("Semi")) return "semi";
-  if (fase === "Final" || fase === "Terceiro") return "final";
-  return "";
-}
-
-// ——— CLASSIFICAÇÃO ———————————————————————————
-
-function calcularClassificacaoGrupo(grupo) {
-  const times = grupos[grupo] || [];
-  const tabela = {};
-  times.forEach(t => {
-    tabela[t] = { time: t, jogos: 0, vitorias: 0, empates: 0, derrotas: 0, golsPro: 0, golsContra: 0, saldo: 0, pontos: 0 };
+// =============================================
+//  CLASSIFICAÇÃO
+// =============================================
+function calcularClassificacaoGrupo(grupo){
+  const times=grupos[grupo]||[];
+  const tabela={};
+  times.forEach(t=>{tabela[t]={time:t,jogos:0,vitorias:0,empates:0,derrotas:0,golsPro:0,golsContra:0,saldo:0,pontos:0};});
+  jogos.filter(j=>j.fase==="Fase de Grupos"&&j.grupo===grupo).forEach(j=>{
+    if(!jogoTemPlacar(j))return;
+    const ca=tabela[j.casa],fo=tabela[j.fora];
+    ca.jogos++;fo.jogos++;
+    ca.golsPro+=j.golsCasa;ca.golsContra+=j.golsFora;
+    fo.golsPro+=j.golsFora;fo.golsContra+=j.golsCasa;
+    if(j.golsCasa>j.golsFora){ca.vitorias++;ca.pontos+=3;fo.derrotas++;}
+    else if(j.golsCasa<j.golsFora){fo.vitorias++;fo.pontos+=3;ca.derrotas++;}
+    else{ca.empates++;fo.empates++;ca.pontos++;fo.pontos++;}
   });
-
-  jogos.filter(j => j.fase === "Fase de Grupos" && j.grupo === grupo)
-    .forEach(j => {
-      if (!jogoTemPlacar(j)) return;
-      const ca = tabela[j.casa], fo = tabela[j.fora];
-      ca.jogos++; fo.jogos++;
-      ca.golsPro += j.golsCasa; ca.golsContra += j.golsFora;
-      fo.golsPro += j.golsFora; fo.golsContra += j.golsCasa;
-      if (j.golsCasa > j.golsFora) { ca.vitorias++; ca.pontos += 3; fo.derrotas++; }
-      else if (j.golsCasa < j.golsFora) { fo.vitorias++; fo.pontos += 3; ca.derrotas++; }
-      else { ca.empates++; fo.empates++; ca.pontos++; fo.pontos++; }
-    });
-
-  return Object.values(tabela)
-    .map(l => ({ ...l, saldo: l.golsPro - l.golsContra }))
-    .sort((a, b) => b.pontos - a.pontos || b.saldo - a.saldo || b.golsPro - a.golsPro || a.time.localeCompare(b.time));
+  return Object.values(tabela).map(l=>({...l,saldo:l.golsPro-l.golsContra}))
+    .sort((a,b)=>b.pontos-a.pontos||b.saldo-a.saldo||b.golsPro-a.golsPro||a.time.localeCompare(b.time));
 }
 
-// ——— RENDER: GROUPS GRID ————————————————————
-
-function renderGrupos() {
-  const grid = document.getElementById("groups-grid");
-  grid.innerHTML = Object.keys(grupos).map(g => {
-    const classificacao = calcularClassificacaoGrupo(g);
-    const teamsHTML = classificacao.map(linha => `
+// =============================================
+//  RENDER: GRUPOS
+// =============================================
+function renderGrupos(){
+  const grid=document.getElementById("groups-grid");
+  grid.innerHTML=Object.keys(grupos).map(g=>{
+    const cl=calcularClassificacaoGrupo(g);
+    const html=cl.map(l=>`
       <div class="team-row">
-        <span class="team-flag">${flag(linha.time, 26)}</span>
-        <span class="team-name-card">${linha.time}</span>
-        <span class="team-pts">${linha.pontos}</span>
-      </div>
-    `).join("");
-
-    return `
-      <div class="group-card" data-grupo="${g}">
-        <div class="group-header">
-          <span class="group-label">Grupo ${g}</span>
-          <span class="group-expand">Ver tabela →</span>
-        </div>
-        <div class="group-teams">${teamsHTML}</div>
-      </div>
-    `;
+        <span class="team-flag">${flag(l.time,26)}</span>
+        <span class="team-name-card">${l.time}</span>
+        <span class="team-pts">${l.pontos}</span>
+      </div>`).join("");
+    return`<div class="group-card" data-grupo="${g}">
+      <div class="group-header"><span class="group-label">Grupo ${g}</span><span class="group-expand">Ver tabela →</span></div>
+      <div class="group-teams">${html}</div>
+    </div>`;
   }).join("");
-
-  grid.querySelectorAll(".group-card").forEach(card => {
-    card.addEventListener("click", () => abrirModalGrupo(card.dataset.grupo));
-  });
+  grid.querySelectorAll(".group-card").forEach(c=>c.addEventListener("click",()=>abrirModalGrupo(c.dataset.grupo)));
 }
 
-// ——— MODAL GRUPO ————————————————————————————
-
-function abrirModalGrupo(grupo) {
-  const overlay = document.getElementById("modal-overlay");
-  const content = document.getElementById("modal-content");
-
-  const classificacao = calcularClassificacaoGrupo(grupo);
-  const jogosGrupo = jogos.filter(j => j.fase === "Fase de Grupos" && j.grupo === grupo);
-
-  const rowsHTML = classificacao.map((l, i) => `
-    <tr>
-      <td>${i + 1}</td>
-      <td style="display:flex;align-items:center;gap:0.5rem">${flag(l.time, 20)} ${l.time}</td>
-      <td>${l.jogos}</td>
-      <td>${l.vitorias}</td>
-      <td>${l.empates}</td>
-      <td>${l.derrotas}</td>
-      <td>${l.golsPro}</td>
-      <td>${l.golsContra}</td>
-      <td>${l.saldo >= 0 ? "+" : ""}${l.saldo}</td>
-      <td class="pts-cell">${l.pontos}</td>
-    </tr>
-  `).join("");
-
-  const matchesHTML = jogosGrupo.map(j => {
-    const placar = jogoTemPlacar(j) ? `${j.golsCasa} – ${j.golsFora}` : null;
-    return `
-      <div class="modal-match">
-        <div class="match-teams">${flag(j.casa, 18)} ${j.casa} <span style="color:var(--muted);font-weight:400">vs</span> ${flag(j.fora, 18)} ${j.fora}</div>
-        <span class="match-score-badge ${placar ? '' : 'pending'}">${placar || formatarData(j.data)}</span>
-      </div>
-    `;
+// =============================================
+//  MODAL GRUPO
+// =============================================
+function abrirModalGrupo(grupo){
+  const overlay=document.getElementById("modal-overlay");
+  const content=document.getElementById("modal-content");
+  const cl=calcularClassificacaoGrupo(grupo);
+  const jg=jogos.filter(j=>j.fase==="Fase de Grupos"&&j.grupo===grupo);
+  const rows=cl.map((l,i)=>`<tr>
+    <td>${i+1}</td>
+    <td style="display:flex;align-items:center;gap:.5rem">${flag(l.time,20)} ${l.time}</td>
+    <td>${l.jogos}</td><td>${l.vitorias}</td><td>${l.empates}</td><td>${l.derrotas}</td>
+    <td>${l.golsPro}</td><td>${l.golsContra}</td>
+    <td>${l.saldo>=0?"+":""}${l.saldo}</td>
+    <td class="pts-cell">${l.pontos}</td>
+  </tr>`).join("");
+  const matches=jg.map(j=>{
+    const sc=jogoTemPlacar(j)?`${j.golsCasa}–${j.golsFora}`:null;
+    return`<div class="modal-match">
+      <div class="match-teams">${flag(j.casa,18)} ${j.casa} <span style="color:var(--muted);font-weight:400">vs</span> ${flag(j.fora,18)} ${j.fora}</div>
+      <span class="match-score-badge ${sc?"":"pending"}">${sc||formatarData(j.data)}</span>
+    </div>`;
   }).join("");
-
-  content.innerHTML = `
-    <div class="modal-title">⚽ Grupo ${grupo}</div>
-    <table>
-      <thead>
-        <tr>
-          <th>#</th><th>Seleção</th><th>J</th><th>V</th><th>E</th><th>D</th><th>GP</th><th>GC</th><th>SG</th><th>Pts</th>
-        </tr>
-      </thead>
-      <tbody>${rowsHTML}</tbody>
-    </table>
-    <div class="modal-jogos">
-      <h4>Jogos do grupo</h4>
-      ${matchesHTML}
-    </div>
-  `;
-
+  content.innerHTML=`<div class="modal-title">⚽ Grupo ${grupo}</div>
+    <table><thead><tr><th>#</th><th>Seleção</th><th>J</th><th>V</th><th>E</th><th>D</th><th>GP</th><th>GC</th><th>SG</th><th>Pts</th></tr></thead><tbody>${rows}</tbody></table>
+    <div class="modal-jogos"><h4>Jogos do grupo</h4>${matches}</div>`;
   overlay.classList.add("open");
 }
 
-// ——— RENDER: JOGOS ——————————————————————————
-
-function renderJogos() {
-  const fase = document.getElementById("fase-select").value;
-  const termo = document.getElementById("search-time").value.trim().toLowerCase();
-
-  const filtrados = jogos.filter(j => {
-    const faseOk = fase === "Todas" || j.fase === fase;
-    const buscaOk = !termo || j.casa.toLowerCase().includes(termo) || j.fora.toLowerCase().includes(termo);
-    return faseOk && buscaOk;
+// =============================================
+//  RENDER: JOGOS
+// =============================================
+function renderJogos(){
+  const fase=document.getElementById("fase-select").value;
+  const termo=document.getElementById("search-time").value.trim().toLowerCase();
+  const filtrados=jogos.filter(j=>{
+    const faseOk=fase==="Todas"||j.fase===fase;
+    const buscaOk=!termo||j.casa.toLowerCase().includes(termo)||j.fora.toLowerCase().includes(termo);
+    return faseOk&&buscaOk;
   });
-
-  const list = document.getElementById("matches-list");
-
-  if (!filtrados.length) {
-    list.innerHTML = '<li style="color:var(--muted);padding:1.5rem;text-align:center">Nenhum jogo encontrado.</li>';
-    return;
-  }
-
-  list.innerHTML = filtrados.map(j => {
-    const { dia, mes } = formatarDia(j.data);
-    const hora = j.data.split(" ")[1];
-    const temPlacar = jogoTemPlacar(j);
-    const placar = temPlacar ? `<span class="score-inline">${j.golsCasa}–${j.golsFora}</span>` : "";
-    const statusClass = temPlacar ? "done" : "";
-    const phaseClass = phaseBadgeClass(j.fase);
-    const grupo = j.grupo ? ` · Grupo ${j.grupo}` : "";
-
-    return `
-      <li class="match-item">
-        <div class="match-date-block">
-          <div class="match-day">${dia}</div>
-          <div class="match-mon">${mes}</div>
-        </div>
-        <div class="match-center">
-          <div class="match-teams-row">
-            ${flag(j.casa, 22)} ${j.casa} ${placar ? placar : '<span style="color:var(--muted);font-size:0.85rem">vs</span>'} ${flag(j.fora, 22)} ${j.fora}
-          </div>
-          <div class="match-info">🕐 ${hora} &nbsp;·&nbsp; 📍 ${j.estadio || "A definir"}</div>
-        </div>
-        <div class="match-right">
-          <span class="phase-badge ${phaseClass}">${j.fase}${grupo}</span>
-          <span class="status-dot ${statusClass}" title="${temPlacar ? 'Encerrado' : 'Agendado'}"></span>
-        </div>
-      </li>
-    `;
+  const list=document.getElementById("matches-list");
+  if(!filtrados.length){list.innerHTML='<li style="color:var(--muted);padding:1.5rem;text-align:center">Nenhum jogo encontrado.</li>';return;}
+  list.innerHTML=filtrados.map(j=>{
+    const{dia,mes}=formatarDia(j.data);
+    const hora=j.data.split(" ")[1];
+    const temPlacar=jogoTemPlacar(j);
+    const placar=temPlacar?`<span class="score-inline">${j.golsCasa}–${j.golsFora}</span>`:"";
+    const phaseClass=phaseBadgeClass(j.fase);
+    const grupo=j.grupo?` · Grupo ${j.grupo}`:"";
+    return`<li class="match-item">
+      <div class="match-date-block"><div class="match-day">${dia}</div><div class="match-mon">${mes}</div></div>
+      <div class="match-center">
+        <div class="match-teams-row">${flag(j.casa,22)} ${j.casa} ${placar||'<span style="color:var(--muted);font-size:.85rem">vs</span>'} ${flag(j.fora,22)} ${j.fora}</div>
+        <div class="match-info">🕐 ${hora} (BRT) &nbsp;·&nbsp; 📍 ${j.estadio||"A definir"}</div>
+      </div>
+      <div class="match-right">
+        <span class="phase-badge ${phaseClass}">${j.fase}${grupo}</span>
+        <span class="status-dot ${temPlacar?"done":""}"></span>
+      </div>
+    </li>`;
   }).join("");
 }
 
-// ——— RENDER: ESTATÍSTICAS ———————————————————
-
-function calcularEstatisticasTimes() {
-  const mapa = {};
-  Object.entries(grupos).forEach(([g, times]) => {
-    times.forEach(t => {
-      if (!mapa[t]) mapa[t] = { time: t, grupo: g, jogos: 0, vitorias: 0, empates: 0, derrotas: 0, golsPro: 0, golsContra: 0 };
-    });
-  });
-
-  jogos.forEach(j => {
-    if (!jogoTemPlacar(j)) return;
-    [j.casa, j.fora].forEach(t => { if (!mapa[t]) mapa[t] = { time: t, grupo: "?", jogos: 0, vitorias: 0, empates: 0, derrotas: 0, golsPro: 0, golsContra: 0 }; });
-
-    mapa[j.casa].jogos++; mapa[j.fora].jogos++;
-    mapa[j.casa].golsPro += j.golsCasa; mapa[j.casa].golsContra += j.golsFora;
-    mapa[j.fora].golsPro += j.golsFora; mapa[j.fora].golsContra += j.golsCasa;
-    if (j.golsCasa > j.golsFora) { mapa[j.casa].vitorias++; mapa[j.fora].derrotas++; }
-    else if (j.golsCasa < j.golsFora) { mapa[j.fora].vitorias++; mapa[j.casa].derrotas++; }
-    else { mapa[j.casa].empates++; mapa[j.fora].empates++; }
-  });
-
-  return Object.values(mapa).sort((a, b) => b.golsPro - a.golsPro || (b.golsPro - b.golsContra) - (a.golsPro - a.golsContra));
+// =============================================
+//  RENDER: ARTILHEIROS
+// =============================================
+function renderArtilheiros(){
+  const makeList=(id,campo,icone,cor)=>{
+    const el=document.getElementById(id);
+    const top=[...jogadores].sort((a,b)=>b[campo]-a[campo]).slice(0,10);
+    if(top.every(j=>j[campo]===0)){
+      el.innerHTML=`<li class="art-empty">A Copa ainda não começou.<br>Edite <code>script.js</code> para adicionar dados.</li>`;return;
+    }
+    el.innerHTML=top.map(j=>`<li class="art-item">
+      <span class="art-rank"></span>
+      <span class="art-flag">${flag(j.selecao,22)}</span>
+      <div class="art-info"><span class="art-nome">${j.nome}</span><span class="art-selecao">${j.selecao}</span></div>
+      <span class="art-val" style="color:${cor}">${icone} ${j[campo]}</span>
+    </li>`).join("");
+  };
+  makeList("list-gols","gols","⚽","var(--green)");
+  makeList("list-assists","assists","🎯","var(--accent)");
+  makeList("list-amarelos","amarelos","🟨","#f5c842");
+  makeList("list-vermelhos","vermelhos","🟥","var(--red)");
 }
 
-function renderEstatisticas() {
-  const stats = calcularEstatisticasTimes();
-  const root = document.getElementById("team-stats");
+// =============================================
+//  RENDER: COPA 2026 — ESTÁDIOS CAROUSEL
+// =============================================
+let currentSlide=0;
 
-  root.innerHTML = stats.map(t => `
+function renderEstadios(){
+  const track=document.getElementById("stadium-track");
+  const dots=document.getElementById("carousel-dots");
+
+  track.innerHTML=estadiosData.map(e=>`
+    <div class="stadium-slide">
+      <div class="stadium-card">
+        <div class="stadium-photo-wrap">
+          <img class="stadium-photo" src="${e.foto}"
+            alt="${e.nome}"
+            loading="lazy"
+            onerror="this.style.display='none';this.parentElement.style.background='#1a2a3a'">
+          <div class="stadium-photo-overlay"></div>
+          <div class="stadium-country-badge">${flag(e.cidade.includes("México")||e.cidade.includes("Monterrey")||e.cidade.includes("Guadalajara")?"México":e.pais==="Canadá"?"Canadá":"Estados Unidos",18)} ${e.pais}</div>
+        </div>
+        <div class="stadium-body">
+          <div class="stadium-name">${e.nome}</div>
+          <div class="stadium-city">📍 ${e.cidade}</div>
+          <div class="stadium-details-grid">
+            <div class="stadium-detail"><div class="sd-label">Capacidade</div><div class="sd-val highlight">${e.capacidade}</div></div>
+            <div class="stadium-detail"><div class="sd-label">Jogos na Copa</div><div class="sd-val">${e.jogos}</div></div>
+            <div class="stadium-detail"><div class="sd-label">Tipo de gramado</div><div class="sd-val">${e.gramado}</div></div>
+            <div class="stadium-detail"><div class="sd-label">Inaugurado</div><div class="sd-val">${e.inaugurado}</div></div>
+          </div>
+          <div style="margin-bottom:.5rem"><span style="background:rgba(245,200,66,.12);border:1px solid rgba(245,200,66,.3);color:var(--gold);border-radius:999px;padding:.2rem .75rem;font-size:.78rem;font-weight:700">${e.destaque}</span></div>
+          <div class="stadium-fact">${e.fato}</div>
+        </div>
+      </div>
+    </div>
+  `).join("");
+
+  dots.innerHTML=estadiosData.map((_,i)=>`<button class="carousel-dot ${i===0?"active":""}" data-idx="${i}" aria-label="Estádio ${i+1}"></button>`).join("");
+  dots.querySelectorAll(".carousel-dot").forEach(d=>d.addEventListener("click",()=>goToSlide(Number(d.dataset.idx))));
+
+  document.getElementById("prev-stadium").addEventListener("click",()=>goToSlide((currentSlide-1+estadiosData.length)%estadiosData.length));
+  document.getElementById("next-stadium").addEventListener("click",()=>goToSlide((currentSlide+1)%estadiosData.length));
+}
+
+function goToSlide(idx){
+  currentSlide=idx;
+  document.getElementById("stadium-track").style.transform=`translateX(-${idx*100}%)`;
+  document.querySelectorAll(".carousel-dot").forEach((d,i)=>d.classList.toggle("active",i===idx));
+}
+
+// =============================================
+//  RENDER: FATOS DA COPA
+// =============================================
+function renderFatos(){
+  document.getElementById("facts-grid").innerHTML=fatosCopa.map(f=>`
+    <div class="fact-card">
+      <div class="fact-num" style="color:${f.cor}">${f.num}</div>
+      <div class="fact-label">${f.label}</div>
+      <div class="fact-desc">${f.desc}</div>
+    </div>`).join("");
+}
+
+// =============================================
+//  RENDER: ESTATÍSTICAS SELEÇÕES
+// =============================================
+function calcularEstatisticasTimes(){
+  const mapa={};
+  Object.entries(grupos).forEach(([g,times])=>{
+    times.forEach(t=>{if(!mapa[t])mapa[t]={time:t,grupo:g,jogos:0,vitorias:0,empates:0,derrotas:0,golsPro:0,golsContra:0};});
+  });
+  jogos.forEach(j=>{
+    if(!jogoTemPlacar(j))return;
+    [j.casa,j.fora].forEach(t=>{if(!mapa[t])mapa[t]={time:t,grupo:"?",jogos:0,vitorias:0,empates:0,derrotas:0,golsPro:0,golsContra:0};});
+    mapa[j.casa].jogos++;mapa[j.fora].jogos++;
+    mapa[j.casa].golsPro+=j.golsCasa;mapa[j.casa].golsContra+=j.golsFora;
+    mapa[j.fora].golsPro+=j.golsFora;mapa[j.fora].golsContra+=j.golsCasa;
+    if(j.golsCasa>j.golsFora){mapa[j.casa].vitorias++;mapa[j.fora].derrotas++;}
+    else if(j.golsCasa<j.golsFora){mapa[j.fora].vitorias++;mapa[j.casa].derrotas++;}
+    else{mapa[j.casa].empates++;mapa[j.fora].empates++;}
+  });
+  return Object.values(mapa).sort((a,b)=>b.golsPro-a.golsPro||(b.golsPro-b.golsContra)-(a.golsPro-a.golsContra));
+}
+
+function renderEstatisticas(){
+  const stats=calcularEstatisticasTimes();
+  document.getElementById("team-stats").innerHTML=stats.map(t=>`
     <article class="team-card">
       <div class="team-card-header">
-        <span class="team-card-flag">${flag(t.time, 32)}</span>
-        <div>
-          <div class="team-card-name">${t.time}</div>
-          <div class="team-card-group">Grupo ${t.grupo}</div>
-        </div>
+        <span class="team-card-flag">${flag(t.time,32)}</span>
+        <div><div class="team-card-name">${t.time}</div><div class="team-card-group">Grupo ${t.grupo}</div></div>
       </div>
       <div class="team-card-stats">
         <div class="stat-row"><span class="stat-label">Jogos</span><span class="stat-value">${t.jogos}</span></div>
         <div class="stat-row"><span class="stat-label">Campanha</span><span class="stat-value">${t.vitorias}V ${t.empates}E ${t.derrotas}D</span></div>
         <div class="stat-row"><span class="stat-label">Gols pró</span><span class="stat-value highlight">${t.golsPro}</span></div>
         <div class="stat-row"><span class="stat-label">Gols contra</span><span class="stat-value">${t.golsContra}</span></div>
-        <div class="stat-row"><span class="stat-label">Saldo</span><span class="stat-value" style="color:${(t.golsPro-t.golsContra)>=0?'var(--green)':'var(--red)'}">${t.golsPro - t.golsContra >= 0 ? '+' : ''}${t.golsPro - t.golsContra}</span></div>
+        <div class="stat-row"><span class="stat-label">Saldo</span><span class="stat-value" style="color:${(t.golsPro-t.golsContra)>=0?"var(--green)":"var(--red)"}">${t.golsPro-t.golsContra>=0?"+":""}${t.golsPro-t.golsContra}</span></div>
       </div>
-    </article>
-  `).join("");
+    </article>`).join("");
 }
 
-// ——— TABS ————————————————————————————————————
-
-function iniciarTabs() {
-  document.querySelectorAll(".tab").forEach(btn => {
-    btn.addEventListener("click", () => {
-      document.querySelectorAll(".tab").forEach(b => b.classList.remove("active"));
-      document.querySelectorAll(".tab-pane").forEach(p => p.classList.remove("active"));
+// =============================================
+//  TABS & INICIALIZAR
+// =============================================
+function iniciarTabs(){
+  document.querySelectorAll(".tab").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      document.querySelectorAll(".tab").forEach(b=>b.classList.remove("active"));
+      document.querySelectorAll(".tab-pane").forEach(p=>p.classList.remove("active"));
       btn.classList.add("active");
       document.getElementById(`tab-${btn.dataset.tab}`).classList.add("active");
     });
   });
 }
 
-// ——— RENDER: ARTILHEIROS ————————————————————
-
-function renderArtListItem(jogador, campo, icone, cor) {
-  const val = jogador[campo];
-  return `
-    <li class="art-item">
-      <span class="art-rank"></span>
-      <span class="art-flag">${flag(jogador.selecao, 22)}</span>
-      <div class="art-info">
-        <span class="art-nome">${jogador.nome}</span>
-        <span class="art-selecao">${jogador.selecao}</span>
-      </div>
-      <span class="art-val" style="color:${cor}">${icone} ${val}</span>
-    </li>
-  `;
-}
-
-function renderArtilheiros() {
-  const sorted = (campo) => [...jogadores].sort((a, b) => b[campo] - a[campo]);
-
-  const makeList = (listId, campo, icone, cor) => {
-    const el = document.getElementById(listId);
-    const top = sorted(campo).slice(0, 10);
-    const semDados = top.every(j => j[campo] === 0);
-    if (semDados) {
-      el.innerHTML = '<li class="art-empty">A Copa ainda não começou.<br>Edite <code>script.js</code> para adicionar dados.</li>';
-      return;
-    }
-    el.innerHTML = top.map(j => renderArtListItem(j, campo, icone, cor)).join("");
-    // Add counter numbers via CSS counter reset
-    el.style.counterReset = "art-counter";
-  };
-
-  makeList("list-gols", "gols", "⚽", "var(--green)");
-  makeList("list-assists", "assists", "🎯", "var(--accent)");
-  makeList("list-amarelos", "amarelos", "🟨", "#f5c842");
-  makeList("list-vermelhos", "vermelhos", "🟥", "var(--red)");
-}
-
-// ——— INICIALIZAR ————————————————————————————
-
-function inicializar() {
-  // Fases no select
-  const faseSelect = document.getElementById("fase-select");
-  const fases = [...new Set(jogos.map(j => j.fase))];
-  fases.forEach(f => {
-    const opt = document.createElement("option");
-    opt.value = f; opt.textContent = f;
-    faseSelect.appendChild(opt);
-  });
-
-  faseSelect.addEventListener("change", renderJogos);
-  document.getElementById("search-time").addEventListener("input", renderJogos);
-
-  // Modal fechar
-  document.getElementById("modal-close").addEventListener("click", () => {
-    document.getElementById("modal-overlay").classList.remove("open");
-  });
-  document.getElementById("modal-overlay").addEventListener("click", e => {
-    if (e.target === document.getElementById("modal-overlay"))
-      document.getElementById("modal-overlay").classList.remove("open");
-  });
-  document.addEventListener("keydown", e => {
-    if (e.key === "Escape") document.getElementById("modal-overlay").classList.remove("open");
-  });
+function inicializar(){
+  const faseSelect=document.getElementById("fase-select");
+  const fases=[...new Set(jogos.map(j=>j.fase))];
+  fases.forEach(f=>{const o=document.createElement("option");o.value=f;o.textContent=f;faseSelect.appendChild(o);});
+  faseSelect.addEventListener("change",renderJogos);
+  document.getElementById("search-time").addEventListener("input",renderJogos);
+  document.getElementById("modal-close").addEventListener("click",()=>document.getElementById("modal-overlay").classList.remove("open"));
+  document.getElementById("modal-overlay").addEventListener("click",e=>{if(e.target===document.getElementById("modal-overlay"))document.getElementById("modal-overlay").classList.remove("open");});
+  document.addEventListener("keydown",e=>{if(e.key==="Escape")document.getElementById("modal-overlay").classList.remove("open");});
 
   iniciarTabs();
   renderGrupos();
   renderJogos();
-  renderEstatisticas();
   renderArtilheiros();
+  renderEstadios();
+  renderFatos();
+  renderEstatisticas();
 }
 
 inicializar();
