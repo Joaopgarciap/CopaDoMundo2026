@@ -549,10 +549,41 @@ const timelineEventos = [
 
 const perfisSementeSelecoes = {
   "Brasil": {
-    tecnico: "A definir",
+    tecnico: "Dorival Júnior",
     melhorResultado: "Campeão (5 títulos)",
-    campanhas: ["1930-2022: única seleção em todas as Copas", "Títulos: 1958, 1962, 1970, 1994 e 2002", "Maior goleador histórico em Copas"],
-    elenco: ["Alisson", "Marquinhos", "Éder Militão", "Bruno Guimarães", "Rodrygo", "Vinicius Jr.", "Raphinha", "Endrick", "Paquetá", "Bremer", "Danilo"],
+    esquema: "4-3-3",
+    cores: { primaria: "#009c3b", secundaria: "#ffdf00", destaque: "#002776" },
+    campanhas: [
+      "1930-2022: única seleção presente em todas as edições.",
+      "Títulos: 1958, 1962, 1970, 1994 e 2002.",
+      "Maior seleção em gols marcados na história das Copas."
+    ],
+    titulares: [
+      { nome: "Alisson", numero: 1, posicao: "GOL", linha: "gk", copas: 2, jogosCopas: 10, gols: 0, assistencias: 0, amarelos: 0, vermelhos: 0, cleanSheets: 5, golsSofridos: 8 },
+      { nome: "Guilherme Arana", numero: 6, posicao: "LE", linha: "def", copas: 1, jogosCopas: 4, gols: 0, assistencias: 1, amarelos: 1, vermelhos: 0 },
+      { nome: "Marquinhos", numero: 4, posicao: "ZAG", linha: "def", copas: 3, jogosCopas: 15, gols: 2, assistencias: 0, amarelos: 3, vermelhos: 0 },
+      { nome: "Éder Militão", numero: 3, posicao: "ZAG", linha: "def", copas: 2, jogosCopas: 9, gols: 1, assistencias: 0, amarelos: 2, vermelhos: 0 },
+      { nome: "Danilo", numero: 2, posicao: "LD", linha: "def", copas: 2, jogosCopas: 10, gols: 0, assistencias: 1, amarelos: 2, vermelhos: 0 },
+      { nome: "Bruno Guimarães", numero: 5, posicao: "VOL", linha: "mid", copas: 1, jogosCopas: 5, gols: 0, assistencias: 1, amarelos: 2, vermelhos: 0 },
+      { nome: "Lucas Paquetá", numero: 8, posicao: "MC", linha: "mid", copas: 1, jogosCopas: 6, gols: 1, assistencias: 2, amarelos: 1, vermelhos: 0 },
+      { nome: "Rodrygo", numero: 10, posicao: "MC", linha: "mid", copas: 1, jogosCopas: 6, gols: 1, assistencias: 1, amarelos: 0, vermelhos: 0 },
+      { nome: "Vinicius Jr.", numero: 7, posicao: "PE", linha: "atk", copas: 1, jogosCopas: 5, gols: 1, assistencias: 2, amarelos: 0, vermelhos: 0 },
+      { nome: "Richarlison", numero: 9, posicao: "CA", linha: "atk", copas: 1, jogosCopas: 4, gols: 3, assistencias: 0, amarelos: 0, vermelhos: 0 },
+      { nome: "Raphinha", numero: 11, posicao: "PD", linha: "atk", copas: 1, jogosCopas: 4, gols: 1, assistencias: 1, amarelos: 1, vermelhos: 0 }
+    ],
+    reservas: ["Ederson", "Bento", "Bremer", "Gabriel Magalhães", "Yan Couto", "Wendell", "Douglas Luiz", "Joelinton", "Andreas Pereira", "Endrick", "Martinelli", "Savinho"],
+    convocacao: [
+      { setor: "Goleiros", jogadores: ["Alisson", "Ederson", "Bento"] },
+      { setor: "Defensores", jogadores: ["Danilo", "Yan Couto", "Marquinhos", "Éder Militão", "Bremer", "Gabriel Magalhães", "Guilherme Arana", "Wendell"] },
+      { setor: "Meio-campistas", jogadores: ["Bruno Guimarães", "Lucas Paquetá", "Douglas Luiz", "Joelinton", "Andreas Pereira", "Rodrygo"] },
+      { setor: "Atacantes", jogadores: ["Vinicius Jr.", "Raphinha", "Richarlison", "Endrick", "Martinelli", "Savinho"] }
+    ],
+    noticias: [
+      { hora: "Agora", titulo: "Comissão técnica confirma trabalho tático em bloco alto para a próxima rodada.", fonte: "Painel da Seleção" },
+      { hora: "1h", titulo: "Treino fechado priorizou bolas paradas ofensivas e defensivas.", fonte: "Centro de Treinamento" },
+      { hora: "3h", titulo: "CBF divulga lista final de convocados para a janela de preparação.", fonte: "CBF" }
+    ],
+    elenco: ["Alisson", "Danilo", "Marquinhos", "Éder Militão", "Guilherme Arana", "Bruno Guimarães", "Lucas Paquetá", "Rodrygo", "Vinicius Jr.", "Richarlison", "Raphinha", "Ederson", "Bento", "Bremer", "Gabriel Magalhães", "Yan Couto", "Wendell", "Douglas Luiz", "Joelinton", "Andreas Pereira", "Endrick", "Martinelli", "Savinho"],
   },
   "Argentina": {
     tecnico: "A definir",
@@ -668,6 +699,14 @@ function normalizarNumero(value, fallback = 0) {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : fallback;
 }
+function slugify(texto) {
+  return texto
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
 function hashTexto(texto) {
   return Array.from(texto).reduce((acc, ch) => ((acc * 31) + ch.charCodeAt(0)) % 2147483647, 7);
 }
@@ -688,16 +727,46 @@ function gerarStatsHistoricos(team, nome, posicao, indice) {
   const assistencias = posicao === "MC" || posicao === "PE" || posicao === "PD" ? 1 + (seed % 10) : seed % 5;
   return { copas, jogosCopas, gols, assistencias, amarelos, vermelhos, cleanSheets: 0, golsSofridos: null };
 }
-function construirJogadoresCampo(team, nomes) {
-  return nomes.slice(0, 11).map((nome, index) => {
+function valorNumericoOuPadrao(value, fallback) {
+  return Number.isFinite(value) ? value : fallback;
+}
+function montarConvocacaoPadrao(elenco, reservas = []) {
+  const base = [...elenco, ...reservas].slice(0, 23);
+  return [
+    { setor: "Goleiros", jogadores: base.slice(0, 3) },
+    { setor: "Defensores", jogadores: base.slice(3, 10) },
+    { setor: "Meio-campistas", jogadores: base.slice(10, 16) },
+    { setor: "Atacantes", jogadores: base.slice(16, 23) },
+  ].filter((grupo) => grupo.jogadores.length);
+}
+function montarNoticiasPadrao(time) {
+  return [
+    { hora: "Agora", titulo: `${time} finalizou treino tático desta manhã.`, fonte: "Painel local" },
+    { hora: "2h", titulo: "Comissão técnica confirmou manutenção do sistema base para o próximo jogo.", fonte: "Painel local" },
+    { hora: "4h", titulo: "Lista de convocados e status físico atualizada internamente.", fonte: "Painel local" },
+  ];
+}
+function construirJogadoresCampo(team, titulares) {
+  return titulares.slice(0, 11).map((item, index) => {
     const formato = FORMATO_CAMPO_433[index] || FORMATO_CAMPO_433[FORMATO_CAMPO_433.length - 1];
+    const base = typeof item === "string" ? { nome: item } : item;
+    const nome = base.nome || `${team} Jogador ${index + 1}`;
+    const posicao = base.posicao || formato.posicao;
+    const statsBase = gerarStatsHistoricos(team, nome, posicao, index);
     return {
-      id: `${team}-${nome}`.toLowerCase().replace(/\s+/g, "-"),
+      id: slugify(`${team}-${nome}`),
       nome,
-      numero: index + 1,
-      posicao: formato.posicao,
-      linha: formato.linha,
-      ...gerarStatsHistoricos(team, nome, formato.posicao, index),
+      numero: valorNumericoOuPadrao(base.numero, index + 1),
+      posicao,
+      linha: base.linha || formato.linha,
+      copas: valorNumericoOuPadrao(base.copas, statsBase.copas),
+      jogosCopas: valorNumericoOuPadrao(base.jogosCopas, statsBase.jogosCopas),
+      gols: valorNumericoOuPadrao(base.gols, statsBase.gols),
+      assistencias: valorNumericoOuPadrao(base.assistencias, statsBase.assistencias),
+      amarelos: valorNumericoOuPadrao(base.amarelos, statsBase.amarelos),
+      vermelhos: valorNumericoOuPadrao(base.vermelhos, statsBase.vermelhos),
+      cleanSheets: valorNumericoOuPadrao(base.cleanSheets, statsBase.cleanSheets),
+      golsSofridos: valorNumericoOuPadrao(base.golsSofridos, statsBase.golsSofridos),
     };
   });
 }
@@ -709,16 +778,25 @@ function construirPerfisSelecoes(){
   const perfis={};
   todasSelecoes.forEach((time)=>{
     const base=perfisSementeSelecoes[time]||{};
+    const elencoBase=base.elenco||Array.from({length:23},(_,i)=>`${time} · Jogador ${i+1}`);
+    const titularesBase=base.titulares||elencoBase.slice(0,11);
+    const reservasBase=base.reservas||elencoBase.slice(11,23);
     perfis[time]={
       tecnico:base.tecnico||"A definir",
       melhorResultado:base.melhorResultado||"Participação em andamento",
+      esquema:base.esquema||"4-3-3",
+      cores:base.cores||{primaria:"#067239",secundaria:"#f5c842",destaque:"#1c3f8a"},
       campanhas:base.campanhas||[
         `Campanha histórica registrada para ${time}.`,
         "Dados detalhados podem ser refinados durante a Copa.",
         `Grupo na edição 2026: ${porGrupo[time]||"?"}.`,
       ],
-      elenco:base.elenco||Array.from({length:11},(_,i)=>`${time} · Jogador ${i+1}`),
-      jogadoresCampo:construirJogadoresCampo(time, base.elenco||Array.from({length:11},(_,i)=>`${time} · Jogador ${i+1}`)),
+      elenco:elencoBase,
+      titulares:titularesBase,
+      reservas:reservasBase,
+      convocacao:base.convocacao||montarConvocacaoPadrao(elencoBase, reservasBase),
+      noticias:base.noticias||montarNoticiasPadrao(time),
+      jogadoresCampo:construirJogadoresCampo(time, titularesBase),
     };
   });
   return perfis;
@@ -1365,6 +1443,9 @@ function renderSelecaoPagina(){
   const info=selecoesInfo[team];
   const jogosTeam=jogos.filter((jogo)=>jogo.casa===team||jogo.fora===team).slice(0,7);
   const jogadoresCampo=info.jogadoresCampo||[];
+  const cores=info.cores||{primaria:"#067239",secundaria:"#f5c842",destaque:"#1c3f8a"};
+  const convocacao=info.convocacao||[];
+  const noticias=info.noticias||[];
   const selecionadoAtual=appState.selectedTeamPlayers[team];
   if(!selecionadoAtual&&jogadoresCampo[0])appState.selectedTeamPlayers[team]=jogadoresCampo[0].id;
   const jogadorSelecionado=jogadoresCampo.find((jogador)=>jogador.id===appState.selectedTeamPlayers[team])||jogadoresCampo[0]||null;
@@ -1375,7 +1456,11 @@ function renderSelecaoPagina(){
     gk:jogadoresCampo.filter((jogador)=>jogador.linha==="gk"),
   };
   content.innerHTML=`
-    <article class="team-profile-card">
+    <article class="team-profile-card team-themed" style="--team-primary:${cores.primaria};--team-secondary:${cores.secundaria};--team-accent:${cores.destaque}">
+      <div class="team-theme-banner">
+        <span>${flag(team,20)} Painel da seleção</span>
+        <small>Formação base: ${info.esquema}</small>
+      </div>
       <div class="team-profile-top">
         <div class="team-profile-title">${flag(team,28)} <h3>${team}</h3></div>
         <button type="button" class="favorite-team-btn ${selecaoFavorita(team)?"active":""}" data-action="toggle-team-favorite" data-team="${team}">
@@ -1392,12 +1477,22 @@ function renderSelecaoPagina(){
           <ul class="team-bullet-list">${info.campanhas.map((item)=>`<li>${item}</li>`).join("")}</ul>
         </div>
         <div>
-          <h4>Elenco base</h4>
-          <ul class="team-bullet-list">${info.elenco.map((jogador)=>`<li>${jogador}</li>`).join("")}</ul>
+          <h4>Convocação feita</h4>
+          <div class="team-callups-grid">${convocacao.map((grupo)=>`
+            <article class="team-callup-card">
+              <h5>${grupo.setor}</h5>
+              <p>${grupo.jogadores.join(" · ")}</p>
+            </article>
+          `).join("")}</div>
         </div>
       </div>
       <div class="team-pitch-section">
-        <h4>Campo interativo (clique no jogador)</h4>
+        <div class="team-pitch-headline">
+          <h4 class="team-interactive-title">Campo tático interativo</h4>
+          <span class="team-scheme-badge">${info.esquema}</span>
+        </div>
+        <p class="team-interactive-sub">Clique no jogador para ver jogos de Copa, gols, assistências, cartões e métricas específicas.</p>
+        <div class="team-coach-chip">👔 Técnico: <strong>${info.tecnico}</strong></div>
         <div class="team-pitch">
           <div class="pitch-line pitch-atk">${jogadoresPorLinha.atk.map((jogador)=>`
             <button
@@ -1440,6 +1535,10 @@ function renderSelecaoPagina(){
               <span class="pitch-player-name">${jogador.nome}</span>
             </button>`).join("")}</div>
         </div>
+        <div class="team-bench">
+          <h5>Reservas</h5>
+          <div class="team-bench-list">${(info.reservas||[]).map((jogador)=>`<span class="team-bench-item">${jogador}</span>`).join("")}</div>
+        </div>
         ${jogadorSelecionado?`
           <div class="team-player-detail-card">
             <div class="team-player-detail-head">
@@ -1454,33 +1553,29 @@ function renderSelecaoPagina(){
               <div><small>Cartões amarelos</small><strong>${jogadorSelecionado.amarelos}</strong></div>
               <div><small>Cartões vermelhos</small><strong>${jogadorSelecionado.vermelhos}</strong></div>
               <div><small>Clean sheets</small><strong>${jogadorSelecionado.cleanSheets}</strong></div>
-              <div><small>${jogadorSelecionado.posicao==="GOL"?"Gols sofridos":"Participações"}</small><strong>${jogadorSelecionado.posicao==="GOL"?jogadorSelecionado.golsSofridos:jogadorSelecionado.jogosCopas}</strong></div>
+              <div><small>${jogadorSelecionado.posicao==="GOL"?"Gols sofridos":"Part. em gols"}</small><strong>${jogadorSelecionado.posicao==="GOL"?jogadorSelecionado.golsSofridos:jogadorSelecionado.gols+jogadorSelecionado.assistencias}</strong></div>
             </div>
           </div>
         `:""}
       </div>
-      <div>
-        <h4>Próximos/últimos jogos</h4>
-        <ul class="timeline-list">${jogosTeam.map(itemJogoTimeline).join("")}</ul>
+      <div class="team-extra-grid">
+        <div>
+          <h4>Notícias de última hora</h4>
+          <ul class="team-news-list">${noticias.map((noticia)=>`
+            <li>
+              <span>${noticia.hora}</span>
+              <div><strong>${noticia.titulo}</strong><small>${noticia.fonte}</small></div>
+            </li>
+          `).join("")}</ul>
+        </div>
+        <div>
+          <h4>Próximos/últimos jogos</h4>
+          <ul class="timeline-list">${jogosTeam.map(itemJogoTimeline).join("")}</ul>
+        </div>
       </div>
     </article>
   `;
 }
-function forcarAbaSelecoesComCampoInterativo(){
-  const tabs = document.querySelectorAll(".tab");
-  if (!tabs.length) return;
-  const target = Array.from(tabs).find((tab) => tab.dataset.tab === "selecoes");
-  if (!target) return;
-
-  const jaExiste = target.parentElement?.querySelector(".tab-feature-badge");
-  if (!jaExiste) {
-    const badge = document.createElement("span");
-    badge.className = "tab-feature-badge";
-    badge.textContent = "NOVO: campo interativo";
-    target.parentElement?.insertBefore(badge, target.nextSibling);
-  }
-}
-
 function renderCentroAoVivo(){
   const playerRoot=document.getElementById("live-player-editor");
   const matchRoot=document.getElementById("live-match-editor");

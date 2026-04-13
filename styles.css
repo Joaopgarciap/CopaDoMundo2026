@@ -289,6 +289,29 @@ select:focus,input:focus { border-color:rgba(245,200,66,.4); }
 }
 .team-page-head { align-items: center; }
 .team-select-wrap { display: flex; flex-direction: column; gap: .35rem; min-width: 240px; }
+.team-themed {
+  border-color: var(--team-primary);
+  box-shadow: inset 0 0 0 1px var(--team-secondary);
+}
+.team-theme-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: .7rem;
+  margin: -.15rem -.15rem .9rem;
+  padding: .5rem .75rem;
+  border-radius: 11px;
+  background: linear-gradient(90deg, var(--team-primary), var(--team-accent));
+  color: #fff;
+  font-size: .76rem;
+  font-weight: 700;
+}
+.team-theme-banner small {
+  font-size: .7rem;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  opacity: .9;
+}
 .team-profile-top {
   display: flex;
   justify-content: space-between;
@@ -326,6 +349,29 @@ select:focus,input:focus { border-color:rgba(245,200,66,.4); }
   gap: .8rem;
   margin-bottom: .9rem;
 }
+.team-callups-grid {
+  display: grid;
+  gap: .45rem;
+}
+.team-callup-card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel2);
+  padding: .5rem .62rem;
+}
+.team-callup-card h5 {
+  margin: 0 0 .22rem;
+  font-size: .7rem;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--team-secondary);
+}
+.team-callup-card p {
+  margin: 0;
+  font-size: .75rem;
+  line-height: 1.4;
+  color: var(--text);
+}
 .team-bullet-list {
   list-style: none;
   display: grid;
@@ -340,17 +386,42 @@ select:focus,input:focus { border-color:rgba(245,200,66,.4); }
   color: var(--text);
 }
 .team-pitch-section { margin-bottom: .95rem; }
-.team-pitch-help {
-  margin: .35rem 0 .65rem;
+.team-pitch-headline {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: .6rem;
+}
+.team-scheme-badge {
+  border: 1px solid var(--team-secondary);
+  background: rgba(0,0,0,.15);
+  color: var(--team-secondary);
+  border-radius: 999px;
+  padding: .18rem .62rem;
+  font-size: .72rem;
+  font-weight: 800;
+}
+.team-interactive-sub {
+  margin: .32rem 0 .58rem;
   color: var(--muted);
   font-size: .76rem;
 }
+.team-coach-chip {
+  margin-bottom: .55rem;
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--team-secondary);
+  border-radius: 9px;
+  background: var(--panel2);
+  padding: .42rem .58rem;
+  font-size: .78rem;
+  color: var(--text);
+}
 .team-pitch {
   border-radius: 14px;
-  border: 1px solid rgba(255,255,255,.22);
+  border: 1px solid var(--team-secondary);
   background:
     radial-gradient(circle at 50% 50%, rgba(255,255,255,.08) 0, rgba(255,255,255,.08) 1px, transparent 1px),
-    linear-gradient(180deg, rgba(20,155,83,.7), rgba(9,110,58,.9));
+    linear-gradient(180deg, var(--team-primary), var(--team-accent));
   background-size: 46px 46px, cover;
   padding: 1rem .75rem;
   display: grid;
@@ -387,28 +458,52 @@ select:focus,input:focus { border-color:rgba(245,200,66,.4); }
   cursor: pointer;
 }
 .pitch-player-btn:hover {
-  border-color: rgba(245,200,66,.55);
+  border-color: var(--team-secondary);
   transform: translateY(-1px);
 }
 .pitch-player-btn.active {
-  border-color: rgba(245,200,66,.9);
-  box-shadow: 0 0 0 1px rgba(245,200,66,.45), 0 6px 18px rgba(0,0,0,.25);
+  border-color: var(--team-secondary);
+  box-shadow: 0 0 0 1px var(--team-secondary), 0 6px 18px rgba(0,0,0,.25);
   transform: translateY(-1px);
 }
 .pitch-player-pos {
   font-size: .64rem;
   letter-spacing: .06em;
   font-weight: 800;
-  color: #ffd66a;
+  color: var(--team-secondary);
 }
 .pitch-player-name {
   font-size: .7rem;
   font-weight: 700;
   line-height: 1.25;
 }
+.team-bench {
+  margin-top: .6rem;
+}
+.team-bench h5 {
+  margin: 0 0 .35rem;
+  font-size: .72rem;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--muted);
+}
+.team-bench-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .36rem;
+}
+.team-bench-item {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--panel2);
+  color: var(--text);
+  font-size: .72rem;
+  font-weight: 700;
+  padding: .22rem .55rem;
+}
 .team-player-detail-card {
   margin-top: .65rem;
-  border: 1px solid var(--border);
+  border: 1px solid var(--team-secondary);
   border-radius: 12px;
   background: var(--panel2);
   padding: .72rem .78rem;
@@ -427,7 +522,7 @@ select:focus,input:focus { border-color:rgba(245,200,66,.4); }
 }
 .team-player-detail-head span {
   font-size: .75rem;
-  color: var(--gold);
+  color: var(--team-secondary);
   font-weight: 700;
 }
 .team-player-detail-grid {
@@ -451,7 +546,43 @@ select:focus,input:focus { border-color:rgba(245,200,66,.4); }
 .team-player-detail-grid strong {
   font-family: "Bebas Neue", sans-serif;
   font-size: 1.1rem;
-  color: var(--gold);
+  color: var(--team-secondary);
+}
+.team-extra-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .8rem;
+}
+.team-news-list {
+  list-style: none;
+  display: grid;
+  gap: .45rem;
+}
+.team-news-list li {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel2);
+  padding: .5rem .6rem;
+  display: grid;
+  grid-template-columns: 52px 1fr;
+  gap: .55rem;
+  align-items: start;
+}
+.team-news-list li > span {
+  font-family: "Bebas Neue", sans-serif;
+  color: var(--team-secondary);
+  font-size: 1rem;
+  letter-spacing: .03em;
+}
+.team-news-list li strong {
+  display: block;
+  font-size: .78rem;
+  line-height: 1.4;
+  margin-bottom: .15rem;
+}
+.team-news-list li small {
+  color: var(--muted);
+  font-size: .7rem;
 }
 .live-table { display: grid; gap: .42rem; max-height: 590px; overflow: auto; padding-right: .2rem; }
 .live-head-row,
@@ -1094,9 +1225,11 @@ footer code { background:rgba(255,255,255,.07); padding:.1rem .4rem; border-radi
   .timeline-grid,
   .live-grid,
   .favorites-grid,
+  .team-extra-grid,
   .team-profile-grid,
   .live-match-grid { grid-template-columns: 1fr; }
   .team-select-wrap { min-width: 100%; width: 100%; }
+  .team-theme-banner { flex-direction: column; align-items: flex-start; }
   .team-player-detail-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .live-head-row,
   .live-player-row { grid-template-columns: minmax(140px,1fr) repeat(5, 42px); }
