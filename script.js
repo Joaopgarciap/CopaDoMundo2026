@@ -1,219 +1,198 @@
 const grupos = {
-  A: ["Qatar", "Equador", "Senegal", "Holanda"],
-  B: ["Inglaterra", "Irã", "EUA", "País de Gales"],
-  C: ["Argentina", "Arábia Saudita", "México", "Polônia"],
-  D: ["França", "Austrália", "Dinamarca", "Tunísia"],
-  E: ["Espanha", "Costa Rica", "Alemanha", "Japão"],
-  F: ["Bélgica", "Canadá", "Marrocos", "Croácia"],
-  G: ["Brasil", "Sérvia", "Suíça", "Camarões"],
-  H: ["Portugal", "Gana", "Uruguai", "Coreia do Sul"],
+  A: ["Canadá", "Classificado AFC 1", "Classificado CAF 1", "Classificado UEFA 1"],
+  B: ["México", "Classificado CONMEBOL 1", "Classificado UEFA 2", "Classificado AFC 2"],
+  C: [
+    "Estados Unidos",
+    "Classificado UEFA 3",
+    "Classificado CAF 2",
+    "Classificado OFC 1",
+  ],
+  D: ["Classificado CONMEBOL 2", "Classificado UEFA 4", "Classificado AFC 3", "Classificado CONCACAF 1"],
+  E: ["Classificado UEFA 5", "Classificado CAF 3", "Classificado AFC 4", "Classificado CONMEBOL 3"],
+  F: ["Classificado UEFA 6", "Classificado CONCACAF 2", "Classificado CAF 4", "Classificado AFC 5"],
+  G: ["Classificado UEFA 7", "Classificado CONMEBOL 4", "Classificado AFC 6", "Classificado CONCACAF 3"],
+  H: ["Classificado UEFA 8", "Classificado CAF 5", "Classificado AFC 7", "Classificado CONMEBOL 5"],
+  I: ["Classificado UEFA 9", "Classificado CONCACAF 4", "Classificado CAF 6", "Classificado AFC 8"],
+  J: ["Classificado UEFA 10", "Classificado CONMEBOL 6", "Classificado CAF 7", "Classificado AFC 9"],
+  K: ["Classificado UEFA 11", "Classificado CONCACAF 5", "Classificado AFC 10", "Classificado CAF 8"],
+  L: ["Classificado UEFA 12", "Classificado CONMEBOL 7", "Classificado CONCACAF 6", "Classificado AFC 11"],
 };
 
 const jogos = [
   {
-    data: "2022-11-20 13:00",
+    data: "2026-06-11 20:00",
     fase: "Fase de Grupos",
     grupo: "A",
-    casa: "Qatar",
-    fora: "Equador",
-    golsCasa: 0,
-    golsFora: 2,
-    estadio: "Al Bayt",
+    casa: "Canadá",
+    fora: "Classificado AFC 1",
+    golsCasa: null,
+    golsFora: null,
+    estadio: "Toronto Stadium",
   },
   {
-    data: "2022-11-21 13:00",
+    data: "2026-06-12 17:00",
     fase: "Fase de Grupos",
     grupo: "A",
-    casa: "Senegal",
-    fora: "Holanda",
-    golsCasa: 0,
-    golsFora: 2,
-    estadio: "Al Thumama",
+    casa: "Classificado CAF 1",
+    fora: "Classificado UEFA 1",
+    golsCasa: null,
+    golsFora: null,
+    estadio: "Vancouver Stadium",
   },
   {
-    data: "2022-11-21 10:00",
+    data: "2026-06-12 20:00",
     fase: "Fase de Grupos",
     grupo: "B",
-    casa: "Inglaterra",
-    fora: "Irã",
-    golsCasa: 6,
-    golsFora: 2,
-    estadio: "Khalifa",
-  },
-  {
-    data: "2022-11-21 16:00",
-    fase: "Fase de Grupos",
-    grupo: "B",
-    casa: "EUA",
-    fora: "País de Gales",
-    golsCasa: 1,
-    golsFora: 1,
-    estadio: "Ahmad Bin Ali",
-  },
-  {
-    data: "2022-11-22 07:00",
-    fase: "Fase de Grupos",
-    grupo: "C",
-    casa: "Argentina",
-    fora: "Arábia Saudita",
-    golsCasa: 1,
-    golsFora: 2,
-    estadio: "Lusail",
-  },
-  {
-    data: "2022-11-22 10:00",
-    fase: "Fase de Grupos",
-    grupo: "C",
     casa: "México",
-    fora: "Polônia",
-    golsCasa: 0,
-    golsFora: 0,
-    estadio: "Stadium 974",
+    fora: "Classificado CONMEBOL 1",
+    golsCasa: null,
+    golsFora: null,
+    estadio: "Estadio Azteca",
   },
   {
-    data: "2022-11-22 13:00",
+    data: "2026-06-13 14:00",
+    fase: "Fase de Grupos",
+    grupo: "C",
+    casa: "Estados Unidos",
+    fora: "Classificado UEFA 3",
+    golsCasa: null,
+    golsFora: null,
+    estadio: "SoFi Stadium",
+  },
+  {
+    data: "2026-06-13 19:00",
     fase: "Fase de Grupos",
     grupo: "D",
-    casa: "Dinamarca",
-    fora: "Tunísia",
-    golsCasa: 0,
-    golsFora: 0,
-    estadio: "Education City",
+    casa: "Classificado CONMEBOL 2",
+    fora: "Classificado UEFA 4",
+    golsCasa: null,
+    golsFora: null,
+    estadio: "Seattle Stadium",
   },
   {
-    data: "2022-11-22 16:00",
-    fase: "Fase de Grupos",
-    grupo: "D",
-    casa: "França",
-    fora: "Austrália",
-    golsCasa: 4,
-    golsFora: 1,
-    estadio: "Al Janoub",
-  },
-  {
-    data: "2022-11-23 10:00",
+    data: "2026-06-14 14:00",
     fase: "Fase de Grupos",
     grupo: "E",
-    casa: "Alemanha",
-    fora: "Japão",
-    golsCasa: 1,
-    golsFora: 2,
-    estadio: "Khalifa",
+    casa: "Classificado UEFA 5",
+    fora: "Classificado CAF 3",
+    golsCasa: null,
+    golsFora: null,
+    estadio: "Dallas Stadium",
   },
   {
-    data: "2022-11-23 13:00",
-    fase: "Fase de Grupos",
-    grupo: "E",
-    casa: "Espanha",
-    fora: "Costa Rica",
-    golsCasa: 7,
-    golsFora: 0,
-    estadio: "Al Thumama",
-  },
-  {
-    data: "2022-11-23 16:00",
+    data: "2026-06-14 19:00",
     fase: "Fase de Grupos",
     grupo: "F",
-    casa: "Bélgica",
-    fora: "Canadá",
-    golsCasa: 1,
-    golsFora: 0,
-    estadio: "Ahmad Bin Ali",
+    casa: "Classificado UEFA 6",
+    fora: "Classificado CONCACAF 2",
+    golsCasa: null,
+    golsFora: null,
+    estadio: "Atlanta Stadium",
   },
   {
-    data: "2022-11-23 19:00",
-    fase: "Fase de Grupos",
-    grupo: "F",
-    casa: "Marrocos",
-    fora: "Croácia",
-    golsCasa: 0,
-    golsFora: 0,
-    estadio: "Al Bayt",
-  },
-  {
-    data: "2022-11-24 13:00",
+    data: "2026-06-15 14:00",
     fase: "Fase de Grupos",
     grupo: "G",
-    casa: "Brasil",
-    fora: "Sérvia",
-    golsCasa: 2,
-    golsFora: 0,
-    estadio: "Lusail",
+    casa: "Classificado UEFA 7",
+    fora: "Classificado CONMEBOL 4",
+    golsCasa: null,
+    golsFora: null,
+    estadio: "Houston Stadium",
   },
   {
-    data: "2022-11-24 16:00",
-    fase: "Fase de Grupos",
-    grupo: "G",
-    casa: "Suíça",
-    fora: "Camarões",
-    golsCasa: 1,
-    golsFora: 0,
-    estadio: "Al Janoub",
-  },
-  {
-    data: "2022-11-24 10:00",
+    data: "2026-06-15 19:00",
     fase: "Fase de Grupos",
     grupo: "H",
-    casa: "Uruguai",
-    fora: "Coreia do Sul",
-    golsCasa: 0,
-    golsFora: 0,
-    estadio: "Education City",
+    casa: "Classificado UEFA 8",
+    fora: "Classificado CAF 5",
+    golsCasa: null,
+    golsFora: null,
+    estadio: "Monterrey Stadium",
   },
   {
-    data: "2022-11-24 19:00",
+    data: "2026-06-16 14:00",
     fase: "Fase de Grupos",
-    grupo: "H",
-    casa: "Portugal",
-    fora: "Gana",
-    golsCasa: 3,
-    golsFora: 2,
-    estadio: "Stadium 974",
+    grupo: "I",
+    casa: "Classificado UEFA 9",
+    fora: "Classificado CONCACAF 4",
+    golsCasa: null,
+    golsFora: null,
+    estadio: "Philadelphia Stadium",
   },
   {
-    data: "2022-12-03 12:00",
+    data: "2026-06-16 19:00",
+    fase: "Fase de Grupos",
+    grupo: "J",
+    casa: "Classificado UEFA 10",
+    fora: "Classificado CONMEBOL 6",
+    golsCasa: null,
+    golsFora: null,
+    estadio: "Kansas City Stadium",
+  },
+  {
+    data: "2026-06-17 14:00",
+    fase: "Fase de Grupos",
+    grupo: "K",
+    casa: "Classificado UEFA 11",
+    fora: "Classificado CONCACAF 5",
+    golsCasa: null,
+    golsFora: null,
+    estadio: "Guadalajara Stadium",
+  },
+  {
+    data: "2026-06-17 19:00",
+    fase: "Fase de Grupos",
+    grupo: "L",
+    casa: "Classificado UEFA 12",
+    fora: "Classificado CONMEBOL 7",
+    golsCasa: null,
+    golsFora: null,
+    estadio: "New York/New Jersey Stadium",
+  },
+  {
+    data: "2026-06-28 16:00",
+    fase: "16 avos de Final",
+    casa: "1A",
+    fora: "3C",
+    golsCasa: null,
+    golsFora: null,
+    estadio: "Los Angeles Stadium",
+  },
+  {
+    data: "2026-07-03 16:00",
     fase: "Oitavas de Final",
-    casa: "Holanda",
-    fora: "EUA",
-    golsCasa: 3,
-    golsFora: 1,
-    estadio: "Khalifa",
+    casa: "Vencedor Jogo 1",
+    fora: "Vencedor Jogo 2",
+    golsCasa: null,
+    golsFora: null,
+    estadio: "Miami Stadium",
   },
   {
-    data: "2022-12-03 16:00",
-    fase: "Oitavas de Final",
-    casa: "Argentina",
-    fora: "Austrália",
-    golsCasa: 2,
-    golsFora: 1,
-    estadio: "Ahmad Bin Ali",
-  },
-  {
-    data: "2022-12-09 12:00",
+    data: "2026-07-09 18:00",
     fase: "Quartas de Final",
-    casa: "Croácia",
-    fora: "Brasil",
-    golsCasa: 1,
-    golsFora: 1,
-    estadio: "Education City",
+    casa: "A definir",
+    fora: "A definir",
+    golsCasa: null,
+    golsFora: null,
+    estadio: "Boston Stadium",
   },
   {
-    data: "2022-12-13 16:00",
+    data: "2026-07-14 19:00",
     fase: "Semifinal",
-    casa: "Argentina",
-    fora: "Croácia",
-    golsCasa: 3,
-    golsFora: 0,
-    estadio: "Lusail",
+    casa: "A definir",
+    fora: "A definir",
+    golsCasa: null,
+    golsFora: null,
+    estadio: "Dallas Stadium",
   },
   {
-    data: "2022-12-18 12:00",
+    data: "2026-07-19 16:00",
     fase: "Final",
-    casa: "Argentina",
-    fora: "França",
-    golsCasa: 3,
-    golsFora: 3,
-    estadio: "Lusail",
+    casa: "A definir",
+    fora: "A definir",
+    golsCasa: null,
+    golsFora: null,
+    estadio: "New York/New Jersey Stadium",
   },
 ];
 
@@ -224,6 +203,10 @@ const standingsBody = document.getElementById("group-standings-body");
 const matchesList = document.getElementById("matches-list");
 const resumoRoot = document.getElementById("resumo");
 const teamStatsRoot = document.getElementById("team-stats");
+
+function jogoTemPlacar(jogo) {
+  return Number.isFinite(jogo.golsCasa) && Number.isFinite(jogo.golsFora);
+}
 
 function formatarData(dataTexto) {
   const data = new Date(dataTexto.replace(" ", "T"));
@@ -254,6 +237,8 @@ function calcularClassificacaoGrupo(grupo) {
   jogos
     .filter((jogo) => jogo.fase === "Fase de Grupos" && jogo.grupo === grupo)
     .forEach((jogo) => {
+      if (!jogoTemPlacar(jogo)) return;
+
       const casa = tabela[jogo.casa];
       const fora = tabela[jogo.fora];
 
@@ -332,15 +317,23 @@ function renderizarJogos() {
 
   matchesList.innerHTML = jogosFiltrados
     .map(
-      (jogo) => `
+      (jogo) => {
+        const placar = jogoTemPlacar(jogo)
+          ? `${jogo.casa} ${jogo.golsCasa} x ${jogo.golsFora} ${jogo.fora}`
+          : `${jogo.casa} x ${jogo.fora}`;
+        const status = jogoTemPlacar(jogo) ? "Encerrado" : "Agendado";
+
+        return `
       <li class="match-item">
         <div>
           <div class="match-meta">${formatarData(jogo.data)} - ${jogo.estadio}</div>
-          <div class="match-score">${jogo.casa} ${jogo.golsCasa} x ${jogo.golsFora} ${jogo.fora}</div>
+          <div class="match-score">${placar}</div>
+          <div class="match-meta">Status: ${status}</div>
         </div>
         <span class="badge">${jogo.fase}${jogo.grupo ? ` - Grupo ${jogo.grupo}` : ""}</span>
       </li>
-    `
+    `;
+      }
     )
     .join("");
 }
@@ -364,6 +357,8 @@ function calcularEstatisticasTimes() {
     });
 
   jogos.forEach((jogo) => {
+    if (!jogoTemPlacar(jogo)) return;
+
     if (!mapa[jogo.casa]) {
       mapa[jogo.casa] = {
         time: jogo.casa,
@@ -433,21 +428,21 @@ function renderizarEstatisticasTimes() {
 }
 
 function renderizarResumo() {
+  const jogosFinalizados = jogos.filter(jogoTemPlacar);
   const totalJogos = jogos.length;
-  const totalGols = jogos.reduce(
+  const totalFinalizados = jogosFinalizados.length;
+  const totalGols = jogosFinalizados.reduce(
     (acumulado, jogo) => acumulado + jogo.golsCasa + jogo.golsFora,
     0
   );
-  const mediaGols = (totalGols / totalJogos).toFixed(2);
-  const selecoesUnicas = new Set(
-    jogos.flatMap((jogo) => [jogo.casa, jogo.fora])
-  ).size;
+  const mediaGols = totalFinalizados ? (totalGols / totalFinalizados).toFixed(2) : "0.00";
+  const selecoesUnicas = new Set(Object.values(grupos).flat()).size;
   const topAtaque =
-    calcularEstatisticasTimes().sort((a, b) => b.golsPro - a.golsPro)[0] ||
-    null;
+    calcularEstatisticasTimes().find((time) => time.jogos > 0) || null;
 
   const cards = [
-    { titulo: "Jogos cadastrados", valor: totalJogos },
+    { titulo: "Jogos programados", valor: totalJogos },
+    { titulo: "Jogos finalizados", valor: totalFinalizados },
     { titulo: "Total de gols", valor: totalGols },
     { titulo: "Média de gols/jogo", valor: mediaGols },
     { titulo: "Seleções no painel", valor: selecoesUnicas },
