@@ -319,6 +319,44 @@ const maiorArtilheiroHistorico = {
     "Maior artilheiro da história da Copa do Mundo, superando Ronaldo Fenômeno em 2014 no Brasil.",
 };
 
+const carreiraKlose = [
+  {
+    equipe: "1. FC Kaiserslautern",
+    periodo: "1999-2004",
+    jogos: 145,
+    gols: 52,
+    titulos: ["2. Bundesliga (1996-97)"],
+  },
+  {
+    equipe: "Werder Bremen",
+    periodo: "2004-2007",
+    jogos: 132,
+    gols: 63,
+    titulos: ["DFB-Ligapokal (2006)"],
+  },
+  {
+    equipe: "Bayern de Munique",
+    periodo: "2007-2011",
+    jogos: 150,
+    gols: 53,
+    titulos: ["Bundesliga (2007-08, 2009-10)", "DFB-Pokal (2007-08, 2009-10)"],
+  },
+  {
+    equipe: "Lazio",
+    periodo: "2011-2016",
+    jogos: 171,
+    gols: 63,
+    titulos: ["Coppa Italia (2012-13)"],
+  },
+  {
+    equipe: "Seleção da Alemanha",
+    periodo: "2001-2014",
+    jogos: 137,
+    gols: 71,
+    titulos: ["Copa do Mundo (2014)"],
+  },
+];
+
 const topArtilheirosHistoricos = [
   { nome: "Miroslav Klose", selecao: "Alemanha", gols: 16, status: "Aposentado", destaque: true },
   { nome: "Ronaldo", selecao: "Brasil", gols: 15, status: "Aposentado" },
@@ -782,12 +820,14 @@ function renderHistoriaCopas() {
   const destaquesRoot = document.getElementById("history-summary-grid");
   const artilheiroRoot = document.getElementById("history-top-scorer");
   const topArtilheirosRoot = document.getElementById("history-top-scorers");
+  const carreiraRoot = document.getElementById("history-klose-career");
   const estreantesRoot = document.getElementById("history-first-timers");
   const campeoesRoot = document.getElementById("history-champions-grid");
   if (
     !destaquesRoot ||
     !artilheiroRoot ||
     !topArtilheirosRoot ||
+    !carreiraRoot ||
     !estreantesRoot ||
     !campeoesRoot
   ) return;
@@ -840,6 +880,24 @@ function renderHistoriaCopas() {
           </span>
         </div>
       </li>
+    `
+    )
+    .join("");
+
+  carreiraRoot.innerHTML = carreiraKlose
+    .map(
+      (item) => `
+      <article class="history-career-item">
+        <div class="history-career-head">
+          <h4>${item.equipe}</h4>
+          <span>${item.periodo}</span>
+        </div>
+        <div class="history-career-stats">
+          <span><strong>${item.jogos}</strong> jogos</span>
+          <span><strong>${item.gols}</strong> gols</span>
+        </div>
+        <p>${item.titulos.join(" · ")}</p>
+      </article>
     `
     )
     .join("");
