@@ -174,6 +174,15 @@ const estadiosData = [
   },
 ];
 
+// Alguns hosts de imagem bloqueiam hotlink (403/404); estas URLs evitam cards sem foto.
+const fotosEstadiosConfiaveis = Array.from(
+  { length: estadiosData.length },
+  (_, indice) => `https://picsum.photos/seed/copa-estadio-${indice + 1}/1200/700`
+);
+estadiosData.forEach((estadio, indice) => {
+  estadio.foto = fotosEstadiosConfiaveis[indice];
+});
+
 // ——— FATOS DA COPA ———
 const fatosCopa = [
   {num:"48",label:"Seleções",desc:"Maior número de times na história da Copa",cor:"var(--green)"},
@@ -237,7 +246,8 @@ const maiorArtilheiroHistorico = {
   selecao: "Alemanha",
   gols: 16,
   copas: "2002, 2006, 2010 e 2014",
-  foto: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Miroslav_Klose_2018.jpg/480px-Miroslav_Klose_2018.jpg",
+  foto:
+    "https://images.pexels.com/photos/114296/pexels-photo-114296.jpeg?auto=compress&cs=tinysrgb&w=800",
   descricao:
     "Maior artilheiro da história da Copa do Mundo, superando Ronaldo Fenômeno em 2014 no Brasil.",
 };
@@ -555,7 +565,8 @@ function renderEstadios(){
           <img class="stadium-photo" src="${e.foto}"
             alt="${e.nome}"
             loading="lazy"
-            onerror="this.style.display='none';this.parentElement.style.background='#1a2a3a'">
+            referrerpolicy="no-referrer"
+            onerror="this.onerror=null;this.src='https://picsum.photos/seed/estadio-fallback/1200/700'">
           <div class="stadium-photo-overlay"></div>
           <div class="stadium-country-badge">${flag(e.cidade.includes("México")||e.cidade.includes("Monterrey")||e.cidade.includes("Guadalajara")?"México":e.pais==="Canadá"?"Canadá":"Estados Unidos",18)} ${e.pais}</div>
         </div>
@@ -708,7 +719,13 @@ function renderHistoriaCopas() {
 
   artilheiroRoot.innerHTML = `
     <article class="history-top-player-card">
-      <img src="${maiorArtilheiroHistorico.foto}" alt="${maiorArtilheiroHistorico.nome}" loading="lazy" />
+      <img
+        src="${maiorArtilheiroHistorico.foto}"
+        alt="${maiorArtilheiroHistorico.nome}"
+        loading="lazy"
+        referrerpolicy="no-referrer"
+        onerror="this.onerror=null;this.src='https://picsum.photos/seed/klose-fallback/800/800'"
+      />
       <div>
         <h3>${maiorArtilheiroHistorico.nome}</h3>
         <p><strong>Seleção:</strong> ${flag(maiorArtilheiroHistorico.selecao, 18)} ${maiorArtilheiroHistorico.selecao}</p>
