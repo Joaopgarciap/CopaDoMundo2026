@@ -882,8 +882,10 @@ function renderHistoriaCopas(){
     </div>`;
 
   topScorersRoot.innerHTML=topArtilheirosHistoricos.map((artilheiro,idx)=>`<li>
-      <div>
-        <strong>${idx+1}. ${artilheiro.nome}</strong>
+      <div class="history-player-main">
+        <span class="history-player-rank">${idx+1}.</span>
+        <span class="history-player-flag">${flag(artilheiro.selecao,16)}</span>
+        <strong>${artilheiro.nome}</strong>
         <span>${artilheiro.selecao}</span>
       </div>
       <div>
@@ -895,9 +897,12 @@ function renderHistoriaCopas(){
   debutantesRoot.innerHTML=selecoesEstreantes2026.map((selecao)=>`<li>${flag(selecao,18)} ${selecao}</li>`).join("");
 
   campeoesRoot.innerHTML=rankingCampeoesCopas.map((item)=>`<li>
-      <div>
-        <strong>${item.selecao}</strong>
-        <span>${item.anos}</span>
+      <div class="history-champion-main">
+        <span class="history-player-flag">${flag(item.selecao,16)}</span>
+        <div>
+          <strong>${item.selecao}</strong>
+          <span>${item.anos}</span>
+        </div>
       </div>
       <strong>${item.titulos}x</strong>
     </li>`).join("");
