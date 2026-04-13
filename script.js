@@ -226,6 +226,19 @@ if (typeof window !== "undefined") {
   window.__fallbackImagemBola = fallbackImagemBola;
 }
 
+const fotosEstadiosLocais = [
+  "assets/stadium-1.jpg",
+  "assets/stadium-2.jpg",
+  "assets/stadium-3.jpg",
+  "assets/stadium-4.jpg",
+];
+
+estadiosData.forEach((estadio, indice) => {
+  estadio.foto = fotosEstadiosLocais[indice % fotosEstadiosLocais.length];
+});
+
+const imagemBolaOficial = "assets/ball-official.jpg";
+
 // ——— FATOS DA COPA ———
 const fatosCopa = [
   {num:"48",label:"Seleções",desc:"Maior número de times na história da Copa",cor:"var(--green)"},
@@ -858,7 +871,13 @@ function iniciarTabs(){
 
 function inicializar(){
   const ballImg = document.getElementById("ball-img");
-  if (ballImg) ballImg.src = fallbackImagemBola;
+  if (ballImg) {
+    ballImg.src = imagemBolaOficial;
+    ballImg.onerror = () => {
+      ballImg.onerror = null;
+      ballImg.src = fallbackImagemBola;
+    };
+  }
 
   const faseSelect=document.getElementById("fase-select");
   const fases=[...new Set(jogos.map(j=>j.fase))];
