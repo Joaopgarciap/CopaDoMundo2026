@@ -16,7 +16,7 @@ const isoCodes = {
   "Argentina":"ar","Argélia":"dz","Áustria":"at","Jordânia":"jo",
   "Portugal":"pt","RD do Congo":"cd","Uzbequistão":"uz","Colômbia":"co",
   "Inglaterra":"gb-eng","Croácia":"hr","Gana":"gh","Panamá":"pa",
-  "Itália":"it","Dinamarca":"dk",
+  "Itália":"it","Dinamarca":"dk","Hungria":"hu","El Salvador":"sv",
 };
 
 const grupos = {
@@ -301,12 +301,15 @@ const rankingCampeoes = [
 const selecoesEstreantes2026 = ["Curaçao", "Haiti", "Uzbequistão", "Jordânia", "Bósnia e Herzegovina", "Cabo Verde"];
 
 const destaquesHistoricos = [
-  { titulo: "Mais participações", valor: "Brasil (22)", detalhe: "Única seleção presente em todas as edições desde 1930." },
-  { titulo: "Mais títulos", valor: "Brasil (5)", detalhe: "Campeão em 1958, 1962, 1970, 1994 e 2002." },
-  { titulo: "Mais jogos em Copas", valor: "Lothar Matthäus (25)", detalhe: "Recordista de partidas disputadas em Mundiais." },
-  { titulo: "Maior goleada", valor: "Hungria 10–1 El Salvador", detalhe: "Fase de grupos da Copa de 1982, na Espanha." },
-  { titulo: "Maior público em final", valor: "Brasil x Uruguai (199.854)", detalhe: "Final de 1950 no Maracanã (Rio de Janeiro)." },
-  { titulo: "Mais gols em uma edição", valor: "Just Fontaine (13)", detalhe: "Marca histórica na Copa de 1958 pela França." },
+  { titulo: "Mais participações", valor: `${flag("Brasil", 16)} Brasil (22)`, detalhe: "Única seleção presente em todas as edições desde 1930." },
+  { titulo: "Mais títulos", valor: `${flag("Brasil", 16)} Brasil (5)`, detalhe: "Campeão em 1958, 1962, 1970, 1994 e 2002." },
+  { titulo: "Mais jogos da seleção", valor: `${flag("Brasil", 16)} Brasil (114)`, detalhe: "Seleção que mais disputou partidas em Copas (até 2022)." },
+  { titulo: "Seleção com mais gols", valor: `${flag("Brasil", 16)} Brasil (237)`, detalhe: "Maior número de gols marcados na história da Copa (até 2022)." },
+  { titulo: "Seleção com mais gols sofridos", valor: `${flag("Alemanha", 16)} Alemanha (130)`, detalhe: "Maior número de gols sofridos na história da Copa (até 2022)." },
+  { titulo: "Maior goleada", valor: `${flag("Hungria", 16)} Hungria 10–1 ${flag("El Salvador", 16)} El Salvador`, detalhe: "Fase de grupos da Copa de 1982, na Espanha." },
+  { titulo: "Maior público em final", valor: `${flag("Brasil", 16)} Brasil x ${flag("Uruguai", 16)} Uruguai (199.854)`, detalhe: "Final de 1950 no Maracanã (Rio de Janeiro)." },
+  { titulo: "Mais gols em uma edição", valor: `${flag("França", 16)} Just Fontaine (13)`, detalhe: "Marca histórica na Copa de 1958 pela França." },
+  { titulo: "Mais jogos em Copas (atleta)", valor: `${flag("Alemanha", 16)} Lothar Matthäus (25)`, detalhe: "Recordista de partidas de um jogador em Mundiais." },
 ];
 
 const maiorArtilheiroHistorico = {
@@ -322,13 +325,15 @@ const maiorArtilheiroHistorico = {
 const carreiraKlose = [
   {
     equipe: "1. FC Kaiserslautern",
+    pais: "Alemanha",
     periodo: "1999-2004",
     jogos: 145,
     gols: 52,
-    titulos: ["2. Bundesliga (1996-97)"],
+    titulos: ["Sem títulos de elite no período"],
   },
   {
     equipe: "Werder Bremen",
+    pais: "Alemanha",
     periodo: "2004-2007",
     jogos: 132,
     gols: 63,
@@ -336,6 +341,7 @@ const carreiraKlose = [
   },
   {
     equipe: "Bayern de Munique",
+    pais: "Alemanha",
     periodo: "2007-2011",
     jogos: 150,
     gols: 53,
@@ -343,6 +349,7 @@ const carreiraKlose = [
   },
   {
     equipe: "Lazio",
+    pais: "Itália",
     periodo: "2011-2016",
     jogos: 171,
     gols: 63,
@@ -350,10 +357,11 @@ const carreiraKlose = [
   },
   {
     equipe: "Seleção da Alemanha",
+    pais: "Alemanha",
     periodo: "2001-2014",
     jogos: 137,
     gols: 71,
-    titulos: ["Copa do Mundo (2014)"],
+    titulos: ["Copa do Mundo FIFA (2014)"],
   },
 ];
 
@@ -889,7 +897,7 @@ function renderHistoriaCopas() {
       (item) => `
       <article class="history-career-item">
         <div class="history-career-head">
-          <h4>${item.equipe}</h4>
+          <h4>${item.pais ? `${flag(item.pais, 16)} ` : ""}${item.equipe}</h4>
           <span>${item.periodo}</span>
         </div>
         <div class="history-career-stats">
