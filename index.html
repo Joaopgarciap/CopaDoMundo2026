@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Painel da Copa do Mundo</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <div>
+        <p class="eyebrow">Acompanhamento local</p>
+        <h1>Painel da Copa do Mundo</h1>
+        <p class="subtitle">
+          Veja grupos, jogos e estatísticas em um só lugar.
+        </p>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="panel" aria-labelledby="resumo-title">
+        <h2 id="resumo-title">Resumo geral</h2>
+        <div id="resumo" class="summary-grid"></div>
+      </section>
+
+      <section class="panel" aria-labelledby="grupos-title">
+        <div class="section-header">
+          <h2 id="grupos-title">Classificação por grupo</h2>
+          <label for="grupo-select">Grupo</label>
+          <select id="grupo-select"></select>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Pos</th>
+                <th>Seleção</th>
+                <th>J</th>
+                <th>V</th>
+                <th>E</th>
+                <th>D</th>
+                <th>GP</th>
+                <th>GC</th>
+                <th>SG</th>
+                <th>Pts</th>
+              </tr>
+            </thead>
+            <tbody id="group-standings-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="jogos-title">
+        <div class="section-header matches-filters">
+          <h2 id="jogos-title">Jogos</h2>
+          <label for="fase-select">Fase</label>
+          <select id="fase-select">
+            <option value="Todas">Todas</option>
+          </select>
+          <label for="search-time">Buscar seleção</label>
+          <input
+            id="search-time"
+            type="search"
+            placeholder="Ex.: Brasil, França..."
+          />
+        </div>
+        <ul id="matches-list" class="match-list"></ul>
+      </section>
+
+      <section class="panel" aria-labelledby="estatisticas-title">
+        <h2 id="estatisticas-title">Estatísticas das seleções</h2>
+        <div id="team-stats" class="team-stats-grid"></div>
+      </section>
+    </main>
+
+    <footer>
+      <p>
+        Dados de exemplo para acompanhamento local. Você pode editar o arquivo
+        <code>script.js</code> para atualizar os jogos.
+      </p>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
