@@ -31,6 +31,7 @@
       <button class="tab" data-tab="artilheiros">🥇 Artilheiros</button>
       <button class="tab" data-tab="copa">🏟️ Copa 2026</button>
       <button class="tab" data-tab="ranking">🌍 Rankings</button>
+      <button class="tab" data-tab="historia">📚 História das Copas</button>
       <button class="tab" data-tab="estatisticas">📊 Estatísticas</button>
     </nav>
 
@@ -164,6 +165,32 @@
             <p class="ranking-source">Fonte: histórico da FIFA World Cup.</p>
           </article>
         </div>
+      </section>
+
+      <section class="tab-pane" id="tab-historia">
+        <div class="history-header">
+          <h2>História Geral das Copas do Mundo</h2>
+          <p>Recordes históricos, destaques individuais e contexto da edição 2026.</p>
+        </div>
+
+        <div id="history-summary-grid" class="history-summary-grid"></div>
+
+        <div class="history-columns">
+          <article class="history-panel">
+            <h3>Maior Artilheiro da História</h3>
+            <div id="history-top-scorer"></div>
+          </article>
+
+          <article class="history-panel">
+            <h3>Seleções estreantes em 2026</h3>
+            <ul id="history-first-timers" class="history-list"></ul>
+          </article>
+        </div>
+
+        <article class="history-panel">
+          <h3>Campeões por número de títulos</h3>
+          <div id="history-champions-grid" class="history-champions-grid"></div>
+        </article>
       </section>
 
       <section class="tab-pane" id="tab-estatisticas">

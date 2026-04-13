@@ -221,6 +221,27 @@ const rankingCampeoes = [
   { selecao: "Espanha", titulos: 1, anos: "2010" },
 ];
 
+const selecoesEstreantes2026 = ["Curaçao", "Haiti", "Uzbequistão", "Jordânia", "Bósnia e Herzegovina", "Cabo Verde"];
+
+const destaquesHistoricos = [
+  { titulo: "Mais participações", valor: "Brasil (22)", detalhe: "Única seleção presente em todas as edições desde 1930." },
+  { titulo: "Mais títulos", valor: "Brasil (5)", detalhe: "Campeão em 1958, 1962, 1970, 1994 e 2002." },
+  { titulo: "Mais jogos em Copas", valor: "Lothar Matthäus (25)", detalhe: "Recordista de partidas disputadas em Mundiais." },
+  { titulo: "Maior goleada", valor: "Hungria 10–1 El Salvador", detalhe: "Fase de grupos da Copa de 1982, na Espanha." },
+  { titulo: "Maior público em final", valor: "Brasil x Uruguai (199.854)", detalhe: "Final de 1950 no Maracanã (Rio de Janeiro)." },
+  { titulo: "Mais gols em uma edição", valor: "Just Fontaine (13)", detalhe: "Marca histórica na Copa de 1958 pela França." },
+];
+
+const maiorArtilheiroHistorico = {
+  nome: "Miroslav Klose",
+  selecao: "Alemanha",
+  gols: 16,
+  copas: "2002, 2006, 2010 e 2014",
+  foto: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Miroslav_Klose_2018.jpg/480px-Miroslav_Klose_2018.jpg",
+  descricao:
+    "Maior artilheiro da história da Copa do Mundo, superando Ronaldo Fenômeno em 2014 no Brasil.",
+};
+
 // ——— JOGOS FASE DE GRUPOS (horário de Brasília) ———
 // Fontes: ESPN, Lance, 365Scores, Olympics.com (confirmados)
 const jogos = [
@@ -664,6 +685,69 @@ function renderRankings(){
 }
 
 // =============================================
+//  RENDER: HISTÓRIA DAS COPAS
+// =============================================
+function renderHistoriaCopas() {
+  const destaquesRoot = document.getElementById("history-summary-grid");
+  const artilheiroRoot = document.getElementById("history-top-scorer");
+  const estreantesRoot = document.getElementById("history-first-timers");
+  const campeoesRoot = document.getElementById("history-champions-grid");
+  if (!destaquesRoot || !artilheiroRoot || !estreantesRoot || !campeoesRoot) return;
+
+  destaquesRoot.innerHTML = destaquesHistoricos
+    .map(
+      (item) => `
+      <article class="history-card">
+        <h3>${item.titulo}</h3>
+        <p class="history-card-value">${item.valor}</p>
+        <p class="history-card-detail">${item.detalhe}</p>
+      </article>
+    `
+    )
+    .join("");
+
+  artilheiroRoot.innerHTML = `
+    <article class="history-top-player-card">
+      <img src="${maiorArtilheiroHistorico.foto}" alt="${maiorArtilheiroHistorico.nome}" loading="lazy" />
+      <div>
+        <h3>${maiorArtilheiroHistorico.nome}</h3>
+        <p><strong>Seleção:</strong> ${flag(maiorArtilheiroHistorico.selecao, 18)} ${maiorArtilheiroHistorico.selecao}</p>
+        <p><strong>Gols em Copas:</strong> ${maiorArtilheiroHistorico.gols}</p>
+        <p><strong>Edições:</strong> ${maiorArtilheiroHistorico.copas}</p>
+        <p class="history-top-player-desc">${maiorArtilheiroHistorico.descricao}</p>
+      </div>
+    </article>
+  `;
+
+  estreantesRoot.innerHTML = selecoesEstreantes2026
+    .map(
+      (time) => `
+      <li class="history-first-timer-item">
+        <span>${flag(time, 20)} ${time}</span>
+        <small>1ª participação</small>
+      </li>
+    `
+    )
+    .join("");
+
+  campeoesRoot.innerHTML = rankingCampeoes
+    .sort((a, b) => b.titulos - a.titulos || a.selecao.localeCompare(b.selecao))
+    .map(
+      (item, indice) => `
+      <article class="history-champion-card">
+        <div class="history-champion-head">
+          <span class="history-champion-rank">#${indice + 1}</span>
+          <span class="history-champion-team">${flag(item.selecao, 22)} ${item.selecao}</span>
+        </div>
+        <p class="history-champion-titles">${item.titulos} título${item.titulos > 1 ? "s" : ""}</p>
+        <p class="history-champion-years">${item.anos}</p>
+      </article>
+    `
+    )
+    .join("");
+}
+
+// =============================================
 //  TABS & INICIALIZAR
 // =============================================
 function iniciarTabs(){
@@ -695,6 +779,7 @@ function inicializar(){
   renderFatos();
   renderEstatisticas();
   renderRankings();
+  renderHistoriaCopas();
 }
 
 inicializar();

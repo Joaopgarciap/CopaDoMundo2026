@@ -218,7 +218,7 @@ select:focus,input:focus { border-color:rgba(245,200,66,.4); }
 /* ——— RANKINGS ——— */
 .ranking-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: 1fr 1fr;
   gap: 1rem;
 }
 
@@ -359,6 +359,155 @@ select:focus,input:focus { border-color:rgba(245,200,66,.4); }
   color: var(--accent);
 }
 
+/* ——— HISTÓRIA DAS COPAS ——— */
+.history-header { margin-bottom: 1rem; }
+.history-header h2 {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 2rem;
+  color: var(--gold);
+}
+.history-header p { color: var(--muted); font-size: 0.86rem; }
+
+.history-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.history-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.95rem;
+}
+.history-card h3 {
+  font-size: 0.78rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: 0.4rem;
+}
+.history-card-value {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 1.5rem;
+  color: var(--gold);
+  line-height: 1;
+}
+.history-card-detail {
+  margin-top: 0.4rem;
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.history-columns {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.history-panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+}
+.history-panel h3 {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 1.35rem;
+  color: var(--gold);
+  letter-spacing: 0.04em;
+  margin-bottom: 0.8rem;
+}
+
+.history-top-player-card {
+  display: grid;
+  grid-template-columns: 190px 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+.history-top-player-card img {
+  width: 100%;
+  height: 230px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+.history-top-player-card h3 {
+  margin-bottom: 0.35rem;
+  font-size: 1.6rem;
+}
+.history-top-player-card p {
+  font-size: 0.84rem;
+  color: var(--muted);
+  margin-bottom: 0.3rem;
+  line-height: 1.4;
+}
+.history-top-player-desc {
+  margin-top: 0.55rem;
+}
+
+.history-list {
+  list-style: none;
+  display: grid;
+  gap: 0.6rem;
+}
+.history-first-timer-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.6rem;
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.62rem 0.75rem;
+}
+.history-first-timer-item span {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.history-first-timer-item small {
+  color: var(--green);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.history-champions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.7rem;
+}
+.history-champion-card {
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.75rem;
+}
+.history-champion-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+}
+.history-champion-head strong {
+  margin-left: auto;
+  font-family: "Bebas Neue", sans-serif;
+  color: var(--gold);
+  font-size: 1.1rem;
+}
+.history-champion-years {
+  margin-top: 0.35rem;
+  font-size: 0.74rem;
+  color: var(--muted);
+}
+
 /* ——— FOOTER ——— */
 footer { text-align:center; color:var(--muted); font-size:.82rem; padding:2rem 1rem 3rem; border-top:1px solid var(--border); }
 footer code { background:rgba(255,255,255,.07); padding:.1rem .4rem; border-radius:4px; font-size:.8rem; color:var(--green); }
@@ -376,4 +525,8 @@ footer code { background:rgba(255,255,255,.07); padding:.1rem .4rem; border-radi
   .stadium-photo-wrap { height:200px; }
   .tab { padding:.85rem .85rem; font-size:.78rem; }
   .copa-section-title h2 { font-size:1.5rem; }
+  .ranking-grid { grid-template-columns: 1fr; }
+  .history-columns { grid-template-columns: 1fr; }
+  .history-top-player-card { grid-template-columns: 1fr; }
+  .history-top-player-card img { height: 260px; }
 }
