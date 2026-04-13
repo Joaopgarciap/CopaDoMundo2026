@@ -669,29 +669,11 @@ select:focus,input:focus { border-color:rgba(245,200,66,.4); }
   color:var(--muted);
   line-height:1.45;
 }
-.match-detail-refresh-row {
-  margin-top:.7rem;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:.6rem;
-  flex-wrap:wrap;
-}
 .match-detail-refresh {
+  margin-top:.65rem;
   font-size:.72rem;
   color:var(--muted);
 }
-.api-sync-btn {
-  background:var(--panel);
-  border:1px solid var(--border2);
-  color:var(--text);
-  border-radius:9px;
-  cursor:pointer;
-  font-size:.8rem;
-  font-weight:700;
-  padding:.45rem .7rem;
-}
-.api-sync-btn:hover { border-color:rgba(59,127,255,.45); color:var(--accent); }
 
 /* ═══════════ ARTILHEIROS ═══════════ */
 .art-top-bar { display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem; }
