@@ -574,6 +574,8 @@ function toggleFavGame(idx){const f=getFavorites();const i=f.games.indexOf(idx);
 function toggleFavTeam(team){const f=getFavorites();const i=f.teams.indexOf(team);if(i>-1)f.teams.splice(i,1);else f.teams.push(team);saveFavorites(f);renderFavoritos();renderSelecoes();}
 function isFavGame(idx){return getFavorites().games.includes(idx);}
 function isFavTeam(t){return getFavorites().teams.includes(t);}
+const getMatchDetailsStore=()=>JSON.parse(localStorage.getItem("copa_match_details")||"{}");
+const saveMatchDetailsStore=(data)=>localStorage.setItem("copa_match_details",JSON.stringify(data));
 
 // ═══════ UTILS ═══════
 function flag(t,s=24){const c=isoCodes[t];if(!c)return`<span style="font-size:${s}px;line-height:1">🏳️</span>`;return`<img src="https://flagcdn.com/w40/${c}.png" alt="${t}" class="flag-img" style="width:${s}px;height:${Math.round(s*.67)}px;object-fit:cover;border-radius:3px">`;}
@@ -581,6 +583,10 @@ function jogoTemPlacar(j){return Number.isFinite(j.golsCasa)&&Number.isFinite(j.
 function formatarData(t){const d=new Date(t.replace(" ","T"));return new Intl.DateTimeFormat("pt-BR",{dateStyle:"short",timeStyle:"short"}).format(d);}
 function formatarDia(t){const d=new Date(t.split(" ")[0]+"T12:00:00");return{dia:d.getDate().toString().padStart(2,"0"),mes:d.toLocaleString("pt-BR",{month:"short"}).replace(".","").toUpperCase()};}
 function phaseBadgeClass(f){if(f==="Fase de Grupos")return"grupos";if(f.includes("16 avos"))return"avos";if(f.includes("Oitavas"))return"oitavas";if(f.includes("Quartas"))return"quartas";if(f.includes("Semi"))return"semi";if(f==="Final"||f.includes("Terceiro"))return"final";return"";}
+function minutoOrdenavel(v){
+  const n=parseInt(String(v||"").replace(/[^\d]/g,""),10);
+  return Number.isFinite(n)?n:999;
+}
 function calcularClassificacaoGrupo(g){
   const ts=grupos[g]||[];const tab={};
   ts.forEach(t=>{tab[t]={time:t,jogos:0,vitorias:0,empates:0,derrotas:0,golsPro:0,golsContra:0,saldo:0,pontos:0};});
@@ -656,7 +662,7 @@ function renderHoje(){
   const proximos=getJogos().filter(j=>{const d=new Date(j.data.replace(" ","T"));return d>hoje&&!jogoTemPlacar(j);}).slice(0,8);
   document.getElementById("proximos-content").innerHTML=proximos.map(j=>{
     const{dia,mes}=formatarDia(j.data);const hora=j.data.split(" ")[1];
-    return`<div class="prox-card">
+    return`<div class="prox-card" onclick="abrirDetalhesJogo(${j._idx})">
       <div class="prox-date-badge"><div class="prox-day-num">${dia}</div><div class="prox-mon">${mes}</div></div>
       <div class="prox-teams">${flag(j.casa,18)} ${j.casa} <span style="color:var(--muted)">vs</span> ${flag(j.fora,18)} ${j.fora}</div>
       <div class="prox-time">🕐 ${hora}</div>
@@ -791,8 +797,8 @@ function buildMatchCard(j,big=false){
   const{dia,mes}=formatarDia(j.data);const hora=j.data.split(" ")[1];
   const temPlacar=jogoTemPlacar(j);const placar=temPlacar?`<span class="score-inline">${j.golsCasa}–${j.golsFora}</span>`:"";
   const phaseClass=phaseBadgeClass(j.fase);const grupo=j.grupo?` · G${j.grupo}`:"";const fav=isFavGame(j._idx);
-  return`<li class="match-item" style="${big?"border-left:3px solid var(--gold)":""}">
-    <button class="match-fav-btn ${fav?"active":""}" onclick="toggleFavGame(${j._idx})">⭐</button>
+  return`<li class="match-item" onclick="abrirDetalhesJogo(${j._idx})" style="${big?"border-left:3px solid var(--gold)":""}">
+    <button class="match-fav-btn ${fav?"active":""}" onclick="event.stopPropagation();toggleFavGame(${j._idx})">⭐</button>
     <div class="match-date-block"><div class="match-day">${dia}</div><div class="match-mon">${mes}</div></div>
     <div class="match-center">
       <div class="match-teams-row">${flag(j.casa,20)} ${j.casa} ${placar||'<span style="color:var(--muted);font-size:.82rem">vs</span>'} ${flag(j.fora,20)} ${j.fora}</div>
@@ -801,7 +807,7 @@ function buildMatchCard(j,big=false){
     <div class="match-right">
       <span class="phase-badge ${phaseClass}">${j.fase}${grupo}</span>
       <span class="status-dot ${temPlacar?"done":""}"></span>
-      <button class="edit-score-btn" onclick="abrirEditarPlacar(${j._idx})">${temPlacar?"✏️ Editar":"+ Placar"}</button>
+      <button class="edit-score-btn" onclick="event.stopPropagation();abrirEditarPlacar(${j._idx})">${temPlacar?"✏️ Editar":"+ Placar"}</button>
     </div>
   </li>`;
 }
@@ -855,6 +861,139 @@ function limparPlacar(idx){
   renderJogos();renderGrupos();renderHoje();
 }
 
+// ═══════ DETALHES DA PARTIDA ═══════
+function rotuloEventoPartida(tipo){
+  if(tipo==="gol")return"Gol";
+  if(tipo==="amarelo")return"Cartão amarelo";
+  if(tipo==="vermelho")return"Cartão vermelho";
+  if(tipo==="substituicao")return"Substituição";
+  return"Evento";
+}
+
+function iconeEventoPartida(tipo){
+  if(tipo==="gol")return"⚽";
+  if(tipo==="amarelo")return"🟨";
+  if(tipo==="vermelho")return"🟥";
+  if(tipo==="substituicao")return"🔄";
+  return"📌";
+}
+
+function descricaoEventoPartida(evento){
+  if(evento.tipo==="gol"){
+    const assistencia=evento.assistencia?` · Assistência: ${evento.assistencia}`:"";
+    return`${evento.selecao} · ${evento.jogador||"Autor não informado"}${assistencia}`;
+  }
+  if(evento.tipo==="amarelo"||evento.tipo==="vermelho"){
+    return`${evento.selecao} · ${evento.jogador||"Jogador não informado"}`;
+  }
+  if(evento.tipo==="substituicao"){
+    return`${evento.selecao} · Sai ${evento.sai||"?"} / Entra ${evento.entra||"?"}`;
+  }
+  return`${evento.selecao} · ${evento.detalhe||"Evento registrado"}`;
+}
+
+function renderDetalhesJogo(idx){
+  const jogo=getJogos()[idx];
+  if(!jogo)return;
+  const store=getMatchDetailsStore();
+  const detalhes=store[idx]||{eventos:[]};
+  const eventos=[...(detalhes.eventos||[])].sort((a,b)=>minutoOrdenavel(a.minuto)-minutoOrdenavel(b.minuto));
+  const placar=jogoTemPlacar(jogo)?`${jogo.golsCasa} × ${jogo.golsFora}`:"– × –";
+  const statusPartida=jogoTemPlacar(jogo)?"Placar registrado":"Sem placar registrado";
+  const eventosHtml=eventos.length?eventos.map((evento)=>`<li class="match-event-item">
+      <div class="match-event-main">
+        <span class="match-event-minute">${evento.minuto}'</span>
+        <span class="match-event-icon">${iconeEventoPartida(evento.tipo)}</span>
+        <div>
+          <strong>${rotuloEventoPartida(evento.tipo)}</strong>
+          <p>${descricaoEventoPartida(evento)}</p>
+        </div>
+      </div>
+      <button class="match-event-remove" onclick="removerEventoJogo(${idx},'${evento.id}')">✕</button>
+    </li>`).join(""):`<div class="match-detail-empty">Sem eventos registrados para este jogo.</div>`;
+
+  document.getElementById("match-detail-body").innerHTML=`
+    <div class="modal-title">📋 Detalhes da Partida</div>
+    <div class="match-detail-head">
+      <div class="match-detail-teams">${flag(jogo.casa,22)} ${jogo.casa} <span>${placar}</span> ${flag(jogo.fora,22)} ${jogo.fora}</div>
+      <div class="match-detail-meta">🕐 ${formatarData(jogo.data)} · ${jogo.fase}${jogo.grupo?` · Grupo ${jogo.grupo}`:""} · 📍 ${jogo.estadio||"A definir"}</div>
+      <div class="match-detail-status">${statusPartida}</div>
+    </div>
+    <div class="match-detail-grid">
+      <section class="match-detail-panel">
+        <h4>Eventos da partida</h4>
+        <ul class="match-events-list">${eventosHtml}</ul>
+      </section>
+      <section class="match-detail-panel">
+        <h4>Registrar evento</h4>
+        <div class="stat-form">
+          <div class="stat-form-row">
+            <div class="stat-field"><label>Minuto</label><input id="md-minute" type="text" placeholder="Ex.: 12 ou 45+2"></div>
+            <div class="stat-field"><label>Tipo</label><select id="md-type"><option value="gol">⚽ Gol</option><option value="amarelo">🟨 Cartão amarelo</option><option value="vermelho">🟥 Cartão vermelho</option><option value="substituicao">🔄 Substituição</option><option value="outro">📌 Outro</option></select></div>
+          </div>
+          <div class="stat-form-row">
+            <div class="stat-field"><label>Seleção</label><select id="md-team"><option value="${jogo.casa}">${jogo.casa}</option><option value="${jogo.fora}">${jogo.fora}</option></select></div>
+            <div class="stat-field"><label>Jogador</label><input id="md-player" type="text" placeholder="Ex.: Mbappé"></div>
+          </div>
+          <div class="stat-form-row">
+            <div class="stat-field"><label>Assistência (gol)</label><input id="md-assist" type="text" placeholder="Opcional"></div>
+            <div class="stat-field"><label>Detalhe extra</label><input id="md-extra" type="text" placeholder="Opcional"></div>
+          </div>
+          <div class="stat-form-row">
+            <div class="stat-field"><label>Sai (substituição)</label><input id="md-out" type="text" placeholder="Opcional"></div>
+            <div class="stat-field"><label>Entra (substituição)</label><input id="md-in" type="text" placeholder="Opcional"></div>
+          </div>
+          <button class="stat-submit" onclick="adicionarEventoJogo(${idx})">✅ Adicionar evento</button>
+        </div>
+      </section>
+    </div>`;
+}
+
+function abrirDetalhesJogo(idx){
+  renderDetalhesJogo(idx);
+  document.getElementById("match-detail-overlay").classList.add("open");
+}
+
+function adicionarEventoJogo(idx){
+  const minuto=(document.getElementById("md-minute").value||"").trim();
+  const tipo=document.getElementById("md-type").value;
+  const selecao=document.getElementById("md-team").value;
+  const jogador=(document.getElementById("md-player").value||"").trim();
+  const assistencia=(document.getElementById("md-assist").value||"").trim();
+  const detalhe=(document.getElementById("md-extra").value||"").trim();
+  const sai=(document.getElementById("md-out").value||"").trim();
+  const entra=(document.getElementById("md-in").value||"").trim();
+  if(!minuto)return alert("Informe o minuto do evento.");
+  if((tipo==="gol"||tipo==="amarelo"||tipo==="vermelho")&&!jogador)return alert("Informe o jogador principal do evento.");
+  if(tipo==="substituicao"&&(!sai||!entra))return alert("Informe quem saiu e quem entrou.");
+  const store=getMatchDetailsStore();
+  const detalhes=store[idx]||{eventos:[]};
+  detalhes.eventos.push({
+    id:`${Date.now()}-${Math.random().toString(16).slice(2,8)}`,
+    minuto,
+    tipo,
+    selecao,
+    jogador,
+    assistencia,
+    detalhe,
+    sai,
+    entra,
+  });
+  detalhes.eventos.sort((a,b)=>minutoOrdenavel(a.minuto)-minutoOrdenavel(b.minuto));
+  store[idx]=detalhes;
+  saveMatchDetailsStore(store);
+  renderDetalhesJogo(idx);
+}
+
+function removerEventoJogo(idx,eventId){
+  const store=getMatchDetailsStore();
+  const detalhes=store[idx]||{eventos:[]};
+  detalhes.eventos=(detalhes.eventos||[]).filter((evento)=>evento.id!==eventId);
+  store[idx]=detalhes;
+  saveMatchDetailsStore(store);
+  renderDetalhesJogo(idx);
+}
+
 // ═══════ TIMELINE ═══════
 function renderTimeline(){
   const fases=[
@@ -885,13 +1024,13 @@ function renderTimeline(){
       </div>
       <div class="tl-games" id="tl-games-${fi}">
         ${gamesInPhase.map(j=>{const temPlacar=jogoTemPlacar(j);const fav=isFavGame(j._idx);
-          return`<div class="tl-game-row">
+          return`<div class="tl-game-row" onclick="abrirDetalhesJogo(${j._idx})">
             <div class="tl-game-date">${formatarData(j.data)}</div>
             <div class="tl-game-teams">${flag(j.casa,16)} ${j.casa} <span style="color:var(--muted)">vs</span> ${flag(j.fora,16)} ${j.fora}</div>
             <div class="tl-game-score" style="color:${temPlacar?"var(--green)":"var(--muted)"}">${temPlacar?`${j.golsCasa}–${j.golsFora}`:"– –"}</div>
             <div class="tl-game-stadium">${(j.estadio||"").split(",")[0]}</div>
-            <button class="tl-fav-btn ${fav?"active":""}" onclick="toggleFavGame(${j._idx});renderTimeline()" title="Favoritar">⭐</button>
-            <button class="edit-score-btn" onclick="abrirEditarPlacar(${j._idx})">${temPlacar?"✏️":"+"}</button>
+            <button class="tl-fav-btn ${fav?"active":""}" onclick="event.stopPropagation();toggleFavGame(${j._idx});renderTimeline()" title="Favoritar">⭐</button>
+            <button class="edit-score-btn" onclick="event.stopPropagation();abrirEditarPlacar(${j._idx})">${temPlacar?"✏️":"+"}</button>
           </div>`;}).join("")}
       </div>
     </div>`;
@@ -1089,6 +1228,8 @@ function initModals(){
   document.getElementById("stat-modal-overlay").addEventListener("click",e=>{if(e.target.id==="stat-modal-overlay")document.getElementById("stat-modal-overlay").classList.remove("open");});
   document.getElementById("score-modal-close").addEventListener("click",()=>document.getElementById("score-modal-overlay").classList.remove("open"));
   document.getElementById("score-modal-overlay").addEventListener("click",e=>{if(e.target.id==="score-modal-overlay")document.getElementById("score-modal-overlay").classList.remove("open");});
+  document.getElementById("match-detail-close").addEventListener("click",()=>document.getElementById("match-detail-overlay").classList.remove("open"));
+  document.getElementById("match-detail-overlay").addEventListener("click",e=>{if(e.target.id==="match-detail-overlay")document.getElementById("match-detail-overlay").classList.remove("open");});
   document.addEventListener("keydown",e=>{if(e.key==="Escape"){document.querySelectorAll(".modal-overlay").forEach(o=>o.classList.remove("open"));}});
   document.getElementById("btn-open-stat-modal").addEventListener("click",abrirStatModal);
   document.getElementById("theme-toggle").addEventListener("click",toggleTheme);

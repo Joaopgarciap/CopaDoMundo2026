@@ -414,8 +414,8 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .proximos-section { margin-top:2.5rem; }
 .proximos-list { display:flex; flex-direction:column; gap:.5rem; }
 
-.prox-card { background:var(--panel); border:1px solid var(--border); border-radius:var(--radius-sm); padding:.8rem 1rem; display:flex; align-items:center; gap:1rem; transition:border-color var(--transition); }
-.prox-card:hover { border-color:var(--border2); }
+.prox-card { background:var(--panel); border:1px solid var(--border); border-radius:var(--radius-sm); padding:.8rem 1rem; display:flex; align-items:center; gap:1rem; transition:border-color var(--transition),transform var(--transition); cursor:pointer; }
+.prox-card:hover { border-color:var(--border2); transform:translateX(2px); }
 .prox-date-badge { background:var(--panel2); border-radius:8px; padding:.4rem .6rem; text-align:center; min-width:50px; flex-shrink:0; }
 .prox-day-num { font-family:'Bebas Neue',sans-serif; font-size:1.3rem; line-height:1; color:var(--gold); }
 .prox-mon { font-size:.6rem; text-transform:uppercase; color:var(--muted); }
@@ -458,7 +458,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 
 .tl-games { display:none; background:var(--panel); border:1px solid var(--border); border-top:none; border-radius:0 0 var(--radius) var(--radius); overflow:hidden; margin-bottom:.5rem; }
 .tl-games.open { display:block; }
-.tl-game-row { display:flex; align-items:center; gap:.75rem; padding:.65rem 1.5rem; border-bottom:1px solid var(--border); transition:background var(--transition); }
+.tl-game-row { display:flex; align-items:center; gap:.75rem; padding:.65rem 1.5rem; border-bottom:1px solid var(--border); transition:background var(--transition); cursor:pointer; }
 .tl-game-row:last-child { border-bottom:none; }
 .tl-game-row:hover { background:rgba(255,255,255,.02); }
 .tl-game-date { font-size:.75rem; color:var(--muted); min-width:90px; }
@@ -568,7 +568,7 @@ select:focus,input:focus { border-color:rgba(245,200,66,.4); }
 .search-icon { position:absolute; left:.7rem; top:50%; transform:translateY(-50%); font-size:.85rem; pointer-events:none; }
 .search-wrap input { padding-left:2.1rem; min-width:220px; }
 .match-list { list-style:none; display:flex; flex-direction:column; gap:.6rem; }
-.match-item { background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:1rem 1.25rem; display:flex; align-items:center; gap:1rem; transition:border-color var(--transition),transform var(--transition); position:relative; }
+.match-item { background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:1rem 1.25rem; display:flex; align-items:center; gap:1rem; transition:border-color var(--transition),transform var(--transition); position:relative; cursor:pointer; }
 .match-item:hover { border-color:var(--border2); transform:translateX(3px); }
 .match-date-block { min-width:52px; text-align:center; background:var(--panel2); border-radius:10px; padding:.45rem .4rem; flex-shrink:0; }
 .match-day { font-family:'Bebas Neue',sans-serif; font-size:1.4rem; line-height:1; color:var(--gold); }
@@ -589,6 +589,81 @@ select:focus,input:focus { border-color:rgba(245,200,66,.4); }
 .match-fav-btn { background:none; border:none; cursor:pointer; font-size:.95rem; opacity:.3; transition:opacity var(--transition); position:absolute; top:.6rem; right:.75rem; }
 .match-fav-btn:hover,.match-fav-btn.active { opacity:1; }
 .match-fav-btn.active { color:var(--gold); }
+
+.match-detail-head {
+  background:var(--panel2);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:.9rem 1rem;
+  margin-bottom:1rem;
+}
+.match-detail-teams {
+  display:flex;
+  align-items:center;
+  gap:.5rem;
+  font-size:1rem;
+  font-weight:700;
+  flex-wrap:wrap;
+}
+.match-detail-teams span {
+  font-family:'Bebas Neue',sans-serif;
+  color:var(--green);
+  font-size:1.35rem;
+  letter-spacing:.03em;
+}
+.match-detail-meta { color:var(--muted); font-size:.78rem; margin-top:.35rem; line-height:1.4; }
+.match-detail-status { color:var(--gold); font-size:.72rem; text-transform:uppercase; letter-spacing:.07em; font-weight:700; margin-top:.45rem; }
+.match-detail-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:.9rem;
+}
+.match-detail-panel {
+  background:var(--panel2);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:.85rem;
+}
+.match-detail-panel h4 {
+  font-size:.78rem;
+  text-transform:uppercase;
+  color:var(--muted);
+  letter-spacing:.07em;
+  margin-bottom:.55rem;
+}
+.match-events-list { list-style:none; display:flex; flex-direction:column; gap:.45rem; max-height:300px; overflow:auto; padding-right:.15rem; }
+.match-event-item {
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:.55rem;
+  border:1px solid var(--border);
+  border-radius:10px;
+  background:var(--panel);
+  padding:.5rem .55rem;
+}
+.match-event-main { display:flex; align-items:flex-start; gap:.45rem; min-width:0; }
+.match-event-minute { font-family:'Bebas Neue',sans-serif; color:var(--gold); font-size:1rem; min-width:30px; }
+.match-event-icon { font-size:.95rem; margin-top:.15rem; }
+.match-event-main strong { display:block; font-size:.82rem; color:var(--text); }
+.match-event-main p { font-size:.74rem; color:var(--muted); line-height:1.35; margin-top:.1rem; }
+.match-event-remove {
+  border:none;
+  background:transparent;
+  color:var(--muted);
+  cursor:pointer;
+  font-size:.82rem;
+  padding:.1rem .25rem;
+}
+.match-event-remove:hover { color:var(--red); }
+.match-detail-empty {
+  border:1px dashed var(--border2);
+  border-radius:10px;
+  color:var(--muted);
+  font-size:.82rem;
+  text-align:center;
+  padding:1rem .8rem;
+}
 
 /* ═══════════ ARTILHEIROS ═══════════ */
 .art-top-bar { display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem; }
@@ -868,6 +943,7 @@ footer code { background:rgba(255,255,255,.07); padding:.1rem .4rem; border-radi
   .stat-form-row { grid-template-columns:1fr; }
   .tab { padding:.85rem .9rem; font-size:.78rem; }
   .match-item { flex-wrap:wrap; }
+  .match-detail-grid { grid-template-columns:1fr; }
   .sel-grid { grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); }
   .history-grid-2 { grid-template-columns:1fr; }
   .history-top-player-card { grid-template-columns:1fr; }
