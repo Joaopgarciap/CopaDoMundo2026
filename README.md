@@ -1,6 +1,6 @@
-# Painel Local da Copa do Mundo
+# Painel Local da Copa do Mundo 2026
 
-Site estático para acompanhamento da Copa do Mundo com:
+Site estático para acompanhamento da Copa do Mundo 2026 com:
 
 - Classificação por grupo (tabela com pontos, saldo e gols)
 - Lista de jogos com filtro por fase e busca por seleção
