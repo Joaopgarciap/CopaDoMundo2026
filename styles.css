@@ -664,6 +664,40 @@ select:focus,input:focus { border-color:rgba(245,200,66,.4); }
   text-align:center;
   padding:1rem .8rem;
 }
+.api-status-chip {
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:.55rem .65rem;
+  font-size:.78rem;
+  line-height:1.4;
+  margin-bottom:.65rem;
+}
+.api-status-chip.is-idle { color:var(--muted); background:var(--panel); }
+.api-status-chip.is-loading { color:var(--gold); background:rgba(245,200,66,.08); border-color:rgba(245,200,66,.25); }
+.api-status-chip.is-ok { color:var(--green); background:rgba(0,209,102,.09); border-color:rgba(0,209,102,.22); }
+.api-status-chip.is-empty { color:var(--muted); background:var(--panel); }
+.api-status-chip.is-error { color:var(--red); background:rgba(255,75,110,.08); border-color:rgba(255,75,110,.2); }
+.api-sync-btn {
+  background:var(--panel);
+  border:1px solid var(--border2);
+  color:var(--text);
+  border-radius:9px;
+  cursor:pointer;
+  font-size:.8rem;
+  font-weight:700;
+  padding:.45rem .7rem;
+}
+.api-sync-btn:hover { border-color:rgba(59,127,255,.45); color:var(--accent); }
+.api-summary {
+  margin-top:.7rem;
+  font-size:.75rem;
+  color:var(--muted);
+  line-height:1.45;
+  max-height:180px;
+  overflow:auto;
+  border-top:1px dashed var(--border);
+  padding-top:.55rem;
+}
 
 /* ═══════════ ARTILHEIROS ═══════════ */
 .art-top-bar { display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem; }

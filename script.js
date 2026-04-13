@@ -861,7 +861,198 @@ function limparPlacar(idx){
   renderJogos();renderGrupos();renderHoje();
 }
 
-// ═══════ DETALHES DA PARTIDA ═══════
+// ═══════ DETALHES DA PARTIDA (API) ═══════
+const THE_SPORTS_DB_BASE_URL="https://www.thesportsdb.com/api/v1/json/3";
+const selecaoApiAliases={
+  "México":"Mexico","África do Sul":"South Africa","Coreia do Sul":"South Korea","República Tcheca":"Czech Republic",
+  "Canadá":"Canada","Bósnia e Herzegovina":"Bosnia and Herzegovina","Catar":"Qatar","Suíça":"Switzerland",
+  "Brasil":"Brazil","Marrocos":"Morocco","Haiti":"Haiti","Escócia":"Scotland",
+  "Estados Unidos":"United States","Paraguai":"Paraguay","Austrália":"Australia","Turquia":"Turkey",
+  "Alemanha":"Germany","Curaçao":"Curacao","Costa do Marfim":"Ivory Coast","Equador":"Ecuador",
+  "Holanda":"Netherlands","Japão":"Japan","Suécia":"Sweden","Tunísia":"Tunisia",
+  "Bélgica":"Belgium","Egito":"Egypt","Irã":"Iran","Nova Zelândia":"New Zealand",
+  "Espanha":"Spain","Cabo Verde":"Cape Verde","Arábia Saudita":"Saudi Arabia","Uruguai":"Uruguay",
+  "França":"France","Senegal":"Senegal","Iraque":"Iraq","Noruega":"Norway",
+  "Argentina":"Argentina","Argélia":"Algeria","Áustria":"Austria","Jordânia":"Jordan",
+  "Portugal":"Portugal","RD do Congo":"DR Congo","Uzbequistão":"Uzbekistan","Colômbia":"Colombia",
+  "Inglaterra":"England","Croácia":"Croatia","Gana":"Ghana","Panamá":"Panama",
+};
+const detalhesApiEmProgresso=new Set();
+
+function normalizarTexto(v){
+  return String(v||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9 ]/g," ").replace(/\s+/g," ").trim();
+}
+
+function nomeSelecaoApi(nome){
+  return selecaoApiAliases[nome]||nome;
+}
+
+function equipePlaceholder(nome){
+  return /(grupo|vencedor|perdedor|melhor|a definir)/i.test(String(nome||""));
+}
+
+async function fetchJSONPublic(url){
+  const resp=await fetch(url);
+  if(!resp.ok)throw new Error(`HTTP ${resp.status}`);
+  return resp.json();
+}
+
+function parseMinutoNarrativa(frase){
+  const m=frase.match(/(\d{1,3})(?:st|nd|rd|th)?(?:\s*\+\s*(\d{1,2}))?\s*minute/i);
+  if(!m)return null;
+  return m[2]?`${m[1]}+${m[2]}`:m[1];
+}
+
+function parseAssistenciaNarrativa(frase){
+  const m=frase.match(/(?:assisted by|pass from)\s+([A-Z][A-Za-zÀ-ÿ'’\-\.\s]{2,40})/i);
+  return m?m[1].trim().replace(/[.,;:!?]+$/,""):"";
+}
+
+function parseJogadorNarrativa(frase,tipo){
+  let m=null;
+  if(tipo==="vermelho"||tipo==="amarelo")m=frase.match(/([A-Z][A-Za-zÀ-ÿ'’\-\.\s]{2,40})\s+was\s+(?:shown|booked|sent off)/i);
+  if(!m&&tipo==="substituicao")m=frase.match(/([A-Z][A-Za-zÀ-ÿ'’\-\.\s]{2,40})\s+replaced\s+([A-Z][A-Za-zÀ-ÿ'’\-\.\s]{2,40})/i);
+  if(!m)m=frase.match(/([A-Z][A-Za-zÀ-ÿ'’\-\.\s]{2,40})\s+(?:opened|doubled|equali|bundled|scored|netted|finished|converted|struck|made it)/i);
+  if(!m)return"";
+  return m[1].trim().replace(/[.,;:!?]+$/,"");
+}
+
+function detectarTipoNarrativa(frase){
+  const f=frase.toLowerCase();
+  if(/red card|sent off|straight red/.test(f))return"vermelho";
+  if(/yellow card|booked/.test(f))return"amarelo";
+  if(/substitut|replaced by|replaced/.test(f))return"substituicao";
+  if(/goal|scored|netted|equali|made it|opened the scoring|doubled the lead|finished/.test(f))return"gol";
+  return"outro";
+}
+
+function detectarSelecaoNarrativa(frase,jogo){
+  const f=normalizarTexto(frase);
+  const casa=[jogo.casa,nomeSelecaoApi(jogo.casa)].some((n)=>f.includes(normalizarTexto(n)));
+  const fora=[jogo.fora,nomeSelecaoApi(jogo.fora)].some((n)=>f.includes(normalizarTexto(n)));
+  if(casa&&!fora)return jogo.casa;
+  if(fora&&!casa)return jogo.fora;
+  return "";
+}
+
+function eventosDaNarrativa(texto,jogo){
+  if(!texto)return[];
+  const sentencas=texto.replace(/\r?\n/g," ").split(/(?<=[.!?])\s+/).map((s)=>s.trim()).filter(Boolean);
+  const eventos=[];
+  sentencas.forEach((frase,i)=>{
+    const minuto=parseMinutoNarrativa(frase);
+    const tipo=detectarTipoNarrativa(frase);
+    if(!minuto&&tipo==="outro")return;
+    const jogador=parseJogadorNarrativa(frase,tipo);
+    const assistencia=tipo==="gol"?parseAssistenciaNarrativa(frase):"";
+    const selecao=detectarSelecaoNarrativa(frase,jogo)||jogo.casa;
+    let sai="",entra="";
+    if(tipo==="substituicao"){
+      const m=frase.match(/([A-Z][A-Za-zÀ-ÿ'’\-\.\s]{2,40})\s+replaced\s+([A-Z][A-Za-zÀ-ÿ'’\-\.\s]{2,40})/i);
+      if(m){entra=m[1].trim();sai=m[2].trim();}
+    }
+    eventos.push({
+      id:`api-${i}-${Date.now()}-${Math.random().toString(16).slice(2,6)}`,
+      minuto:minuto||"90",
+      tipo,
+      selecao,
+      jogador,
+      assistencia,
+      detalhe:frase,
+      sai,
+      entra,
+    });
+  });
+  return eventos.sort((a,b)=>minutoOrdenavel(a.minuto)-minutoOrdenavel(b.minuto)).slice(0,20);
+}
+
+function dataIsoJogo(jogo){
+  return String(jogo.data||"").split(" ")[0]||"";
+}
+
+function equipesCompativeis(evento,jogo){
+  const home=normalizarTexto(evento.strHomeTeam);
+  const away=normalizarTexto(evento.strAwayTeam);
+  const casaApi=normalizarTexto(nomeSelecaoApi(jogo.casa));
+  const foraApi=normalizarTexto(nomeSelecaoApi(jogo.fora));
+  if(home===casaApi&&away===foraApi)return"normal";
+  if(home===foraApi&&away===casaApi)return"invertido";
+  return"nao";
+}
+
+function escolherEventoApi(candidatos,jogo){
+  if(!candidatos.length)return null;
+  const alvoData=dataIsoJogo(jogo);
+  const comMatch=candidatos
+    .map((ev)=>({ev,orientacao:equipesCompativeis(ev,jogo)}))
+    .filter((item)=>item.orientacao!=="nao");
+  const base=(comMatch.length?comMatch:candidatos.map((ev)=>({ev,orientacao:"normal"}))).sort((a,b)=>{
+    const da=Math.abs(new Date(`${a.ev.dateEvent||"1970-01-01"}T00:00:00Z`)-new Date(`${alvoData||"1970-01-01"}T00:00:00Z`));
+    const db=Math.abs(new Date(`${b.ev.dateEvent||"1970-01-01"}T00:00:00Z`)-new Date(`${alvoData||"1970-01-01"}T00:00:00Z`));
+    return da-db;
+  });
+  return base[0]||null;
+}
+
+async function buscarDetalhesPartidaAPI(jogo){
+  if(equipePlaceholder(jogo.casa)||equipePlaceholder(jogo.fora)){
+    return{status:"no-data",message:"Partida de chave (mata-mata) ainda sem confronto definido na API gratuita."};
+  }
+  const casaApi=nomeSelecaoApi(jogo.casa);
+  const foraApi=nomeSelecaoApi(jogo.fora);
+  const query=encodeURIComponent(`${casaApi}_vs_${foraApi}`);
+  const json=await fetchJSONPublic(`${THE_SPORTS_DB_BASE_URL}/searchevents.php?e=${query}`);
+  const candidatos=(json.event||[]).filter((ev)=>ev.strSport==="Soccer");
+  const escolhido=escolherEventoApi(candidatos,jogo);
+  if(!escolhido)return{status:"no-data",message:"API gratuita sem dados detalhados para este confronto neste momento."};
+
+  const ev=escolhido.ev||escolhido;
+  const orientacao=escolhido.orientacao||"normal";
+  const placarCasaRaw=parseInt(ev.intHomeScore,10);
+  const placarForaRaw=parseInt(ev.intAwayScore,10);
+  const placarCasa=Number.isFinite(placarCasaRaw)?(orientacao==="invertido"?placarForaRaw:placarCasaRaw):null;
+  const placarFora=Number.isFinite(placarForaRaw)?(orientacao==="invertido"?placarCasaRaw:placarForaRaw):null;
+  const narrativa=(ev.strResult||"").trim();
+  const eventos=eventosDaNarrativa(narrativa,jogo);
+
+  return{
+    status:"ok",
+    provider:"TheSportsDB (gratuita)",
+    fetchedAt:new Date().toISOString(),
+    eventId:ev.idEvent||"",
+    matchStatus:ev.strStatus||"",
+    scoreHome:placarCasa,
+    scoreAway:placarFora,
+    resultText:narrativa,
+    eventos,
+  };
+}
+
+function salvarPlacarAPISeDisponivel(idx,api){
+  if(!Number.isFinite(api?.scoreHome)||!Number.isFinite(api?.scoreAway))return;
+  const scores=JSON.parse(localStorage.getItem("copa_scores")||"{}");
+  if(!scores[idx]){
+    scores[idx]={golsCasa:api.scoreHome,golsFora:api.scoreAway};
+    localStorage.setItem("copa_scores",JSON.stringify(scores));
+  }
+}
+
+function textoStatusAPI(api){
+  if(!api||!api.status)return"Dados automáticos ainda não consultados.";
+  if(api.status==="loading")return"Buscando dados automáticos na API...";
+  if(api.status==="ok")return`Dados automáticos via ${api.provider} · atualizado em ${new Date(api.fetchedAt).toLocaleString("pt-BR")}`;
+  if(api.status==="no-data")return api.message||"API sem dados detalhados para este jogo.";
+  return api.message||"Falha ao consultar API. Tente atualizar novamente.";
+}
+
+function classeStatusAPI(api){
+  if(!api||!api.status)return"is-idle";
+  if(api.status==="loading")return"is-loading";
+  if(api.status==="ok")return"is-ok";
+  if(api.status==="no-data")return"is-empty";
+  return"is-error";
+}
+
 function rotuloEventoPartida(tipo){
   if(tipo==="gol")return"Gol";
   if(tipo==="amarelo")return"Cartão amarelo";
@@ -897,9 +1088,11 @@ function renderDetalhesJogo(idx){
   if(!jogo)return;
   const store=getMatchDetailsStore();
   const detalhes=store[idx]||{eventos:[]};
-  const eventos=[...(detalhes.eventos||[])].sort((a,b)=>minutoOrdenavel(a.minuto)-minutoOrdenavel(b.minuto));
+  const api=detalhes.api||{};
+  const eventosFonte=(api.status==="ok"&&Array.isArray(api.eventos)&&api.eventos.length)?api.eventos:(detalhes.eventos||[]);
+  const eventos=[...eventosFonte].sort((a,b)=>minutoOrdenavel(a.minuto)-minutoOrdenavel(b.minuto));
   const placar=jogoTemPlacar(jogo)?`${jogo.golsCasa} × ${jogo.golsFora}`:"– × –";
-  const statusPartida=jogoTemPlacar(jogo)?"Placar registrado":"Sem placar registrado";
+  const statusPartida=jogoTemPlacar(jogo)?"Placar disponível":"Sem placar disponível";
   const eventosHtml=eventos.length?eventos.map((evento)=>`<li class="match-event-item">
       <div class="match-event-main">
         <span class="match-event-minute">${evento.minuto}'</span>
@@ -909,8 +1102,7 @@ function renderDetalhesJogo(idx){
           <p>${descricaoEventoPartida(evento)}</p>
         </div>
       </div>
-      <button class="match-event-remove" onclick="removerEventoJogo(${idx},'${evento.id}')">✕</button>
-    </li>`).join(""):`<div class="match-detail-empty">Sem eventos registrados para este jogo.</div>`;
+    </li>`).join(""):`<div class="match-detail-empty">Sem eventos detalhados disponíveis na API para este jogo.</div>`;
 
   document.getElementById("match-detail-body").innerHTML=`
     <div class="modal-title">📋 Detalhes da Partida</div>
@@ -921,77 +1113,61 @@ function renderDetalhesJogo(idx){
     </div>
     <div class="match-detail-grid">
       <section class="match-detail-panel">
-        <h4>Eventos da partida</h4>
+        <h4>Eventos automáticos</h4>
         <ul class="match-events-list">${eventosHtml}</ul>
       </section>
       <section class="match-detail-panel">
-        <h4>Registrar evento</h4>
-        <div class="stat-form">
-          <div class="stat-form-row">
-            <div class="stat-field"><label>Minuto</label><input id="md-minute" type="text" placeholder="Ex.: 12 ou 45+2"></div>
-            <div class="stat-field"><label>Tipo</label><select id="md-type"><option value="gol">⚽ Gol</option><option value="amarelo">🟨 Cartão amarelo</option><option value="vermelho">🟥 Cartão vermelho</option><option value="substituicao">🔄 Substituição</option><option value="outro">📌 Outro</option></select></div>
-          </div>
-          <div class="stat-form-row">
-            <div class="stat-field"><label>Seleção</label><select id="md-team"><option value="${jogo.casa}">${jogo.casa}</option><option value="${jogo.fora}">${jogo.fora}</option></select></div>
-            <div class="stat-field"><label>Jogador</label><input id="md-player" type="text" placeholder="Ex.: Mbappé"></div>
-          </div>
-          <div class="stat-form-row">
-            <div class="stat-field"><label>Assistência (gol)</label><input id="md-assist" type="text" placeholder="Opcional"></div>
-            <div class="stat-field"><label>Detalhe extra</label><input id="md-extra" type="text" placeholder="Opcional"></div>
-          </div>
-          <div class="stat-form-row">
-            <div class="stat-field"><label>Sai (substituição)</label><input id="md-out" type="text" placeholder="Opcional"></div>
-            <div class="stat-field"><label>Entra (substituição)</label><input id="md-in" type="text" placeholder="Opcional"></div>
-          </div>
-          <button class="stat-submit" onclick="adicionarEventoJogo(${idx})">✅ Adicionar evento</button>
-        </div>
+        <h4>Fonte de dados</h4>
+        <p class="api-status-chip ${classeStatusAPI(api)}">${textoStatusAPI(api)}</p>
+        <button class="api-sync-btn" onclick="sincronizarDetalhesJogoApi(${idx},true)">🔄 Atualizar dados da API</button>
+        ${api.resultText?`<p class="api-summary">${api.resultText}</p>`:"<p class='api-summary'>Quando houver narrativa oficial da partida, ela aparece aqui automaticamente.</p>"}
       </section>
     </div>`;
+}
+
+async function sincronizarDetalhesJogoApi(idx,forcar=false){
+  const jogo=getJogos()[idx];
+  if(!jogo)return;
+  if(detalhesApiEmProgresso.has(idx))return;
+
+  const store=getMatchDetailsStore();
+  const detalhes=store[idx]||{eventos:[]};
+  const ultimoFetch=detalhes.api?.fetchedAt?new Date(detalhes.api.fetchedAt).getTime():0;
+  const recente=ultimoFetch&&(Date.now()-ultimoFetch)<(10*60*1000);
+  if(!forcar&&recente&&["ok","no-data"].includes(detalhes.api?.status))return;
+
+  detalhesApiEmProgresso.add(idx);
+  detalhes.api={...(detalhes.api||{}),status:"loading",provider:"TheSportsDB (gratuita)",message:""};
+  store[idx]=detalhes;
+  saveMatchDetailsStore(store);
+  renderDetalhesJogo(idx);
+
+  try{
+    const api=await buscarDetalhesPartidaAPI(jogo);
+    const storeAtual=getMatchDetailsStore();
+    const detalhesAtual=storeAtual[idx]||{eventos:[]};
+    detalhesAtual.api=api;
+    storeAtual[idx]=detalhesAtual;
+    saveMatchDetailsStore(storeAtual);
+    salvarPlacarAPISeDisponivel(idx,api);
+    renderJogos();renderHoje();renderFavoritos();
+    renderDetalhesJogo(idx);
+  }catch(e){
+    const storeAtual=getMatchDetailsStore();
+    const detalhesAtual=storeAtual[idx]||{eventos:[]};
+    detalhesAtual.api={status:"error",provider:"TheSportsDB (gratuita)",message:"Não foi possível carregar os dados automáticos agora."};
+    storeAtual[idx]=detalhesAtual;
+    saveMatchDetailsStore(storeAtual);
+    renderDetalhesJogo(idx);
+  }finally{
+    detalhesApiEmProgresso.delete(idx);
+  }
 }
 
 function abrirDetalhesJogo(idx){
   renderDetalhesJogo(idx);
   document.getElementById("match-detail-overlay").classList.add("open");
-}
-
-function adicionarEventoJogo(idx){
-  const minuto=(document.getElementById("md-minute").value||"").trim();
-  const tipo=document.getElementById("md-type").value;
-  const selecao=document.getElementById("md-team").value;
-  const jogador=(document.getElementById("md-player").value||"").trim();
-  const assistencia=(document.getElementById("md-assist").value||"").trim();
-  const detalhe=(document.getElementById("md-extra").value||"").trim();
-  const sai=(document.getElementById("md-out").value||"").trim();
-  const entra=(document.getElementById("md-in").value||"").trim();
-  if(!minuto)return alert("Informe o minuto do evento.");
-  if((tipo==="gol"||tipo==="amarelo"||tipo==="vermelho")&&!jogador)return alert("Informe o jogador principal do evento.");
-  if(tipo==="substituicao"&&(!sai||!entra))return alert("Informe quem saiu e quem entrou.");
-  const store=getMatchDetailsStore();
-  const detalhes=store[idx]||{eventos:[]};
-  detalhes.eventos.push({
-    id:`${Date.now()}-${Math.random().toString(16).slice(2,8)}`,
-    minuto,
-    tipo,
-    selecao,
-    jogador,
-    assistencia,
-    detalhe,
-    sai,
-    entra,
-  });
-  detalhes.eventos.sort((a,b)=>minutoOrdenavel(a.minuto)-minutoOrdenavel(b.minuto));
-  store[idx]=detalhes;
-  saveMatchDetailsStore(store);
-  renderDetalhesJogo(idx);
-}
-
-function removerEventoJogo(idx,eventId){
-  const store=getMatchDetailsStore();
-  const detalhes=store[idx]||{eventos:[]};
-  detalhes.eventos=(detalhes.eventos||[]).filter((evento)=>evento.id!==eventId);
-  store[idx]=detalhes;
-  saveMatchDetailsStore(store);
-  renderDetalhesJogo(idx);
+  sincronizarDetalhesJogoApi(idx,false);
 }
 
 // ═══════ TIMELINE ═══════
