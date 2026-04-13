@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 900" role="img" aria-labelledby="title desc">
+  <title id="title">Imagem ilustrativa da bola oficial</title>
+  <desc id="desc">Placeholder para bola oficial da Copa.</desc>
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="35%" r="70%">
+      <stop offset="0%" stop-color="#1f3d7a" />
+      <stop offset="100%" stop-color="#0b1632" />
+    </radialGradient>
+    <radialGradient id="ball" cx="40%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#d5dceb" />
+    </radialGradient>
+  </defs>
+  <rect width="900" height="900" fill="url(#bg)" />
+  <circle cx="450" cy="430" r="255" fill="url(#ball)" />
+  <path d="M315 350 L390 305 L510 305 L585 350 L560 450 L450 510 L340 450 Z" fill="#102344" opacity="0.9" />
+  <path d="M390 305 L365 230 L450 180 L535 230 L510 305 Z" fill="#173361" opacity="0.9" />
+  <path d="M340 450 L285 540 L340 635 L450 650 L560 635 L615 540 L560 450 L450 510 Z" fill="#173361" opacity="0.85" />
+  <text x="450" y="760" font-family="Arial, Helvetica, sans-serif" font-size="44" text-anchor="middle" fill="#f5c842" font-weight="700">
+    BOLA OFICIAL - IMAGEM ILUSTRATIVA
+  </text>
+</svg>
