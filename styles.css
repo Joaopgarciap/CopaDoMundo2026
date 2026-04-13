@@ -340,6 +340,11 @@ select:focus,input:focus { border-color:rgba(245,200,66,.4); }
   color: var(--text);
 }
 .team-pitch-section { margin-bottom: .95rem; }
+.team-pitch-help {
+  margin: .35rem 0 .65rem;
+  color: var(--muted);
+  font-size: .76rem;
+}
 .team-pitch {
   border-radius: 14px;
   border: 1px solid rgba(255,255,255,.22);
@@ -380,6 +385,10 @@ select:focus,input:focus { border-color:rgba(245,200,66,.4); }
   gap: .08rem;
   text-align: center;
   cursor: pointer;
+}
+.pitch-player-btn:hover {
+  border-color: rgba(245,200,66,.55);
+  transform: translateY(-1px);
 }
 .pitch-player-btn.active {
   border-color: rgba(245,200,66,.9);

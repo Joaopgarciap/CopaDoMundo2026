@@ -936,6 +936,41 @@ function abrirModalGrupo(grupo){
   overlay.classList.add("open");
 }
 
+function obterJogadorSelecao(team, playerId){
+  const jogadoresCampo=selecoesInfo[team]?.jogadoresCampo||[];
+  return jogadoresCampo.find((jogador)=>jogador.id===playerId)||null;
+}
+
+function abrirModalJogadorSelecao(team, playerId){
+  const jogador=obterJogadorSelecao(team, playerId);
+  if(!jogador)return;
+  const overlay=document.getElementById("modal-overlay");
+  const content=document.getElementById("modal-content");
+  if(!overlay||!content)return;
+  const metricaExtraLabel=jogador.posicao==="GOL"?"Gols sofridos":"Participações";
+  const metricaExtraValor=jogador.posicao==="GOL"?jogador.golsSofridos:jogador.jogosCopas;
+  content.innerHTML=`
+    <div class="modal-title">🎯 ${jogador.nome}</div>
+    <article class="team-player-modal">
+      <div class="team-player-modal-head">
+        <p>${flag(team,22)} ${team}</p>
+        <span>#${jogador.numero} · ${jogador.posicao}</span>
+      </div>
+      <div class="team-player-modal-grid">
+        <div><small>Copas</small><strong>${jogador.copas}</strong></div>
+        <div><small>Jogos</small><strong>${jogador.jogosCopas}</strong></div>
+        <div><small>Gols</small><strong>${jogador.gols}</strong></div>
+        <div><small>Assistências</small><strong>${jogador.assistencias}</strong></div>
+        <div><small>Amarelos</small><strong>${jogador.amarelos}</strong></div>
+        <div><small>Vermelhos</small><strong>${jogador.vermelhos}</strong></div>
+        <div><small>Clean sheets</small><strong>${jogador.cleanSheets}</strong></div>
+        <div><small>${metricaExtraLabel}</small><strong>${metricaExtraValor}</strong></div>
+      </div>
+    </article>
+  `;
+  overlay.classList.add("open");
+}
+
 // =============================================
 //  RENDER: JOGOS
 // =============================================
@@ -1431,6 +1466,20 @@ function renderSelecaoPagina(){
     </article>
   `;
 }
+function forcarAbaSelecoesComCampoInterativo(){
+  const tabs = document.querySelectorAll(".tab");
+  if (!tabs.length) return;
+  const target = Array.from(tabs).find((tab) => tab.dataset.tab === "selecoes");
+  if (!target) return;
+
+  const jaExiste = target.parentElement?.querySelector(".tab-feature-badge");
+  if (!jaExiste) {
+    const badge = document.createElement("span");
+    badge.className = "tab-feature-badge";
+    badge.textContent = "NOVO: campo interativo";
+    target.parentElement?.insertBefore(badge, target.nextSibling);
+  }
+}
 
 function renderCentroAoVivo(){
   const playerRoot=document.getElementById("live-player-editor");
@@ -1553,6 +1602,7 @@ function iniciarEventosGlobais(){
     if(selectTeamPlayerBtn){
       appState.selectedTeamPlayers[selectTeamPlayerBtn.dataset.team]=selectTeamPlayerBtn.dataset.playerId;
       renderSelecaoPagina();
+      abrirModalJogadorSelecao(selectTeamPlayerBtn.dataset.team, selectTeamPlayerBtn.dataset.playerId);
       return;
     }
     const openTeamBtn=event.target.closest('[data-action="open-team-page"]');
