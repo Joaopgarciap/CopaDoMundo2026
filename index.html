@@ -3,81 +3,85 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Painel da Copa do Mundo 2026</title>
+    <title>Copa do Mundo 2026 🏆</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+
+    <!-- HERO -->
     <header class="hero">
-      <div>
-        <p class="eyebrow">Acompanhamento local</p>
-        <h1>Painel da Copa do Mundo 2026</h1>
-        <p class="subtitle">
-          Acompanhe grupos, jogos e estatísticas da edição de 2026 em um só lugar.
-        </p>
+      <div class="hero-bg"></div>
+      <div class="hero-content">
+        <div class="hero-badge">⚽ FIFA World Cup</div>
+        <h1 class="hero-title">Copa do Mundo<br><span class="year">2026</span></h1>
+        <p class="hero-sub">EUA · México · Canadá &nbsp;|&nbsp; 11 Jun – 19 Jul</p>
+        <div class="hero-stats">
+          <div class="hstat"><span id="h-paises">48</span><small>Seleções</small></div>
+          <div class="hstat"><span id="h-jogos">104</span><small>Jogos</small></div>
+          <div class="hstat"><span id="h-grupos">12</span><small>Grupos</small></div>
+          <div class="hstat"><span id="h-cidades">16</span><small>Cidades</small></div>
+        </div>
       </div>
     </header>
 
+    <!-- NAV TABS -->
+    <nav class="tab-nav">
+      <button class="tab active" data-tab="grupos">🏅 Grupos</button>
+      <button class="tab" data-tab="jogos">📅 Jogos</button>
+      <button class="tab" data-tab="estatisticas">📊 Estatísticas</button>
+    </nav>
+
     <main class="container">
-      <section class="panel" aria-labelledby="resumo-title">
-        <h2 id="resumo-title">Resumo geral</h2>
-        <div id="resumo" class="summary-grid"></div>
+
+      <!-- TAB: GRUPOS -->
+      <section class="tab-pane active" id="tab-grupos">
+        <div class="groups-grid" id="groups-grid"></div>
       </section>
 
-      <section class="panel" aria-labelledby="grupos-title">
-        <div class="section-header">
-          <h2 id="grupos-title">Classificação por grupo</h2>
-          <label for="grupo-select">Grupo</label>
-          <select id="grupo-select"></select>
-        </div>
-        <div class="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th>Pos</th>
-                <th>Seleção</th>
-                <th>J</th>
-                <th>V</th>
-                <th>E</th>
-                <th>D</th>
-                <th>GP</th>
-                <th>GC</th>
-                <th>SG</th>
-                <th>Pts</th>
-              </tr>
-            </thead>
-            <tbody id="group-standings-body"></tbody>
-          </table>
-        </div>
-      </section>
-
-      <section class="panel" aria-labelledby="jogos-title">
-        <div class="section-header matches-filters">
-          <h2 id="jogos-title">Jogos</h2>
-          <label for="fase-select">Fase</label>
-          <select id="fase-select">
-            <option value="Todas">Todas</option>
-          </select>
-          <label for="search-time">Buscar seleção</label>
-          <input
-            id="search-time"
-            type="search"
-            placeholder="Ex.: Brasil, França..."
-          />
+      <!-- TAB: JOGOS -->
+      <section class="tab-pane" id="tab-jogos">
+        <div class="filters">
+          <div class="filter-group">
+            <label>Fase</label>
+            <select id="fase-select">
+              <option value="Todas">Todas as fases</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>Buscar seleção</label>
+            <div class="search-wrap">
+              <span class="search-icon">🔍</span>
+              <input id="search-time" type="search" placeholder="Ex.: Brasil, França..." />
+            </div>
+          </div>
         </div>
         <ul id="matches-list" class="match-list"></ul>
       </section>
 
-      <section class="panel" aria-labelledby="estatisticas-title">
-        <h2 id="estatisticas-title">Estatísticas das seleções</h2>
+      <!-- TAB: ESTATISTICAS -->
+      <section class="tab-pane" id="tab-estatisticas">
+        <div class="stats-header">
+          <h2>Estatísticas das Seleções</h2>
+          <p>Ordenado por gols marcados</p>
+        </div>
         <div id="team-stats" class="team-stats-grid"></div>
       </section>
+
     </main>
 
+    <!-- MODAL: GRUPO DETALHADO -->
+    <div class="modal-overlay" id="modal-overlay">
+      <div class="modal" id="modal">
+        <button class="modal-close" id="modal-close">✕</button>
+        <div id="modal-content"></div>
+      </div>
+    </div>
+
     <footer>
-      <p>
-        Dados iniciais da Copa do Mundo 2026. Você pode editar o arquivo
-        <code>script.js</code> para atualizar seleções, partidas e placares.
-      </p>
+      <p>⚽ Copa do Mundo FIFA 2026 · Edite <code>script.js</code> para atualizar placares</p>
     </footer>
 
     <script src="script.js"></script>
