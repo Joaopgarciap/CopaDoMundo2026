@@ -375,11 +375,15 @@ estadiosData.forEach((estadio)=>{
 
 // ═══ HISTÓRIA DAS COPAS ═══
 const destaquesHistoricos=[
-  {titulo:"Maior campeão",valor:"Brasil",detalhe:"5 títulos: 1958, 1962, 1970, 1994 e 2002"},
-  {titulo:"Mais participações",valor:"Brasil",detalhe:"22 participações em 22 edições (1930-2022)"},
-  {titulo:"Seleção com mais gols",valor:"Brasil",detalhe:"237 gols marcados em Copas"},
-  {titulo:"Seleção com mais gols sofridos",valor:"México",detalhe:"101 gols sofridos em Copas"},
-  {titulo:"Seleção com mais jogos",valor:"Brasil",detalhe:"114 partidas em Copas"},
+  {titulo:"Mais participações",valor:"BRASIL (22)",detalhe:"Única seleção presente em todas as edições desde 1930."},
+  {titulo:"Mais títulos",valor:"BRASIL (5)",detalhe:"Campeão em 1958, 1962, 1970, 1994 e 2002."},
+  {titulo:"Mais jogos da seleção",valor:"BRASIL (114)",detalhe:"Seleção que mais disputou partidas em Copas (até 2022)."},
+  {titulo:"Seleção com mais gols",valor:"BRASIL (237)",detalhe:"Maior número de gols marcados na história da Copa (até 2022)."},
+  {titulo:"Seleção com mais gols sofridos",valor:"ALEMANHA (130)",detalhe:"Maior número de gols sofridos na história da Copa (até 2022)."},
+  {titulo:"Maior goleada",valor:"HUNGRIA 10-1 EL SALVADOR",detalhe:"Fase de grupos da Copa de 1982, na Espanha."},
+  {titulo:"Maior público em final",valor:"BRASIL X URUGUAI (199.854)",detalhe:"Final de 1950 no Maracanã (Rio de Janeiro)."},
+  {titulo:"Mais gols em uma edição",valor:"JUST FONTAINE (13)",detalhe:"Marca histórica na Copa de 1958 pela França."},
+  {titulo:"Mais jogos em Copas (atleta)",valor:"LOTHAR MATTHÄUS (25)",detalhe:"Recordista de partidas de um jogador em Mundiais."},
 ];
 
 const maiorArtilheiroHistorico={

@@ -629,7 +629,7 @@ select:focus,input:focus { border-color:rgba(245,200,66,.4); }
 
 .history-summary-grid {
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
   gap:.75rem;
   margin-bottom:1rem;
 }
