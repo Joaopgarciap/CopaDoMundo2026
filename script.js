@@ -576,6 +576,12 @@ function isFavGame(idx){return getFavorites().games.includes(idx);}
 function isFavTeam(t){return getFavorites().teams.includes(t);}
 const getMatchDetailsStore=()=>JSON.parse(localStorage.getItem("copa_match_details")||"{}");
 const saveMatchDetailsStore=(data)=>localStorage.setItem("copa_match_details",JSON.stringify(data));
+const getMatchApiCacheStore=()=>JSON.parse(localStorage.getItem("copa_match_api_cache")||"{}");
+const saveMatchApiCacheStore=(data)=>localStorage.setItem("copa_match_api_cache",JSON.stringify(data));
+const getNotificationsStateStore=()=>JSON.parse(localStorage.getItem("copa_notify_state")||"{}");
+const saveNotificationsStateStore=(data)=>localStorage.setItem("copa_notify_state",JSON.stringify(data));
+let globalMatchWatcherHandle=null;
+let globalVisibilityWatcherBound=false;
 
 // ═══════ UTILS ═══════
 function flag(t,s=24){const c=isoCodes[t];if(!c)return`<span style="font-size:${s}px;line-height:1">🏳️</span>`;return`<img src="https://flagcdn.com/w40/${c}.png" alt="${t}" class="flag-img" style="width:${s}px;height:${Math.round(s*.67)}px;object-fit:cover;border-radius:3px">`;}
@@ -586,6 +592,109 @@ function phaseBadgeClass(f){if(f==="Fase de Grupos")return"grupos";if(f.includes
 function minutoOrdenavel(v){
   const n=parseInt(String(v||"").replace(/[^\d]/g,""),10);
   return Number.isFinite(n)?n:999;
+}
+function statusEhAoVivo(status){
+  const s=String(status||"").toLowerCase();
+  return /live|in play|1st half|2nd half|extra time|penalties|half time/.test(s);
+}
+function statusEhEncerrado(status){
+  const s=String(status||"").toLowerCase();
+  return /finished|ft|full time|after penalties/.test(s);
+}
+function getApiDoJogo(idx){
+  return getMatchDetailsStore()[idx]?.api||null;
+}
+function jogoEstaAoVivo(idx){
+  return statusEhAoVivo(getApiDoJogo(idx)?.matchStatus);
+}
+function badgeAoVivo(idx){
+  return jogoEstaAoVivo(idx)?`<span class="live-pill">AO VIVO</span>`:"";
+}
+
+function phaseLabelComLive(jogo){
+  const grupo=jogo.grupo?` · G${jogo.grupo}`:"";
+  return `${jogo.fase}${grupo}${badgeAoVivo(jogo._idx)}`;
+}
+
+function renderLiveIndicators(){
+  const jogos=getJogos();
+  let aoVivo=0;
+  jogos.forEach((jogo)=>{
+    if(jogoEstaAoVivo(jogo._idx))aoVivo++;
+  });
+  const alertCount=document.getElementById("alert-count");
+  if(alertCount)alertCount.textContent=String(aoVivo);
+}
+
+function notifyInApp(message){
+  const root=document.getElementById("match-notification-center");
+  if(!root)return;
+  const item=document.createElement("div");
+  item.className="match-notification-item";
+  item.textContent=message;
+  root.prepend(item);
+  while(root.children.length>4)root.removeChild(root.lastChild);
+  setTimeout(()=>item.classList.add("hide"),5500);
+}
+
+function requestNotificationPermissionIfNeeded(){
+  if(typeof Notification==="undefined")return;
+  if(Notification.permission==="default")Notification.requestPermission().catch(()=>{});
+}
+
+function notifyDesktop(message){
+  if(typeof Notification==="undefined")return;
+  if(Notification.permission!=="granted")return;
+  try{new Notification("Copa 2026", {body:message, silent:false});}catch(e){}
+}
+
+function notifyMatchEvent(matchIdx,message){
+  notifyInApp(message);
+  notifyDesktop(message);
+  const state=getNotificationsStateStore();
+  state.history=Array.isArray(state.history)?state.history:[];
+  state.history.unshift({t:Date.now(),matchIdx,message});
+  state.history=state.history.slice(0,25);
+  saveNotificationsStateStore(state);
+}
+
+function monitorarMudancasNotificaveis(matchIdx,api,jogo){
+  if(!api)return;
+  const state=getNotificationsStateStore();
+  const scoreKey=`${api.scoreHome}-${api.scoreAway}`;
+  state.lastScoreByMatch=state.lastScoreByMatch||{};
+  state.lastStatusByMatch=state.lastStatusByMatch||{};
+  const primeiraLeitura=!(matchIdx in state.lastStatusByMatch)&&!(matchIdx in state.lastScoreByMatch);
+  const prevScore=state.lastScoreByMatch[matchIdx];
+  const prevStatus=state.lastStatusByMatch[matchIdx];
+
+  if(primeiraLeitura){
+    if(Number.isFinite(api.scoreHome)&&Number.isFinite(api.scoreAway)){
+      state.lastScoreByMatch[matchIdx]=scoreKey;
+    }
+    state.lastStatusByMatch[matchIdx]=api.matchStatus||"";
+    saveNotificationsStateStore(state);
+    return;
+  }
+
+  if(Number.isFinite(api.scoreHome)&&Number.isFinite(api.scoreAway)){
+    if(prevScore&&prevScore!==scoreKey){
+      const f=getFavorites();
+      const favorito=f.games.includes(matchIdx)||f.teams.includes(jogo.casa)||f.teams.includes(jogo.fora);
+      notifyMatchEvent(matchIdx,`⚽ Gol em ${jogo.casa} x ${jogo.fora}: ${api.scoreHome}-${api.scoreAway}${favorito?" (favorito)":""}`);
+    }
+    state.lastScoreByMatch[matchIdx]=scoreKey;
+  }
+
+  if(statusEhAoVivo(api.matchStatus)&&!statusEhAoVivo(prevStatus)){
+    notifyMatchEvent(matchIdx,`🔴 ${jogo.casa} x ${jogo.fora} começou e está AO VIVO`);
+  }
+  if(statusEhEncerrado(api.matchStatus)&&!statusEhEncerrado(prevStatus)){
+    notifyMatchEvent(matchIdx,`🏁 Fim de jogo: ${jogo.casa} ${api.scoreHome ?? "-"} x ${api.scoreAway ?? "-"} ${jogo.fora}`);
+  }
+
+  state.lastStatusByMatch[matchIdx]=api.matchStatus||"";
+  saveNotificationsStateStore(state);
 }
 function calcularClassificacaoGrupo(g){
   const ts=grupos[g]||[];const tab={};
@@ -650,11 +759,12 @@ function renderHoje(){
   document.getElementById("hoje-date").textContent=hoje.toLocaleDateString("pt-BR",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
   const jogosHoje=getJogos().filter(j=>j.data.startsWith(ds));
   const hojeContent=document.getElementById("hoje-content");
+  const aoVivoHoje=jogosHoje.filter((j)=>jogoEstaAoVivo(j._idx)).length;
   if(jogosHoje.length===0){
     hojeContent.innerHTML=`<div class="hoje-empty"><div class="hoje-empty-icon">⚽</div><div class="hoje-empty-title">Nenhum jogo hoje</div><div class="hoje-empty-sub">A Copa começa em <strong>11 de junho de 2026</strong>. Confira os próximos jogos abaixo ou a aba de Timeline.</div></div>`;
-    document.getElementById("alert-count").textContent="0";
+    document.getElementById("alert-count").textContent=String(aoVivoHoje);
   }else{
-    document.getElementById("alert-count").textContent=jogosHoje.length;
+    document.getElementById("alert-count").textContent=String(aoVivoHoje||jogosHoje.length);
     hojeContent.innerHTML=`<div class="hoje-jogos">${jogosHoje.map(j=>buildMatchCard(j,true)).join("")}</div>`;
     attachMatchFavListeners();
   }
@@ -662,13 +772,14 @@ function renderHoje(){
   const proximos=getJogos().filter(j=>{const d=new Date(j.data.replace(" ","T"));return d>hoje&&!jogoTemPlacar(j);}).slice(0,8);
   document.getElementById("proximos-content").innerHTML=proximos.map(j=>{
     const{dia,mes}=formatarDia(j.data);const hora=j.data.split(" ")[1];
-    return`<div class="prox-card" onclick="abrirDetalhesJogo(${j._idx})">
+    return`<div class="prox-card ${jogoEstaAoVivo(j._idx)?"live-match":""}" onclick="abrirDetalhesJogo(${j._idx})">
       <div class="prox-date-badge"><div class="prox-day-num">${dia}</div><div class="prox-mon">${mes}</div></div>
       <div class="prox-teams">${flag(j.casa,18)} ${j.casa} <span style="color:var(--muted)">vs</span> ${flag(j.fora,18)} ${j.fora}</div>
       <div class="prox-time">🕐 ${hora}</div>
-      <span class="prox-phase">${j.fase}${j.grupo?" · G"+j.grupo:""}</span>
+      <span class="prox-phase">${phaseLabelComLive(j)}</span>
     </div>`;
   }).join("")||`<div style="color:var(--muted);font-size:.9rem;text-align:center;padding:2rem">Os próximos jogos aparecerão aqui conforme a Copa avança.</div>`;
+  renderLiveIndicators();
 }
 
 // ═══════ GRUPOS ═══════
@@ -796,8 +907,8 @@ function showStaticNews(teamName,body){
 function buildMatchCard(j,big=false){
   const{dia,mes}=formatarDia(j.data);const hora=j.data.split(" ")[1];
   const temPlacar=jogoTemPlacar(j);const placar=temPlacar?`<span class="score-inline">${j.golsCasa}–${j.golsFora}</span>`:"";
-  const phaseClass=phaseBadgeClass(j.fase);const grupo=j.grupo?` · G${j.grupo}`:"";const fav=isFavGame(j._idx);
-  return`<li class="match-item" onclick="abrirDetalhesJogo(${j._idx})" style="${big?"border-left:3px solid var(--gold)":""}">
+  const phaseClass=phaseBadgeClass(j.fase);const fav=isFavGame(j._idx);
+  return`<li class="match-item ${jogoEstaAoVivo(j._idx)?"live-match":""}" onclick="abrirDetalhesJogo(${j._idx})" style="${big?"border-left:3px solid var(--gold)":""}">
     <button class="match-fav-btn ${fav?"active":""}" onclick="event.stopPropagation();toggleFavGame(${j._idx})">⭐</button>
     <div class="match-date-block"><div class="match-day">${dia}</div><div class="match-mon">${mes}</div></div>
     <div class="match-center">
@@ -805,8 +916,8 @@ function buildMatchCard(j,big=false){
       <div class="match-info">🕐 ${hora} (BRT) · 📍 ${j.estadio||"A definir"}</div>
     </div>
     <div class="match-right">
-      <span class="phase-badge ${phaseClass}">${j.fase}${grupo}</span>
-      <span class="status-dot ${temPlacar?"done":""}"></span>
+      <span class="phase-badge ${phaseClass}">${phaseLabelComLive(j)}</span>
+      <span class="status-dot ${jogoEstaAoVivo(j._idx)?"live":(temPlacar?"done":"")}"></span>
       <button class="edit-score-btn" onclick="event.stopPropagation();abrirEditarPlacar(${j._idx})">${temPlacar?"✏️ Editar":"+ Placar"}</button>
     </div>
   </li>`;
@@ -1000,9 +1111,21 @@ async function buscarDetalhesPartidaAPI(jogo){
   }
   const casaApi=nomeSelecaoApi(jogo.casa);
   const foraApi=nomeSelecaoApi(jogo.fora);
-  const query=encodeURIComponent(`${casaApi}_vs_${foraApi}`);
-  const json=await fetchJSONPublic(`${THE_SPORTS_DB_BASE_URL}/searchevents.php?e=${query}`);
-  const candidatos=(json.event||[]).filter((ev)=>ev.strSport==="Soccer");
+  const consultas=[
+    `${casaApi}_vs_${foraApi}`,
+    `${foraApi}_vs_${casaApi}`,
+    `${casaApi} vs ${foraApi}`,
+    `${foraApi} vs ${casaApi}`,
+  ];
+  let candidatos=[];
+  for(const consulta of consultas){
+    const query=encodeURIComponent(consulta);
+    try{
+      const json=await fetchJSONPublic(`${THE_SPORTS_DB_BASE_URL}/searchevents.php?e=${query}`);
+      const lista=(json.event||[]).filter((ev)=>ev.strSport==="Soccer");
+      if(lista.length)candidatos=candidatos.concat(lista);
+    }catch(e){}
+  }
   const escolhido=escolherEventoApi(candidatos,jogo);
   if(!escolhido)return{status:"no-data",message:"API gratuita sem dados detalhados para este confronto neste momento."};
 
@@ -1025,6 +1148,51 @@ async function buscarDetalhesPartidaAPI(jogo){
     scoreAway:placarFora,
     resultText:narrativa,
     eventos,
+  };
+}
+
+function lerCacheApiPartida(idx){
+  const cache=getMatchApiCacheStore();
+  return cache[idx]||null;
+}
+
+function salvarCacheApiPartida(idx,api){
+  if(!api||api.status!=="ok")return;
+  const cache=getMatchApiCacheStore();
+  cache[idx]={...api,cachedAt:new Date().toISOString()};
+  saveMatchApiCacheStore(cache);
+}
+
+async function fetchComDadosDetalheComFallback(jogo,idx){
+  let ultimoErro="";
+  try{
+    const api=await buscarDetalhesPartidaAPI(jogo);
+    if(api.status==="ok"){
+      salvarCacheApiPartida(idx,api);
+      return api;
+    }
+    ultimoErro=api.message||"Sem dados na API principal.";
+  }catch(e){
+    ultimoErro=e?.message||"Falha ao consultar API principal.";
+  }
+
+  const cache=lerCacheApiPartida(idx);
+  if(cache){
+    return{
+      ...cache,
+      provider:`${cache.provider||"Cache local"} · fallback`,
+      status:"ok",
+      fromCache:true,
+      message:"Exibindo último dado salvo localmente enquanto as APIs não respondem.",
+    };
+  }
+
+  return{
+    status:"error",
+    provider:"Fallback local",
+    message:ultimoErro||"Sem dados de partida disponíveis no momento.",
+    fetchedAt:new Date().toISOString(),
+    eventos:[],
   };
 }
 
@@ -1110,8 +1278,10 @@ function renderDetalhesJogo(idx){
 }
 
 let detalheJogoAutoRefreshHandle=null;
+let detalheJogoAbertoIdx=null;
 
-async function sincronizarDetalhesJogoApi(idx,forcar=false){
+async function sincronizarDetalhesJogoApi(idx,forcar=false,options={}){
+  const{rerender=true,monitorar=true}=options;
   const jogo=getJogos()[idx];
   if(!jogo)return;
   if(detalhesApiEmProgresso.has(idx))return;
@@ -1126,36 +1296,86 @@ async function sincronizarDetalhesJogoApi(idx,forcar=false){
   detalhes.api={...(detalhes.api||{}),status:"loading",provider:"TheSportsDB (gratuita)",message:""};
   store[idx]=detalhes;
   saveMatchDetailsStore(store);
-  renderDetalhesJogo(idx);
+  if(detalheJogoAbertoIdx===idx)renderDetalhesJogo(idx);
 
   try{
-    const api=await buscarDetalhesPartidaAPI(jogo);
+    const api=await fetchComDadosDetalheComFallback(jogo,idx);
     const storeAtual=getMatchDetailsStore();
     const detalhesAtual=storeAtual[idx]||{eventos:[]};
     detalhesAtual.api=api;
     storeAtual[idx]=detalhesAtual;
     saveMatchDetailsStore(storeAtual);
     salvarPlacarAPISeDisponivel(idx,api);
-    renderJogos();renderHoje();renderFavoritos();
-    renderDetalhesJogo(idx);
+    if(monitorar)monitorarMudancasNotificaveis(idx,api,jogo);
+    if(rerender){
+      renderJogos();renderHoje();renderFavoritos();
+      if(document.getElementById("tab-timeline")?.classList.contains("active"))renderTimeline();
+    }
+    if(detalheJogoAbertoIdx===idx)renderDetalhesJogo(idx);
   }catch(e){
     const storeAtual=getMatchDetailsStore();
     const detalhesAtual=storeAtual[idx]||{eventos:[]};
-    detalhesAtual.api={status:"error",provider:"TheSportsDB (gratuita)",message:"Não foi possível carregar os dados automáticos agora."};
+    detalhesAtual.api={
+      status:"error",
+      provider:"TheSportsDB (gratuita)",
+      message:"Não foi possível carregar os dados automáticos agora.",
+      fetchedAt:new Date().toISOString(),
+      eventos:[],
+    };
     storeAtual[idx]=detalhesAtual;
     saveMatchDetailsStore(storeAtual);
-    renderDetalhesJogo(idx);
+    if(detalheJogoAbertoIdx===idx)renderDetalhesJogo(idx);
   }finally{
     detalhesApiEmProgresso.delete(idx);
   }
 }
 
 function abrirDetalhesJogo(idx){
+  detalheJogoAbertoIdx=idx;
   renderDetalhesJogo(idx);
   document.getElementById("match-detail-overlay").classList.add("open");
   sincronizarDetalhesJogoApi(idx,false);
   if(detalheJogoAutoRefreshHandle)clearInterval(detalheJogoAutoRefreshHandle);
   detalheJogoAutoRefreshHandle=setInterval(()=>sincronizarDetalhesJogoApi(idx,true),60000);
+}
+
+function getJogosParaMonitoramentoGlobal(){
+  const favoritos=getFavorites();
+  const agora=Date.now();
+  return getJogos().filter((jogo)=>{
+    const favorito=favoritos.games.includes(jogo._idx)||favoritos.teams.includes(jogo.casa)||favoritos.teams.includes(jogo.fora);
+    const dataJogo=new Date(jogo.data.replace(" ","T")).getTime();
+    const pertoDaPartida=Math.abs(dataJogo-agora)<=(6*60*60*1000);
+    return favorito||pertoDaPartida||jogoEstaAoVivo(jogo._idx);
+  }).slice(0,16);
+}
+
+async function sincronizarDetalhesGlobais(){
+  const jogosMonitorados=getJogosParaMonitoramentoGlobal();
+  if(!jogosMonitorados.length){
+    renderLiveIndicators();
+    return;
+  }
+  await Promise.all(
+    jogosMonitorados.map((jogo)=>sincronizarDetalhesJogoApi(jogo._idx,true,{rerender:false,monitorar:true}))
+  );
+  renderJogos();
+  renderHoje();
+  renderFavoritos();
+  if(document.getElementById("tab-timeline")?.classList.contains("active"))renderTimeline();
+  renderLiveIndicators();
+}
+
+function startGlobalMatchWatchers(){
+  if(globalMatchWatcherHandle)clearInterval(globalMatchWatcherHandle);
+  sincronizarDetalhesGlobais();
+  globalMatchWatcherHandle=setInterval(sincronizarDetalhesGlobais,60000);
+  if(!globalVisibilityWatcherBound){
+    document.addEventListener("visibilitychange",()=>{
+      if(!document.hidden)sincronizarDetalhesGlobais();
+    });
+    globalVisibilityWatcherBound=true;
+  }
 }
 
 // ═══════ TIMELINE ═══════
@@ -1188,10 +1408,11 @@ function renderTimeline(){
       </div>
       <div class="tl-games" id="tl-games-${fi}">
         ${gamesInPhase.map(j=>{const temPlacar=jogoTemPlacar(j);const fav=isFavGame(j._idx);
-          return`<div class="tl-game-row" onclick="abrirDetalhesJogo(${j._idx})">
+          const aoVivo=jogoEstaAoVivo(j._idx);
+          return`<div class="tl-game-row ${aoVivo?"live-match":""}" onclick="abrirDetalhesJogo(${j._idx})">
             <div class="tl-game-date">${formatarData(j.data)}</div>
             <div class="tl-game-teams">${flag(j.casa,16)} ${j.casa} <span style="color:var(--muted)">vs</span> ${flag(j.fora,16)} ${j.fora}</div>
-            <div class="tl-game-score" style="color:${temPlacar?"var(--green)":"var(--muted)"}">${temPlacar?`${j.golsCasa}–${j.golsFora}`:"– –"}</div>
+            <div class="tl-game-score" style="color:${temPlacar?"var(--green)":"var(--muted)"}">${aoVivo?'<span class="live-chip">AO VIVO</span>':""}${temPlacar?`${j.golsCasa}–${j.golsFora}`:"– –"}</div>
             <div class="tl-game-stadium">${(j.estadio||"").split(",")[0]}</div>
             <button class="tl-fav-btn ${fav?"active":""}" onclick="event.stopPropagation();toggleFavGame(${j._idx});renderTimeline()" title="Favoritar">⭐</button>
             <button class="edit-score-btn" onclick="event.stopPropagation();abrirEditarPlacar(${j._idx})">${temPlacar?"✏️":"+"}</button>
@@ -1395,11 +1616,13 @@ function initModals(){
   document.getElementById("match-detail-close").addEventListener("click",()=>{
     document.getElementById("match-detail-overlay").classList.remove("open");
     if(detalheJogoAutoRefreshHandle){clearInterval(detalheJogoAutoRefreshHandle);detalheJogoAutoRefreshHandle=null;}
+    detalheJogoAbertoIdx=null;
   });
   document.getElementById("match-detail-overlay").addEventListener("click",e=>{
     if(e.target.id==="match-detail-overlay"){
       document.getElementById("match-detail-overlay").classList.remove("open");
       if(detalheJogoAutoRefreshHandle){clearInterval(detalheJogoAutoRefreshHandle);detalheJogoAutoRefreshHandle=null;}
+      detalheJogoAbertoIdx=null;
     }
   });
   document.addEventListener("keydown",e=>{if(e.key==="Escape"){document.querySelectorAll(".modal-overlay").forEach(o=>o.classList.remove("open"));}});
@@ -1433,6 +1656,8 @@ function inicializar(){
   renderEstadios();
   renderFavoritos();
   renderHistoriaCopas();
+  requestNotificationPermissionIfNeeded();
+  startGlobalMatchWatchers();
 }
 
 inicializar();
