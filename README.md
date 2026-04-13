@@ -19,6 +19,28 @@ python3 -m http.server 8080
 
 Depois acesse: `http://localhost:8080`
 
+### Rodar pelo VSCode (task pronta)
+
+1. Abra a pasta do projeto no VSCode
+2. Use `Terminal > Run Task...`
+3. Escolha `Copa: iniciar servidor local`
+4. Acesse `http://localhost:8080` no navegador
+
+### Se abrir "Lista de diretórios para /"
+
+Você iniciou o servidor na pasta errada (normalmente um nível acima do projeto).
+
+No terminal, faça:
+
+```bash
+cd "C:\GitHub\Copa do Mundo\CopaDoMundo2026"
+python -m http.server 8080
+```
+
+Depois abra:
+- `http://localhost:8080/` (abre `index.html`)
+- ou `http://localhost:8080/index.html`
+
 ## Estrutura
 
 - `index.html`: estrutura da página
