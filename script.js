@@ -527,6 +527,93 @@ const jogos = [
 ];
 
 // =============================================
+//  ESTADO DA APLICAÇÃO / PERSISTÊNCIA
+// =============================================
+const STORAGE_KEYS = {
+  favorites: "copa2026_favorites",
+  display: "copa2026_display",
+  players: "copa2026_players",
+  matches: "copa2026_matches",
+  activeTab: "copa2026_active_tab",
+};
+
+const timelineEventos = [
+  { data: "2026-06-11", titulo: "Abertura da Copa", detalhe: "Cerimônia + México x África do Sul no Estádio Azteca." },
+  { data: "2026-06-24", titulo: "Rodada final de grupos", detalhe: "Início dos jogos simultâneos e definição dos classificados." },
+  { data: "2026-07-01", titulo: "Início do mata-mata", detalhe: "Começam os 16 avos de final da Copa 2026." },
+  { data: "2026-07-10", titulo: "Oitavas de final", detalhe: "Confrontos decisivos para chegar ao top 8." },
+  { data: "2026-07-16", titulo: "Quartas de final", detalhe: "Apenas oito seleções seguem vivas." },
+  { data: "2026-07-14", titulo: "Semifinais", detalhe: "Decisão dos finalistas em Atlanta e Arlington." },
+  { data: "2026-07-19", titulo: "Final", detalhe: "Grande final no MetLife Stadium, Nova Jersey." },
+];
+
+const perfisSementeSelecoes = {
+  "Brasil": {
+    tecnico: "A definir",
+    melhorResultado: "Campeão (5 títulos)",
+    campanhas: ["1930-2022: única seleção em todas as Copas", "Títulos: 1958, 1962, 1970, 1994 e 2002", "Maior goleador histórico em Copas"],
+    elenco: ["Alisson", "Marquinhos", "Éder Militão", "Bruno Guimarães", "Rodrygo", "Vinicius Jr.", "Raphinha", "Endrick", "Paquetá", "Bremer", "Danilo"],
+  },
+  "Argentina": {
+    tecnico: "A definir",
+    melhorResultado: "Campeão (3 títulos)",
+    campanhas: ["Títulos: 1978, 1986 e 2022", "Finalista em 2014", "Tradição em mata-mata"],
+    elenco: ["Emiliano Martínez", "Otamendi", "Romero", "Enzo Fernández", "Mac Allister", "De Paul", "Julián Álvarez", "Lautaro Martínez", "Messi", "Di María", "Molina"],
+  },
+  "França": {
+    tecnico: "A definir",
+    melhorResultado: "Campeão (2 títulos)",
+    campanhas: ["Títulos: 1998 e 2018", "Vice em 2006 e 2022", "Finalista em 3 das últimas 5 edições"],
+    elenco: ["Maignan", "Koundé", "Konaté", "Theo Hernández", "Tchouaméni", "Camavinga", "Griezmann", "Dembélé", "Mbappé", "Kolo Muani", "Zaïre-Emery"],
+  },
+  "Alemanha": {
+    tecnico: "A definir",
+    melhorResultado: "Campeão (4 títulos)",
+    campanhas: ["Títulos: 1954, 1974, 1990 e 2014", "8 finais disputadas", "Consistência histórica em fases finais"],
+    elenco: ["Neuer", "Rüdiger", "Tah", "Kimmich", "Gündogan", "Wirtz", "Musiala", "Havertz", "Sané", "Füllkrug", "Schlotterbeck"],
+  },
+  "Inglaterra": {
+    tecnico: "A definir",
+    melhorResultado: "Campeão (1966)",
+    campanhas: ["Campeã em 1966", "Semifinal em 2018", "Quartas em 2022"],
+    elenco: ["Pickford", "Walker", "Stones", "Rice", "Bellingham", "Foden", "Saka", "Kane", "Trent", "Rashford", "Guehi"],
+  },
+  "Portugal": {
+    tecnico: "A definir",
+    melhorResultado: "3º lugar (1966)",
+    campanhas: ["Semifinal em 1966", "4º lugar em 2006", "Elenco técnico e competitivo"],
+    elenco: ["Diogo Costa", "Pepe", "Rúben Dias", "Nuno Mendes", "Vitinha", "Bruno Fernandes", "Bernardo Silva", "Leão", "João Félix", "Cristiano Ronaldo", "Cancelo"],
+  },
+};
+
+const appState = {
+  favoriteTeams: new Set(),
+  favoriteMatches: new Set(),
+  theme: "dark",
+  tvMode: false,
+};
+
+let liveSelectedMatchId = null;
+
+const todasSelecoes = Object.values(grupos).flat();
+jogadores.forEach((jogador) => {
+  if (!Number.isFinite(jogador.cleanSheets)) jogador.cleanSheets = 0;
+});
+jogos.forEach((jogo, index) => {
+  if (!jogo.id) jogo.id = `jogo-${index + 1}`;
+  if (!Number.isFinite(jogo.amarelosCasa)) jogo.amarelosCasa = 0;
+  if (!Number.isFinite(jogo.amarelosFora)) jogo.amarelosFora = 0;
+  if (!Number.isFinite(jogo.vermelhosCasa)) jogo.vermelhosCasa = 0;
+  if (!Number.isFinite(jogo.vermelhosFora)) jogo.vermelhosFora = 0;
+  if (!Number.isFinite(jogo.finalizacoesCasa)) jogo.finalizacoesCasa = 0;
+  if (!Number.isFinite(jogo.finalizacoesFora)) jogo.finalizacoesFora = 0;
+  if (!Number.isFinite(jogo.posseCasa)) jogo.posseCasa = 50;
+  if (!Number.isFinite(jogo.posseFora)) jogo.posseFora = 50;
+});
+
+const selecoesInfo = construirPerfisSelecoes();
+
+// =============================================
 //  UTILS
 // =============================================
 function flag(time,size=24){
@@ -535,8 +622,8 @@ function flag(time,size=24){
   return`<img src="https://flagcdn.com/w40/${code}.png" alt="${time}" class="flag-img" style="width:${size}px;height:${Math.round(size*.67)}px;object-fit:cover;border-radius:3px">`;
 }
 function jogoTemPlacar(j){return Number.isFinite(j.golsCasa)&&Number.isFinite(j.golsFora);}
-function formatarData(t){const d=new Date(t.replace(" ","T"));return new Intl.DateTimeFormat("pt-BR",{dateStyle:"short",timeStyle:"short"}).format(d);}
-function formatarDia(t){const d=new Date(t.split(" ")[0]+"T12:00:00");return{dia:d.getDate().toString().padStart(2,"0"),mes:d.toLocaleString("pt-BR",{month:"short"}).replace(".","").toUpperCase()};}
+function formatarData(t){const d=parseDataJogo(t);return new Intl.DateTimeFormat("pt-BR",{dateStyle:"short",timeStyle:"short"}).format(d);}
+function formatarDia(t){const d=parseDataJogo(t);return{dia:d.getDate().toString().padStart(2,"0"),mes:d.toLocaleString("pt-BR",{month:"short"}).replace(".","").toUpperCase()};}
 function phaseBadgeClass(fase){
   if(fase==="Fase de Grupos")return"grupos";
   if(fase.includes("16 avos"))return"avos";
@@ -545,6 +632,186 @@ function phaseBadgeClass(fase){
   if(fase.includes("Semi"))return"semi";
   if(fase==="Final"||fase.includes("Terceiro"))return"final";
   return"";
+}
+function parseDataJogo(dataTexto){
+  const [dataParte,horaParte="00:00"]=dataTexto.split(" ");
+  const [ano,mes,dia]=dataParte.split("-").map(Number);
+  const [hora,minuto]=horaParte.split(":").map(Number);
+  return new Date(ano,mes-1,dia,hora||0,minuto||0,0,0);
+}
+function dataISO(date){
+  const y=date.getFullYear();
+  const m=String(date.getMonth()+1).padStart(2,"0");
+  const d=String(date.getDate()).padStart(2,"0");
+  return`${y}-${m}-${d}`;
+}
+function isMesmoDia(a,b){
+  return a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate();
+}
+function normalizarNumero(value, fallback = 0) {
+  if (value === "" || value === null || typeof value === "undefined") return fallback;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+function construirPerfisSelecoes(){
+  const porGrupo={};
+  Object.entries(grupos).forEach(([grupo,times])=>{
+    times.forEach((time)=>{porGrupo[time]=grupo;});
+  });
+  const perfis={};
+  todasSelecoes.forEach((time)=>{
+    const base=perfisSementeSelecoes[time]||{};
+    perfis[time]={
+      tecnico:base.tecnico||"A definir",
+      melhorResultado:base.melhorResultado||"Participação em andamento",
+      campanhas:base.campanhas||[
+        `Campanha histórica registrada para ${time}.`,
+        "Dados detalhados podem ser refinados durante a Copa.",
+        `Grupo na edição 2026: ${porGrupo[time]||"?"}.`,
+      ],
+      elenco:base.elenco||Array.from({length:11},(_,i)=>`${time} · Jogador ${i+1}`),
+    };
+  });
+  return perfis;
+}
+function obterJogoPorId(matchId){
+  return jogos.find((jogo)=>jogo.id===matchId)||null;
+}
+function matchFavorito(matchId){return appState.favoriteMatches.has(matchId);}
+function selecaoFavorita(team){return appState.favoriteTeams.has(team);}
+function proximoJogoData(){return jogos.map((j)=>parseDataJogo(j.data)).sort((a,b)=>a-b)[0]||new Date();}
+function dataPadraoPainel(){
+  const hoje=new Date();
+  if(hoje.getFullYear()===2026&&hoje.getMonth()>=5&&hoje.getMonth()<=6)return dataISO(hoje);
+  return dataISO(proximoJogoData());
+}
+function salvarJSON(chave,dados){
+  try{localStorage.setItem(chave,JSON.stringify(dados));}catch(error){console.warn("Falha ao salvar",chave,error);}
+}
+function carregarJSON(chave,padrao){
+  try{
+    const raw=localStorage.getItem(chave);
+    if(!raw)return padrao;
+    return JSON.parse(raw);
+  }catch(error){
+    console.warn("Falha ao carregar",chave,error);
+    return padrao;
+  }
+}
+function carregarPersistencia(){
+  const favoritos=carregarJSON(STORAGE_KEYS.favorites,{teams:[],matches:[]});
+  appState.favoriteTeams=new Set(favoritos.teams||[]);
+  appState.favoriteMatches=new Set(favoritos.matches||[]);
+
+  const display=carregarJSON(STORAGE_KEYS.display,{theme:"dark",tvMode:false});
+  appState.theme=display.theme==="light"?"light":"dark";
+  appState.tvMode=Boolean(display.tvMode);
+
+  const players=carregarJSON(STORAGE_KEYS.players,[]);
+  const playersMap=new Map(players.map((item)=>[`${item.nome}|${item.selecao}`,item]));
+  jogadores.forEach((jogador)=>{
+    const saved=playersMap.get(`${jogador.nome}|${jogador.selecao}`);
+    if(!saved)return;
+    jogador.gols=normalizarNumero(saved.gols,0);
+    jogador.assists=normalizarNumero(saved.assists,0);
+    jogador.amarelos=normalizarNumero(saved.amarelos,0);
+    jogador.vermelhos=normalizarNumero(saved.vermelhos,0);
+    jogador.cleanSheets=normalizarNumero(saved.cleanSheets,0);
+  });
+
+  const matches=carregarJSON(STORAGE_KEYS.matches,[]);
+  const matchMap=new Map(matches.map((item)=>[item.id,item]));
+  jogos.forEach((jogo)=>{
+    const saved=matchMap.get(jogo.id);
+    if(!saved)return;
+    jogo.golsCasa=saved.golsCasa===null?null:normalizarNumero(saved.golsCasa,0);
+    jogo.golsFora=saved.golsFora===null?null:normalizarNumero(saved.golsFora,0);
+    jogo.amarelosCasa=normalizarNumero(saved.amarelosCasa,0);
+    jogo.amarelosFora=normalizarNumero(saved.amarelosFora,0);
+    jogo.vermelhosCasa=normalizarNumero(saved.vermelhosCasa,0);
+    jogo.vermelhosFora=normalizarNumero(saved.vermelhosFora,0);
+    jogo.finalizacoesCasa=normalizarNumero(saved.finalizacoesCasa,0);
+    jogo.finalizacoesFora=normalizarNumero(saved.finalizacoesFora,0);
+    jogo.posseCasa=normalizarNumero(saved.posseCasa,50);
+    jogo.posseFora=normalizarNumero(saved.posseFora,50);
+  });
+}
+function salvarFavoritos(){
+  salvarJSON(STORAGE_KEYS.favorites,{
+    teams:[...appState.favoriteTeams],
+    matches:[...appState.favoriteMatches],
+  });
+}
+function salvarDisplay(){
+  salvarJSON(STORAGE_KEYS.display,{theme:appState.theme,tvMode:appState.tvMode});
+}
+function salvarDadosAoVivo(){
+  salvarJSON(STORAGE_KEYS.players,jogadores.map((j)=>({
+    nome:j.nome,selecao:j.selecao,gols:j.gols,assists:j.assists,amarelos:j.amarelos,vermelhos:j.vermelhos,cleanSheets:j.cleanSheets,
+  })));
+  salvarJSON(STORAGE_KEYS.matches,jogos.map((j)=>({
+    id:j.id,golsCasa:j.golsCasa,golsFora:j.golsFora,amarelosCasa:j.amarelosCasa,amarelosFora:j.amarelosFora,
+    vermelhosCasa:j.vermelhosCasa,vermelhosFora:j.vermelhosFora,finalizacoesCasa:j.finalizacoesCasa,finalizacoesFora:j.finalizacoesFora,
+    posseCasa:j.posseCasa,posseFora:j.posseFora,
+  })));
+}
+function aplicarDisplay(){
+  document.body.dataset.theme=appState.theme;
+  document.body.classList.toggle("tv-mode",appState.tvMode);
+  const themeBtn=document.getElementById("theme-toggle");
+  const tvBtn=document.getElementById("tv-toggle");
+  if(themeBtn)themeBtn.textContent=appState.theme==="dark"?"🌙 Tema escuro":"☀️ Tema claro";
+  if(tvBtn)tvBtn.textContent=`📺 Modo TV: ${appState.tvMode?"on":"off"}`;
+}
+function toggleFavoritoSelecao(team){
+  if(selecaoFavorita(team))appState.favoriteTeams.delete(team);
+  else appState.favoriteTeams.add(team);
+  salvarFavoritos();
+  renderSelecaoPagina();
+  renderFavoritos();
+  renderHoje();
+}
+function toggleFavoritoJogo(matchId){
+  if(matchFavorito(matchId))appState.favoriteMatches.delete(matchId);
+  else appState.favoriteMatches.add(matchId);
+  salvarFavoritos();
+  renderJogos();
+  renderTimeline();
+  renderHoje();
+  renderFavoritos();
+}
+function itemJogoMarkup(j,{showFase=true,compact=false}={}){
+  const {dia,mes}=formatarDia(j.data);
+  const hora=j.data.split(" ")[1];
+  const temPlacar=jogoTemPlacar(j);
+  const placar=temPlacar?`<span class="score-inline">${j.golsCasa}–${j.golsFora}</span>`:"";
+  const phaseClass=phaseBadgeClass(j.fase);
+  const grupo=j.grupo?` · Grupo ${j.grupo}`:"";
+  return`<li class="match-item ${compact?"match-item-compact":""}">
+    <div class="match-date-block"><div class="match-day">${dia}</div><div class="match-mon">${mes}</div></div>
+    <div class="match-center">
+      <div class="match-teams-row">${flag(j.casa,22)} ${j.casa} ${placar||'<span style="color:var(--muted);font-size:.85rem">vs</span>'} ${flag(j.fora,22)} ${j.fora}</div>
+      <div class="match-info">🕐 ${hora} (BRT) &nbsp;·&nbsp; 📍 ${j.estadio||"A definir"}</div>
+    </div>
+    <div class="match-right">
+      ${showFase?`<span class="phase-badge ${phaseClass}">${j.fase}${grupo}</span>`:""}
+      <button type="button" class="favorite-match-btn ${matchFavorito(j.id)?"active":""}" data-match-id="${j.id}" aria-label="Favoritar jogo">★</button>
+      <span class="status-dot ${temPlacar?"done":""}"></span>
+    </div>
+  </li>`;
+}
+function itemJogoTimeline(j){
+  const temPlacar=jogoTemPlacar(j);
+  return`<li class="timeline-item">
+    <div>
+      <strong>${j.casa} x ${j.fora}</strong>
+      <p>${formatarData(j.data)} · ${j.fase}${j.grupo?` (Grupo ${j.grupo})`:""}</p>
+    </div>
+    <div class="timeline-item-right">
+      <span class="timeline-score">${temPlacar?`${j.golsCasa}–${j.golsFora}`:"--"}</span>
+      <button type="button" class="favorite-match-btn ${matchFavorito(j.id)?"active":""}" data-match-id="${j.id}" aria-label="Favoritar jogo">★</button>
+    </div>
+  </li>`;
 }
 
 // =============================================
@@ -573,6 +840,7 @@ function calcularClassificacaoGrupo(grupo){
 // =============================================
 function renderGrupos(){
   const grid=document.getElementById("groups-grid");
+  if(!grid)return;
   grid.innerHTML=Object.keys(grupos).map(g=>{
     const cl=calcularClassificacaoGrupo(g);
     const html=cl.map(l=>`
@@ -595,6 +863,7 @@ function renderGrupos(){
 function abrirModalGrupo(grupo){
   const overlay=document.getElementById("modal-overlay");
   const content=document.getElementById("modal-content");
+  if(!overlay||!content)return;
   const cl=calcularClassificacaoGrupo(grupo);
   const jg=jogos.filter(j=>j.fase==="Fase de Grupos"&&j.grupo===grupo);
   const rows=cl.map((l,i)=>`<tr>
@@ -622,34 +891,17 @@ function abrirModalGrupo(grupo){
 //  RENDER: JOGOS
 // =============================================
 function renderJogos(){
-  const fase=document.getElementById("fase-select").value;
-  const termo=document.getElementById("search-time").value.trim().toLowerCase();
+  const fase=document.getElementById("fase-select")?.value||"Todas";
+  const termo=document.getElementById("search-time")?.value.trim().toLowerCase()||"";
   const filtrados=jogos.filter(j=>{
     const faseOk=fase==="Todas"||j.fase===fase;
     const buscaOk=!termo||j.casa.toLowerCase().includes(termo)||j.fora.toLowerCase().includes(termo);
     return faseOk&&buscaOk;
   });
   const list=document.getElementById("matches-list");
+  if(!list)return;
   if(!filtrados.length){list.innerHTML='<li style="color:var(--muted);padding:1.5rem;text-align:center">Nenhum jogo encontrado.</li>';return;}
-  list.innerHTML=filtrados.map(j=>{
-    const{dia,mes}=formatarDia(j.data);
-    const hora=j.data.split(" ")[1];
-    const temPlacar=jogoTemPlacar(j);
-    const placar=temPlacar?`<span class="score-inline">${j.golsCasa}–${j.golsFora}</span>`:"";
-    const phaseClass=phaseBadgeClass(j.fase);
-    const grupo=j.grupo?` · Grupo ${j.grupo}`:"";
-    return`<li class="match-item">
-      <div class="match-date-block"><div class="match-day">${dia}</div><div class="match-mon">${mes}</div></div>
-      <div class="match-center">
-        <div class="match-teams-row">${flag(j.casa,22)} ${j.casa} ${placar||'<span style="color:var(--muted);font-size:.85rem">vs</span>'} ${flag(j.fora,22)} ${j.fora}</div>
-        <div class="match-info">🕐 ${hora} (BRT) &nbsp;·&nbsp; 📍 ${j.estadio||"A definir"}</div>
-      </div>
-      <div class="match-right">
-        <span class="phase-badge ${phaseClass}">${j.fase}${grupo}</span>
-        <span class="status-dot ${temPlacar?"done":""}"></span>
-      </div>
-    </li>`;
-  }).join("");
+  list.innerHTML=filtrados.map((j)=>itemJogoMarkup(j)).join("");
 }
 
 // =============================================
@@ -658,9 +910,10 @@ function renderJogos(){
 function renderArtilheiros(){
   const makeList=(id,campo,icone,cor)=>{
     const el=document.getElementById(id);
+    if(!el)return;
     const top=[...jogadores].sort((a,b)=>b[campo]-a[campo]).slice(0,10);
     if(top.every(j=>j[campo]===0)){
-      el.innerHTML=`<li class="art-empty">A Copa ainda não começou.<br>Edite <code>script.js</code> para adicionar dados.</li>`;return;
+      el.innerHTML=`<li class="art-empty">Sem dados ainda.<br>Atualize no <strong>Centro ao vivo</strong>.</li>`;return;
     }
     el.innerHTML=top.map(j=>`<li class="art-item">
       <span class="art-rank"></span>
@@ -673,6 +926,7 @@ function renderArtilheiros(){
   makeList("list-assists","assists","🎯","var(--accent)");
   makeList("list-amarelos","amarelos","🟨","#f5c842");
   makeList("list-vermelhos","vermelhos","🟥","var(--red)");
+  makeList("list-clean-sheets","cleanSheets","🧤","var(--gold)");
 }
 
 // =============================================
@@ -683,6 +937,7 @@ let currentSlide=0;
 function renderEstadios(){
   const track=document.getElementById("stadium-track");
   const dots=document.getElementById("carousel-dots");
+  if(!track||!dots)return;
 
   track.innerHTML=estadiosData.map(e=>`
     <div class="stadium-slide">
@@ -715,13 +970,14 @@ function renderEstadios(){
   dots.innerHTML=estadiosData.map((_,i)=>`<button class="carousel-dot ${i===0?"active":""}" data-idx="${i}" aria-label="Estádio ${i+1}"></button>`).join("");
   dots.querySelectorAll(".carousel-dot").forEach(d=>d.addEventListener("click",()=>goToSlide(Number(d.dataset.idx))));
 
-  document.getElementById("prev-stadium").addEventListener("click",()=>goToSlide((currentSlide-1+estadiosData.length)%estadiosData.length));
-  document.getElementById("next-stadium").addEventListener("click",()=>goToSlide((currentSlide+1)%estadiosData.length));
+  document.getElementById("prev-stadium")?.addEventListener("click",()=>goToSlide((currentSlide-1+estadiosData.length)%estadiosData.length));
+  document.getElementById("next-stadium")?.addEventListener("click",()=>goToSlide((currentSlide+1)%estadiosData.length));
 }
 
 function goToSlide(idx){
   currentSlide=idx;
-  document.getElementById("stadium-track").style.transform=`translateX(-${idx*100}%)`;
+  const track=document.getElementById("stadium-track");
+  if(track)track.style.transform=`translateX(-${idx*100}%)`;
   document.querySelectorAll(".carousel-dot").forEach((d,i)=>d.classList.toggle("active",i===idx));
 }
 
@@ -729,7 +985,9 @@ function goToSlide(idx){
 //  RENDER: FATOS DA COPA
 // =============================================
 function renderFatos(){
-  document.getElementById("facts-grid").innerHTML=fatosCopa.map(f=>`
+  const root=document.getElementById("facts-grid");
+  if(!root)return;
+  root.innerHTML=fatosCopa.map(f=>`
     <div class="fact-card">
       <div class="fact-num" style="color:${f.cor}">${f.num}</div>
       <div class="fact-label">${f.label}</div>
@@ -759,8 +1017,10 @@ function calcularEstatisticasTimes(){
 }
 
 function renderEstatisticas(){
+  const root=document.getElementById("team-stats");
+  if(!root)return;
   const stats=calcularEstatisticasTimes();
-  document.getElementById("team-stats").innerHTML=stats.map(t=>`
+  root.innerHTML=stats.map(t=>`
     <article class="team-card">
       <div class="team-card-header">
         <span class="team-card-flag">${flag(t.time,32)}</span>
@@ -939,20 +1199,305 @@ function renderHistoriaCopas() {
 }
 
 // =============================================
-//  TABS & INICIALIZAR
+//  NOVOS MÓDULOS
 // =============================================
+function renderTimeline(){
+  const dateInput=document.getElementById("timeline-date");
+  const eventosRoot=document.getElementById("timeline-events");
+  const diaRoot=document.getElementById("timeline-day-games");
+  const proximosRoot=document.getElementById("timeline-next-games");
+  if(!dateInput||!eventosRoot||!diaRoot||!proximosRoot)return;
+
+  if(!dateInput.value)dateInput.value=dataPadraoPainel();
+  const base=new Date(`${dateInput.value}T12:00:00`);
+
+  eventosRoot.innerHTML=timelineEventos.map((evento)=>{
+    const dataEvento=new Date(`${evento.data}T12:00:00`);
+    const status=isMesmoDia(dataEvento,base)?"today":dataEvento<base?"past":"next";
+    return`<li class="timeline-item ${status}">
+      <div>
+        <strong>${evento.titulo}</strong>
+        <p>${evento.data.split("-").reverse().join("/")} · ${evento.detalhe}</p>
+      </div>
+    </li>`;
+  }).join("");
+
+  const jogosOrdenados=[...jogos].sort((a,b)=>parseDataJogo(a.data)-parseDataJogo(b.data));
+  const jogosDoDia=jogosOrdenados.filter((jogo)=>isMesmoDia(parseDataJogo(jogo.data),base));
+  const fimDia=new Date(base);
+  fimDia.setHours(23,59,59,999);
+  const proximos=jogosOrdenados.filter((jogo)=>parseDataJogo(jogo.data)>fimDia).slice(0,8);
+
+  diaRoot.innerHTML=jogosDoDia.length?jogosDoDia.map(itemJogoTimeline).join(""):'<li class="timeline-item"><p>Sem jogos nesta data.</p></li>';
+  proximosRoot.innerHTML=proximos.length?proximos.map(itemJogoTimeline).join(""):'<li class="timeline-item"><p>Sem próximos jogos cadastrados.</p></li>';
+}
+
+function renderHoje(){
+  const dateInput=document.getElementById("today-date");
+  const alertsRoot=document.getElementById("today-alerts");
+  const matchesRoot=document.getElementById("today-matches");
+  if(!dateInput||!alertsRoot||!matchesRoot)return;
+
+  if(!dateInput.value)dateInput.value=dataPadraoPainel();
+  const base=new Date(`${dateInput.value}T12:00:00`);
+  const agora=new Date();
+  const jogosDoDia=[...jogos]
+    .filter((jogo)=>isMesmoDia(parseDataJogo(jogo.data),base))
+    .sort((a,b)=>parseDataJogo(a.data)-parseDataJogo(b.data));
+
+  const alertas=[];
+  alertas.push(`📅 ${jogosDoDia.length} partida(s) no painel do dia.`);
+  const jogosFavoritos=jogosDoDia.filter((jogo)=>matchFavorito(jogo.id));
+  if(jogosFavoritos.length)alertas.push(`⭐ ${jogosFavoritos.length} jogo(s) favorito(s) hoje.`);
+  const selecoesFavDia=jogosDoDia.filter((jogo)=>selecaoFavorita(jogo.casa)||selecaoFavorita(jogo.fora));
+  if(selecoesFavDia.length)alertas.push(`🔥 ${selecoesFavDia.length} jogo(s) com seleções favoritas.`);
+  const aoVivo=jogosDoDia.filter((jogo)=>{
+    const inicio=parseDataJogo(jogo.data).getTime();
+    const diff=agora.getTime()-inicio;
+    return diff>=0&&diff<=2*60*60*1000&&!jogoTemPlacar(jogo);
+  });
+  if(aoVivo.length)alertas.push(`🔴 ${aoVivo.length} partida(s) em janela de jogo ao vivo.`);
+
+  alertsRoot.innerHTML=alertas.map((alerta)=>`<div class="today-alert-item">${alerta}</div>`).join("");
+  matchesRoot.innerHTML=jogosDoDia.length?jogosDoDia.map((jogo)=>itemJogoMarkup(jogo,{showFase:false,compact:true})).join(""):'<li class="match-item"><div class="match-center">Sem partidas no dia selecionado.</div></li>';
+}
+
+function renderSelecaoPagina(){
+  const select=document.getElementById("team-select");
+  const content=document.getElementById("team-page-content");
+  if(!select||!content)return;
+
+  if(!select.options.length){
+    [...todasSelecoes].sort((a,b)=>a.localeCompare(b)).forEach((time)=>{
+      const option=document.createElement("option");
+      option.value=time;
+      option.textContent=time;
+      select.appendChild(option);
+    });
+  }
+  if(!select.value)select.value=[...todasSelecoes].sort((a,b)=>a.localeCompare(b))[0];
+
+  const team=select.value;
+  const info=selecoesInfo[team];
+  const jogosTeam=jogos.filter((jogo)=>jogo.casa===team||jogo.fora===team).slice(0,7);
+  content.innerHTML=`
+    <article class="team-profile-card">
+      <div class="team-profile-top">
+        <div class="team-profile-title">${flag(team,28)} <h3>${team}</h3></div>
+        <button type="button" class="favorite-team-btn ${selecaoFavorita(team)?"active":""}" data-action="toggle-team-favorite" data-team="${team}">
+          ${selecaoFavorita(team)?"★ Favorita":"☆ Marcar favorita"}
+        </button>
+      </div>
+      <div class="team-profile-meta">
+        <p><strong>Técnico:</strong> ${info.tecnico}</p>
+        <p><strong>Melhor resultado:</strong> ${info.melhorResultado}</p>
+      </div>
+      <div class="team-profile-grid">
+        <div>
+          <h4>Campanhas históricas</h4>
+          <ul class="team-bullet-list">${info.campanhas.map((item)=>`<li>${item}</li>`).join("")}</ul>
+        </div>
+        <div>
+          <h4>Elenco base</h4>
+          <ul class="team-bullet-list">${info.elenco.map((jogador)=>`<li>${jogador}</li>`).join("")}</ul>
+        </div>
+      </div>
+      <div>
+        <h4>Próximos/últimos jogos</h4>
+        <ul class="timeline-list">${jogosTeam.map(itemJogoTimeline).join("")}</ul>
+      </div>
+    </article>
+  `;
+}
+
+function renderCentroAoVivo(){
+  const playerRoot=document.getElementById("live-player-editor");
+  const matchRoot=document.getElementById("live-match-editor");
+  if(!playerRoot||!matchRoot)return;
+
+  playerRoot.innerHTML=`
+    <div class="live-table">
+      <div class="live-head-row">
+        <span>Jogador</span><span>⚽</span><span>🎯</span><span>🟨</span><span>🟥</span><span>🧤</span>
+      </div>
+      ${jogadores.map((jogador,idx)=>`
+        <div class="live-player-row" data-player-index="${idx}">
+          <span class="live-player-name">${flag(jogador.selecao,18)} ${jogador.nome}</span>
+          <input class="live-player-input" data-field="gols" type="number" min="0" value="${jogador.gols}">
+          <input class="live-player-input" data-field="assists" type="number" min="0" value="${jogador.assists}">
+          <input class="live-player-input" data-field="amarelos" type="number" min="0" value="${jogador.amarelos}">
+          <input class="live-player-input" data-field="vermelhos" type="number" min="0" value="${jogador.vermelhos}">
+          <input class="live-player-input" data-field="cleanSheets" type="number" min="0" value="${jogador.cleanSheets}">
+        </div>
+      `).join("")}
+    </div>
+  `;
+
+  if(!liveSelectedMatchId)liveSelectedMatchId=jogos[0]?.id||null;
+  const match=obterJogoPorId(liveSelectedMatchId)||jogos[0];
+  if(match)liveSelectedMatchId=match.id;
+  matchRoot.innerHTML=match?`
+    <div class="live-match-select-wrap">
+      <label for="live-match-select">Partida</label>
+      <select id="live-match-select">
+        ${jogos.map((jogo)=>`<option value="${jogo.id}" ${jogo.id===liveSelectedMatchId?"selected":""}>${jogo.data} · ${jogo.casa} x ${jogo.fora}</option>`).join("")}
+      </select>
+    </div>
+    <div class="live-match-score">
+      <div>${flag(match.casa,20)} ${match.casa}</div>
+      <input id="live-gols-casa" type="number" min="0" value="${jogoTemPlacar(match)?match.golsCasa:""}" placeholder="gols">
+      <span>x</span>
+      <input id="live-gols-fora" type="number" min="0" value="${jogoTemPlacar(match)?match.golsFora:""}" placeholder="gols">
+      <div>${flag(match.fora,20)} ${match.fora}</div>
+    </div>
+    <div class="live-match-grid">
+      <label>🟨 ${match.casa}<input id="live-am-casa" type="number" min="0" value="${match.amarelosCasa}"></label>
+      <label>🟨 ${match.fora}<input id="live-am-fora" type="number" min="0" value="${match.amarelosFora}"></label>
+      <label>🟥 ${match.casa}<input id="live-vm-casa" type="number" min="0" value="${match.vermelhosCasa}"></label>
+      <label>🟥 ${match.fora}<input id="live-vm-fora" type="number" min="0" value="${match.vermelhosFora}"></label>
+      <label>🎯 Finalizações ${match.casa}<input id="live-fin-casa" type="number" min="0" value="${match.finalizacoesCasa}"></label>
+      <label>🎯 Finalizações ${match.fora}<input id="live-fin-fora" type="number" min="0" value="${match.finalizacoesFora}"></label>
+      <label>📊 Posse ${match.casa}%<input id="live-posse-casa" type="number" min="0" max="100" value="${match.posseCasa}"></label>
+      <label>📊 Posse ${match.fora}%<input id="live-posse-fora" type="number" min="0" max="100" value="${match.posseFora}"></label>
+    </div>
+    <div class="live-actions">
+      <button type="button" id="save-live-match">Salvar dados do jogo</button>
+      <button type="button" id="clear-live-score">Limpar placar</button>
+    </div>
+  `:'';
+}
+
+function renderFavoritos(){
+  const teamsRoot=document.getElementById("favorites-teams");
+  const matchesRoot=document.getElementById("favorites-matches");
+  if(!teamsRoot||!matchesRoot)return;
+
+  const teams=[...appState.favoriteTeams].sort((a,b)=>a.localeCompare(b));
+  teamsRoot.innerHTML=teams.length?`
+    <div class="favorite-team-chips">
+      ${teams.map((team)=>`
+        <button type="button" class="favorite-team-chip" data-action="open-team-page" data-team="${team}">
+          ${flag(team,16)} ${team}
+        </button>
+      `).join("")}
+    </div>`:'<p class="favorites-empty">Nenhuma seleção favorita ainda.</p>';
+
+  const matches=[...appState.favoriteMatches]
+    .map((matchId)=>obterJogoPorId(matchId))
+    .filter(Boolean)
+    .sort((a,b)=>parseDataJogo(a.data)-parseDataJogo(b.data));
+  matchesRoot.innerHTML=matches.length?matches.map(itemJogoTimeline).join(""):'<li class="timeline-item"><p>Nenhum jogo favorito marcado.</p></li>';
+}
+
+// =============================================
+//  EVENTOS E HANDLERS
+// =============================================
+function atualizarTudo(){
+  renderGrupos();
+  renderJogos();
+  renderArtilheiros();
+  renderEstatisticas();
+  renderTimeline();
+  renderHoje();
+  renderSelecaoPagina();
+  renderCentroAoVivo();
+  renderFavoritos();
+}
+function ativarTab(tabName){
+  const existeAba=document.querySelector(`.tab[data-tab="${tabName}"]`);
+  if(!existeAba)tabName="grupos";
+  document.querySelectorAll(".tab").forEach((botao)=>botao.classList.toggle("active",botao.dataset.tab===tabName));
+  document.querySelectorAll(".tab-pane").forEach((pane)=>pane.classList.toggle("active",pane.id===`tab-${tabName}`));
+  localStorage.setItem(STORAGE_KEYS.activeTab,tabName);
+}
 function iniciarTabs(){
   document.querySelectorAll(".tab").forEach(btn=>{
-    btn.addEventListener("click",()=>{
-      document.querySelectorAll(".tab").forEach(b=>b.classList.remove("active"));
-      document.querySelectorAll(".tab-pane").forEach(p=>p.classList.remove("active"));
-      btn.classList.add("active");
-      document.getElementById(`tab-${btn.dataset.tab}`).classList.add("active");
-    });
+    btn.addEventListener("click",()=>ativarTab(btn.dataset.tab));
+  });
+}
+function iniciarEventosGlobais(){
+  document.addEventListener("click",(event)=>{
+    const favoriteMatchBtn=event.target.closest(".favorite-match-btn");
+    if(favoriteMatchBtn){
+      toggleFavoritoJogo(favoriteMatchBtn.dataset.matchId);
+      return;
+    }
+    const teamFavoriteBtn=event.target.closest('[data-action="toggle-team-favorite"]');
+    if(teamFavoriteBtn){
+      toggleFavoritoSelecao(teamFavoriteBtn.dataset.team);
+      return;
+    }
+    const openTeamBtn=event.target.closest('[data-action="open-team-page"]');
+    if(openTeamBtn){
+      const select=document.getElementById("team-select");
+      if(select){
+        select.value=openTeamBtn.dataset.team;
+        renderSelecaoPagina();
+        ativarTab("selecoes");
+      }
+      return;
+    }
+    if(event.target.id==="save-live-match"){
+      const jogo=obterJogoPorId(liveSelectedMatchId);
+      if(!jogo)return;
+      const golsCasa=document.getElementById("live-gols-casa").value;
+      const golsFora=document.getElementById("live-gols-fora").value;
+      if(golsCasa===""&&golsFora===""){jogo.golsCasa=null;jogo.golsFora=null;}
+      else{
+        jogo.golsCasa=normalizarNumero(golsCasa,0);
+        jogo.golsFora=normalizarNumero(golsFora,0);
+      }
+      jogo.amarelosCasa=normalizarNumero(document.getElementById("live-am-casa").value,0);
+      jogo.amarelosFora=normalizarNumero(document.getElementById("live-am-fora").value,0);
+      jogo.vermelhosCasa=normalizarNumero(document.getElementById("live-vm-casa").value,0);
+      jogo.vermelhosFora=normalizarNumero(document.getElementById("live-vm-fora").value,0);
+      jogo.finalizacoesCasa=normalizarNumero(document.getElementById("live-fin-casa").value,0);
+      jogo.finalizacoesFora=normalizarNumero(document.getElementById("live-fin-fora").value,0);
+      jogo.posseCasa=normalizarNumero(document.getElementById("live-posse-casa").value,50);
+      jogo.posseFora=normalizarNumero(document.getElementById("live-posse-fora").value,50);
+      salvarDadosAoVivo();
+      atualizarTudo();
+      return;
+    }
+    if(event.target.id==="clear-live-score"){
+      const jogo=obterJogoPorId(liveSelectedMatchId);
+      if(!jogo)return;
+      jogo.golsCasa=null;
+      jogo.golsFora=null;
+      salvarDadosAoVivo();
+      atualizarTudo();
+    }
+  });
+
+  document.addEventListener("change",(event)=>{
+    if(event.target.id==="timeline-date")renderTimeline();
+    if(event.target.id==="today-date")renderHoje();
+    if(event.target.id==="team-select")renderSelecaoPagina();
+    if(event.target.id==="live-match-select"){
+      liveSelectedMatchId=event.target.value;
+      renderCentroAoVivo();
+    }
+
+    const playerInput=event.target.closest(".live-player-input");
+    if(playerInput){
+      const row=event.target.closest(".live-player-row");
+      const index=Number(row?.dataset.playerIndex);
+      if(Number.isFinite(index)&&jogadores[index]){
+        jogadores[index][playerInput.dataset.field]=normalizarNumero(playerInput.value,0);
+        salvarDadosAoVivo();
+        renderArtilheiros();
+      }
+    }
   });
 }
 
+// =============================================
+//  TABS & INICIALIZAR
+// =============================================
 function inicializar(){
+  carregarPersistencia();
+  aplicarDisplay();
+
   const ballImg = document.getElementById("ball-img");
   if (ballImg) {
     ballImg.src = imagemBolaOficial;
@@ -964,22 +1509,34 @@ function inicializar(){
 
   const faseSelect=document.getElementById("fase-select");
   const fases=[...new Set(jogos.map(j=>j.fase))];
-  fases.forEach(f=>{const o=document.createElement("option");o.value=f;o.textContent=f;faseSelect.appendChild(o);});
-  faseSelect.addEventListener("change",renderJogos);
-  document.getElementById("search-time").addEventListener("input",renderJogos);
-  document.getElementById("modal-close").addEventListener("click",()=>document.getElementById("modal-overlay").classList.remove("open"));
-  document.getElementById("modal-overlay").addEventListener("click",e=>{if(e.target===document.getElementById("modal-overlay"))document.getElementById("modal-overlay").classList.remove("open");});
+  fases.forEach(f=>{const o=document.createElement("option");o.value=f;o.textContent=f;faseSelect?.appendChild(o);});
+  faseSelect?.addEventListener("change",renderJogos);
+  document.getElementById("search-time")?.addEventListener("input",renderJogos);
+  document.getElementById("modal-close")?.addEventListener("click",()=>document.getElementById("modal-overlay").classList.remove("open"));
+  document.getElementById("modal-overlay")?.addEventListener("click",e=>{if(e.target===document.getElementById("modal-overlay"))document.getElementById("modal-overlay").classList.remove("open");});
   document.addEventListener("keydown",e=>{if(e.key==="Escape")document.getElementById("modal-overlay").classList.remove("open");});
 
+  document.getElementById("theme-toggle")?.addEventListener("click",()=>{
+    appState.theme=appState.theme==="dark"?"light":"dark";
+    salvarDisplay();
+    aplicarDisplay();
+  });
+  document.getElementById("tv-toggle")?.addEventListener("click",()=>{
+    appState.tvMode=!appState.tvMode;
+    salvarDisplay();
+    aplicarDisplay();
+  });
+
   iniciarTabs();
-  renderGrupos();
-  renderJogos();
-  renderArtilheiros();
+  iniciarEventosGlobais();
   renderEstadios();
   renderFatos();
-  renderEstatisticas();
   renderRankings();
   renderHistoriaCopas();
+  atualizarTudo();
+
+  const tabSalva=localStorage.getItem(STORAGE_KEYS.activeTab);
+  ativarTab(tabSalva||"grupos");
 }
 
 inicializar();

@@ -28,12 +28,21 @@
     <nav class="tab-nav">
       <button class="tab active" data-tab="grupos">🏅 Grupos</button>
       <button class="tab" data-tab="jogos">📅 Jogos</button>
+      <button class="tab" data-tab="timeline">🕒 Linha do tempo</button>
+      <button class="tab" data-tab="hoje">📍 Modo Hoje</button>
+      <button class="tab" data-tab="selecoes">🧩 Seleções</button>
+      <button class="tab" data-tab="live">🔴 Centro ao vivo</button>
+      <button class="tab" data-tab="favoritos">⭐ Favoritos</button>
       <button class="tab" data-tab="artilheiros">🥇 Artilheiros</button>
       <button class="tab" data-tab="copa">🏟️ Copa 2026</button>
       <button class="tab" data-tab="ranking">🌍 Rankings</button>
       <button class="tab" data-tab="historia">📚 História das Copas</button>
       <button class="tab" data-tab="estatisticas">📊 Estatísticas</button>
     </nav>
+    <div class="display-controls">
+      <button id="theme-toggle" class="display-btn" type="button">🌙 Tema escuro</button>
+      <button id="tv-toggle" class="display-btn" type="button">📺 Modo TV: off</button>
+    </div>
 
     <main class="container">
 
@@ -58,6 +67,87 @@
         <ul id="matches-list" class="match-list"></ul>
       </section>
 
+      <section class="tab-pane" id="tab-timeline">
+        <div class="timeline-head">
+          <h2>Linha do tempo — Copa 2026</h2>
+          <div class="timeline-controls">
+            <label for="timeline-date">Data base</label>
+            <input id="timeline-date" type="date" />
+          </div>
+        </div>
+        <div class="timeline-grid">
+          <article class="timeline-panel">
+            <h3>Eventos principais</h3>
+            <ul id="timeline-events" class="timeline-list"></ul>
+          </article>
+          <article class="timeline-panel">
+            <h3>Jogos do dia</h3>
+            <ul id="timeline-day-games" class="timeline-list"></ul>
+          </article>
+          <article class="timeline-panel">
+            <h3>Próximos jogos</h3>
+            <ul id="timeline-next-games" class="timeline-list"></ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="tab-pane" id="tab-hoje">
+        <div class="today-head">
+          <h2>Modo Hoje</h2>
+          <div class="timeline-controls">
+            <label for="today-date">Data do painel</label>
+            <input id="today-date" type="date" />
+          </div>
+        </div>
+        <div id="today-alerts" class="today-alerts"></div>
+        <ul id="today-matches" class="match-list"></ul>
+      </section>
+
+      <section class="tab-pane" id="tab-selecoes">
+        <div class="team-page-head">
+          <h2>Página de cada seleção</h2>
+          <div class="team-select-wrap">
+            <label for="team-select">Seleção</label>
+            <select id="team-select"></select>
+          </div>
+        </div>
+        <div id="team-page-content"></div>
+      </section>
+
+      <section class="tab-pane" id="tab-live">
+        <div class="live-head">
+          <h2>Centro ao vivo</h2>
+          <p>Atualize e grave em tempo real: artilharia, assistências, clean sheet, cartões e dados das partidas.</p>
+        </div>
+        <div class="live-grid">
+          <article class="live-panel">
+            <h3>Estatísticas por jogador</h3>
+            <div id="live-player-editor"></div>
+          </article>
+          <article class="live-panel">
+            <h3>Dados dos jogos</h3>
+            <div id="live-match-editor"></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="tab-pane" id="tab-favoritos">
+        <div class="favorites-head">
+          <h2>Favoritos</h2>
+          <p>Acesso rápido às seleções e jogos que você marcou para acompanhar.</p>
+        </div>
+        <div class="favorites-grid">
+          <article class="favorites-panel">
+            <h3>Seleções favoritas</h3>
+            <div id="favorites-teams"></div>
+          </article>
+          <article class="favorites-panel">
+            <h3>Jogos favoritos</h3>
+            <ul id="favorites-matches" class="timeline-list"></ul>
+          </article>
+        </div>
+      </section>
+
       <section class="tab-pane" id="tab-artilheiros">
         <div class="art-grid">
           <div class="art-panel">
@@ -75,6 +165,10 @@
           <div class="art-panel">
             <div class="art-panel-header"><span class="art-icon">🟥</span><span>Cartões Vermelhos</span></div>
             <ol id="list-vermelhos" class="art-list"></ol>
+          </div>
+          <div class="art-panel">
+            <div class="art-panel-header"><span class="art-icon">🧤</span><span>Clean Sheets</span></div>
+            <ol id="list-clean-sheets" class="art-list"></ol>
           </div>
         </div>
       </section>
