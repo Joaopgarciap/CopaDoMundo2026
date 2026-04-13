@@ -586,11 +586,26 @@ const perfisSementeSelecoes = {
   },
 };
 
+const FORMATO_CAMPO_433 = [
+  { posicao: "GOL", linha: "gk" },
+  { posicao: "LE", linha: "def" },
+  { posicao: "ZAG", linha: "def" },
+  { posicao: "ZAG", linha: "def" },
+  { posicao: "LD", linha: "def" },
+  { posicao: "VOL", linha: "mid" },
+  { posicao: "MC", linha: "mid" },
+  { posicao: "MC", linha: "mid" },
+  { posicao: "PE", linha: "atk" },
+  { posicao: "CA", linha: "atk" },
+  { posicao: "PD", linha: "atk" },
+];
+
 const appState = {
   favoriteTeams: new Set(),
   favoriteMatches: new Set(),
   theme: "dark",
   tvMode: false,
+  selectedTeamPlayers: {},
 };
 
 let liveSelectedMatchId = null;
@@ -653,6 +668,39 @@ function normalizarNumero(value, fallback = 0) {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : fallback;
 }
+function hashTexto(texto) {
+  return Array.from(texto).reduce((acc, ch) => ((acc * 31) + ch.charCodeAt(0)) % 2147483647, 7);
+}
+function gerarStatsHistoricos(team, nome, posicao, indice) {
+  const seed = hashTexto(`${team}-${nome}-${indice}`);
+  const copas = 1 + (seed % 4);
+  const jogosCopas = Math.max(copas, Math.min(26, copas * 4 + (seed % 7)));
+  const amarelos = seed % 6;
+  const vermelhos = seed % 2;
+
+  if (posicao === "GOL") {
+    const golsSofridos = 5 + (seed % 18);
+    const cleanSheets = 2 + (seed % 9);
+    return { copas, jogosCopas, gols: 0, assistencias: 0, amarelos, vermelhos, cleanSheets, golsSofridos };
+  }
+
+  const gols = posicao === "CA" ? 2 + (seed % 16) : seed % 8;
+  const assistencias = posicao === "MC" || posicao === "PE" || posicao === "PD" ? 1 + (seed % 10) : seed % 5;
+  return { copas, jogosCopas, gols, assistencias, amarelos, vermelhos, cleanSheets: 0, golsSofridos: null };
+}
+function construirJogadoresCampo(team, nomes) {
+  return nomes.slice(0, 11).map((nome, index) => {
+    const formato = FORMATO_CAMPO_433[index] || FORMATO_CAMPO_433[FORMATO_CAMPO_433.length - 1];
+    return {
+      id: `${team}-${nome}`.toLowerCase().replace(/\s+/g, "-"),
+      nome,
+      numero: index + 1,
+      posicao: formato.posicao,
+      linha: formato.linha,
+      ...gerarStatsHistoricos(team, nome, formato.posicao, index),
+    };
+  });
+}
 function construirPerfisSelecoes(){
   const porGrupo={};
   Object.entries(grupos).forEach(([grupo,times])=>{
@@ -670,6 +718,7 @@ function construirPerfisSelecoes(){
         `Grupo na edição 2026: ${porGrupo[time]||"?"}.`,
       ],
       elenco:base.elenco||Array.from({length:11},(_,i)=>`${time} · Jogador ${i+1}`),
+      jogadoresCampo:construirJogadoresCampo(time, base.elenco||Array.from({length:11},(_,i)=>`${time} · Jogador ${i+1}`)),
     };
   });
   return perfis;
@@ -1280,6 +1329,16 @@ function renderSelecaoPagina(){
   const team=select.value;
   const info=selecoesInfo[team];
   const jogosTeam=jogos.filter((jogo)=>jogo.casa===team||jogo.fora===team).slice(0,7);
+  const jogadoresCampo=info.jogadoresCampo||[];
+  const selecionadoAtual=appState.selectedTeamPlayers[team];
+  if(!selecionadoAtual&&jogadoresCampo[0])appState.selectedTeamPlayers[team]=jogadoresCampo[0].id;
+  const jogadorSelecionado=jogadoresCampo.find((jogador)=>jogador.id===appState.selectedTeamPlayers[team])||jogadoresCampo[0]||null;
+  const jogadoresPorLinha={
+    atk:jogadoresCampo.filter((jogador)=>jogador.linha==="atk"),
+    mid:jogadoresCampo.filter((jogador)=>jogador.linha==="mid"),
+    def:jogadoresCampo.filter((jogador)=>jogador.linha==="def"),
+    gk:jogadoresCampo.filter((jogador)=>jogador.linha==="gk"),
+  };
   content.innerHTML=`
     <article class="team-profile-card">
       <div class="team-profile-top">
@@ -1301,6 +1360,69 @@ function renderSelecaoPagina(){
           <h4>Elenco base</h4>
           <ul class="team-bullet-list">${info.elenco.map((jogador)=>`<li>${jogador}</li>`).join("")}</ul>
         </div>
+      </div>
+      <div class="team-pitch-section">
+        <h4>Campo interativo (clique no jogador)</h4>
+        <div class="team-pitch">
+          <div class="pitch-line pitch-atk">${jogadoresPorLinha.atk.map((jogador)=>`
+            <button
+              type="button"
+              class="pitch-player-btn ${jogadorSelecionado?.id===jogador.id?"active":""}"
+              data-action="select-team-player"
+              data-team="${team}"
+              data-player-id="${jogador.id}">
+              <span class="pitch-player-pos">${jogador.posicao}</span>
+              <span class="pitch-player-name">${jogador.nome}</span>
+            </button>`).join("")}</div>
+          <div class="pitch-line pitch-mid">${jogadoresPorLinha.mid.map((jogador)=>`
+            <button
+              type="button"
+              class="pitch-player-btn ${jogadorSelecionado?.id===jogador.id?"active":""}"
+              data-action="select-team-player"
+              data-team="${team}"
+              data-player-id="${jogador.id}">
+              <span class="pitch-player-pos">${jogador.posicao}</span>
+              <span class="pitch-player-name">${jogador.nome}</span>
+            </button>`).join("")}</div>
+          <div class="pitch-line pitch-def">${jogadoresPorLinha.def.map((jogador)=>`
+            <button
+              type="button"
+              class="pitch-player-btn ${jogadorSelecionado?.id===jogador.id?"active":""}"
+              data-action="select-team-player"
+              data-team="${team}"
+              data-player-id="${jogador.id}">
+              <span class="pitch-player-pos">${jogador.posicao}</span>
+              <span class="pitch-player-name">${jogador.nome}</span>
+            </button>`).join("")}</div>
+          <div class="pitch-line pitch-gk">${jogadoresPorLinha.gk.map((jogador)=>`
+            <button
+              type="button"
+              class="pitch-player-btn ${jogadorSelecionado?.id===jogador.id?"active":""}"
+              data-action="select-team-player"
+              data-team="${team}"
+              data-player-id="${jogador.id}">
+              <span class="pitch-player-pos">${jogador.posicao}</span>
+              <span class="pitch-player-name">${jogador.nome}</span>
+            </button>`).join("")}</div>
+        </div>
+        ${jogadorSelecionado?`
+          <div class="team-player-detail-card">
+            <div class="team-player-detail-head">
+              <h5>${jogadorSelecionado.nome}</h5>
+              <span>#${jogadorSelecionado.numero} · ${jogadorSelecionado.posicao}</span>
+            </div>
+            <div class="team-player-detail-grid">
+              <div><small>Copas disputadas</small><strong>${jogadorSelecionado.copas}</strong></div>
+              <div><small>Jogos em Copas</small><strong>${jogadorSelecionado.jogosCopas}</strong></div>
+              <div><small>Gols</small><strong>${jogadorSelecionado.gols}</strong></div>
+              <div><small>Assistências</small><strong>${jogadorSelecionado.assistencias}</strong></div>
+              <div><small>Cartões amarelos</small><strong>${jogadorSelecionado.amarelos}</strong></div>
+              <div><small>Cartões vermelhos</small><strong>${jogadorSelecionado.vermelhos}</strong></div>
+              <div><small>Clean sheets</small><strong>${jogadorSelecionado.cleanSheets}</strong></div>
+              <div><small>${jogadorSelecionado.posicao==="GOL"?"Gols sofridos":"Participações"}</small><strong>${jogadorSelecionado.posicao==="GOL"?jogadorSelecionado.golsSofridos:jogadorSelecionado.jogosCopas}</strong></div>
+            </div>
+          </div>
+        `:""}
       </div>
       <div>
         <h4>Próximos/últimos jogos</h4>
@@ -1425,6 +1547,12 @@ function iniciarEventosGlobais(){
     const teamFavoriteBtn=event.target.closest('[data-action="toggle-team-favorite"]');
     if(teamFavoriteBtn){
       toggleFavoritoSelecao(teamFavoriteBtn.dataset.team);
+      return;
+    }
+    const selectTeamPlayerBtn=event.target.closest('[data-action="select-team-player"]');
+    if(selectTeamPlayerBtn){
+      appState.selectedTeamPlayers[selectTeamPlayerBtn.dataset.team]=selectTeamPlayerBtn.dataset.playerId;
+      renderSelecaoPagina();
       return;
     }
     const openTeamBtn=event.target.closest('[data-action="open-team-page"]');
