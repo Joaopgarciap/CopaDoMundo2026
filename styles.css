@@ -586,6 +586,63 @@ select:focus,input:focus { border-color:rgba(245,200,66,.4); }
 .phase-badge.final { color:var(--red); border-color:rgba(255,75,110,.3); background:rgba(255,75,110,.07); }
 .status-dot { width:8px; height:8px; border-radius:50%; background:var(--muted); flex-shrink:0; }
 .status-dot.done { background:var(--green); }
+.status-dot.live { background:#ff3b30; box-shadow:0 0 0 0 rgba(255,59,48,.5); animation:livePulse 1.3s ease-in-out infinite; }
+@keyframes livePulse {
+  0%{box-shadow:0 0 0 0 rgba(255,59,48,.55);}
+  70%{box-shadow:0 0 0 8px rgba(255,59,48,0);}
+  100%{box-shadow:0 0 0 0 rgba(255,59,48,0);}
+}
+.live-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:.25rem;
+  margin-left:.45rem;
+  background:rgba(255,59,48,.14);
+  color:#ff8a80;
+  border:1px solid rgba(255,59,48,.35);
+  border-radius:999px;
+  padding:.06rem .45rem;
+  font-size:.6rem;
+  letter-spacing:.06em;
+  font-weight:700;
+  text-transform:uppercase;
+}
+.live-pill::before {
+  content:"";
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:#ff3b30;
+  box-shadow:0 0 0 0 rgba(255,59,48,.5);
+  animation:livePulse 1.3s ease-in-out infinite;
+}
+.match-item.live-match{ border-color:rgba(255,59,48,.25); box-shadow:0 0 0 1px rgba(255,59,48,.12) inset; }
+.prox-card.live-match{ border-color:rgba(255,59,48,.25); box-shadow:0 0 0 1px rgba(255,59,48,.12) inset; }
+.tl-game-row.live-match{ background:rgba(255,59,48,.06); }
+.live-chip {
+  display:inline-flex;
+  align-items:center;
+  gap:.28rem;
+  margin-right:.35rem;
+  font-size:.62rem;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+  color:#ffd7d4;
+  background:rgba(255,59,48,.18);
+  border:1px solid rgba(255,59,48,.42);
+  border-radius:999px;
+  padding:.12rem .42rem;
+}
+.live-chip::before{
+  content:"";
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:#ff3b30;
+  box-shadow:0 0 0 0 rgba(255,59,48,.5);
+  animation:livePulse 1.3s ease-in-out infinite;
+}
 .match-fav-btn { background:none; border:none; cursor:pointer; font-size:.95rem; opacity:.3; transition:opacity var(--transition); position:absolute; top:.6rem; right:.75rem; }
 .match-fav-btn:hover,.match-fav-btn.active { opacity:1; }
 .match-fav-btn.active { color:var(--gold); }
@@ -674,6 +731,32 @@ select:focus,input:focus { border-color:rgba(245,200,66,.4); }
   font-size:.72rem;
   color:var(--muted);
 }
+.match-notification-center{
+  position:fixed;
+  right:1rem;
+  bottom:1rem;
+  z-index:260;
+  display:flex;
+  flex-direction:column;
+  gap:.45rem;
+  pointer-events:none;
+}
+.match-notification-item{
+  pointer-events:auto;
+  max-width:320px;
+  background:var(--panel);
+  border:1px solid var(--border2);
+  border-left:3px solid var(--gold);
+  color:var(--text);
+  border-radius:10px;
+  padding:.6rem .75rem;
+  font-size:.78rem;
+  line-height:1.35;
+  box-shadow:var(--shadow-sm);
+  animation:notificationIn .25s ease;
+}
+.match-notification-item.hide{ opacity:0; transform:translateX(20px); transition:all .35s ease; }
+@keyframes notificationIn { from{opacity:0;transform:translateX(16px)} to{opacity:1;transform:translateX(0)} }
 
 /* ═══════════ ARTILHEIROS ═══════════ */
 .art-top-bar { display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem; }
