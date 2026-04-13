@@ -32,6 +32,7 @@
       <button class="tab active" data-tab="grupos">🏅 Grupos</button>
       <button class="tab" data-tab="jogos">📅 Jogos</button>
       <button class="tab" data-tab="estatisticas">📊 Estatísticas</button>
+      <button class="tab" data-tab="artilheiros">🥇 Artilheiros</button>
     </nav>
 
     <main class="container">
@@ -59,6 +60,28 @@
           </div>
         </div>
         <ul id="matches-list" class="match-list"></ul>
+      </section>
+
+      <!-- TAB: ARTILHEIROS -->
+      <section class="tab-pane" id="tab-artilheiros">
+        <div class="art-grid">
+          <div class="art-panel">
+            <div class="art-panel-header"><span class="art-icon">⚽</span><span>Artilheiros</span></div>
+            <ol id="list-gols" class="art-list"></ol>
+          </div>
+          <div class="art-panel">
+            <div class="art-panel-header"><span class="art-icon">🎯</span><span>Assistências</span></div>
+            <ol id="list-assists" class="art-list"></ol>
+          </div>
+          <div class="art-panel">
+            <div class="art-panel-header"><span class="art-icon">🟨</span><span>Cartões Amarelos</span></div>
+            <ol id="list-amarelos" class="art-list"></ol>
+          </div>
+          <div class="art-panel">
+            <div class="art-panel-header"><span class="art-icon">🟥</span><span>Cartões Vermelhos</span></div>
+            <ol id="list-vermelhos" class="art-list"></ol>
+          </div>
+        </div>
       </section>
 
       <!-- TAB: ESTATISTICAS -->

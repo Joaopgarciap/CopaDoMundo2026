@@ -593,6 +593,110 @@ footer code {
   color: var(--green);
 }
 
+/* ——— FLAG IMG ——— */
+.flag-img {
+  display: inline-block;
+  border-radius: 3px;
+  vertical-align: middle;
+  object-fit: cover;
+  flex-shrink: 0;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+}
+
+/* ——— ARTILHEIROS ——— */
+.art-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.art-panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.art-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.9rem 1.1rem;
+  background: var(--panel2);
+  border-bottom: 1px solid var(--border);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.2rem;
+  letter-spacing: 0.05em;
+  color: var(--gold);
+}
+
+.art-icon { font-size: 1.2rem; }
+
+.art-list {
+  list-style: none;
+  counter-reset: art-counter;
+  padding: 0.4rem 0;
+}
+
+.art-item {
+  counter-increment: art-counter;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+
+.art-item:last-child { border-bottom: none; }
+.art-item:hover { background: rgba(255,255,255,0.03); }
+
+.art-rank {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1rem;
+  color: var(--muted);
+  min-width: 18px;
+  text-align: center;
+}
+
+.art-rank::before {
+  content: counter(art-counter);
+}
+
+.art-item:nth-child(1) .art-rank { color: #ffd700; }
+.art-item:nth-child(2) .art-rank { color: #c0c0c0; }
+.art-item:nth-child(3) .art-rank { color: #cd7f32; }
+
+.art-flag { flex-shrink: 0; display: flex; align-items: center; }
+
+.art-info { flex: 1; display: flex; flex-direction: column; gap: 0.1rem; }
+.art-nome { font-size: 0.9rem; font-weight: 600; color: var(--text); }
+.art-selecao { font-size: 0.74rem; color: var(--muted); }
+
+.art-val {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.3rem;
+  min-width: 40px;
+  text-align: right;
+  letter-spacing: 0.03em;
+}
+
+.art-empty {
+  padding: 1.5rem 1rem;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.art-empty code {
+  background: rgba(255,255,255,0.07);
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  color: var(--green);
+  font-size: 0.8rem;
+}
+
 /* ——— SCROLLBAR ——— */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg); }

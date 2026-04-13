@@ -2,20 +2,46 @@
 //  COPA DO MUNDO 2026 — DADOS E LÓGICA
 // =============================================
 
-const bandeiras = {
-  "México": "🇲🇽", "África do Sul": "🇿🇦", "Coreia do Sul": "🇰🇷", "República Tcheca": "🇨🇿",
-  "Canadá": "🇨🇦", "Bósnia e Herzegovina": "🇧🇦", "Catar": "🇶🇦", "Suíça": "🇨🇭",
-  "Brasil": "🇧🇷", "Marrocos": "🇲🇦", "Haiti": "🇭🇹", "Escócia": "🏴󠁧󠁢󠁳󠁣󠁴󠁿",
-  "Estados Unidos": "🇺🇸", "Paraguai": "🇵🇾", "Austrália": "🇦🇺", "Turquia": "🇹🇷",
-  "Alemanha": "🇩🇪", "Curaçao": "🇨🇼", "Costa do Marfim": "🇨🇮", "Equador": "🇪🇨",
-  "Holanda": "🇳🇱", "Japão": "🇯🇵", "Suécia": "🇸🇪", "Tunísia": "🇹🇳",
-  "Bélgica": "🇧🇪", "Egito": "🇪🇬", "Irã": "🇮🇷", "Nova Zelândia": "🇳🇿",
-  "Espanha": "🇪🇸", "Cabo Verde": "🇨🇻", "Arábia Saudita": "🇸🇦", "Uruguai": "🇺🇾",
-  "França": "🇫🇷", "Senegal": "🇸🇳", "Iraque": "🇮🇶", "Noruega": "🇳🇴",
-  "Argentina": "🇦🇷", "Argélia": "🇩🇿", "Áustria": "🇦🇹", "Jordânia": "🇯🇴",
-  "Portugal": "🇵🇹", "RD do Congo": "🇨🇩", "Uzbequistão": "🇺🇿", "Colômbia": "🇨🇴",
-  "Inglaterra": "🏴󠁧󠁢󠁥󠁮󠁧󠁿", "Croácia": "🇭🇷", "Gana": "🇬🇭", "Panamá": "🇵🇦",
+// ISO codes para flagcdn.com
+const isoCodes = {
+  "México": "mx", "África do Sul": "za", "Coreia do Sul": "kr", "República Tcheca": "cz",
+  "Canadá": "ca", "Bósnia e Herzegovina": "ba", "Catar": "qa", "Suíça": "ch",
+  "Brasil": "br", "Marrocos": "ma", "Haiti": "ht", "Escócia": "gb-sct",
+  "Estados Unidos": "us", "Paraguai": "py", "Austrália": "au", "Turquia": "tr",
+  "Alemanha": "de", "Curaçao": "cw", "Costa do Marfim": "ci", "Equador": "ec",
+  "Holanda": "nl", "Japão": "jp", "Suécia": "se", "Tunísia": "tn",
+  "Bélgica": "be", "Egito": "eg", "Irã": "ir", "Nova Zelândia": "nz",
+  "Espanha": "es", "Cabo Verde": "cv", "Arábia Saudita": "sa", "Uruguai": "uy",
+  "França": "fr", "Senegal": "sn", "Iraque": "iq", "Noruega": "no",
+  "Argentina": "ar", "Argélia": "dz", "Áustria": "at", "Jordânia": "jo",
+  "Portugal": "pt", "RD do Congo": "cd", "Uzbequistão": "uz", "Colômbia": "co",
+  "Inglaterra": "gb-eng", "Croácia": "hr", "Gana": "gh", "Panamá": "pa",
 };
+
+// Dados dos jogadores — edite para atualizar durante a Copa
+const jogadores = [
+  // { nome, selecao, gols, assists, amarelos, vermelhos }
+  { nome: "Vinicius Jr.", selecao: "Brasil", gols: 0, assists: 0, amarelos: 0, vermelhos: 0 },
+  { nome: "Erling Haaland", selecao: "Noruega", gols: 0, assists: 0, amarelos: 0, vermelhos: 0 },
+  { nome: "Kylian Mbappé", selecao: "França", gols: 0, assists: 0, amarelos: 0, vermelhos: 0 },
+  { nome: "Harry Kane", selecao: "Inglaterra", gols: 0, assists: 0, amarelos: 0, vermelhos: 0 },
+  { nome: "Lionel Messi", selecao: "Argentina", gols: 0, assists: 0, amarelos: 0, vermelhos: 0 },
+  { nome: "Cristiano Ronaldo", selecao: "Portugal", gols: 0, assists: 0, amarelos: 0, vermelhos: 0 },
+  { nome: "Lamine Yamal", selecao: "Espanha", gols: 0, assists: 0, amarelos: 0, vermelhos: 0 },
+  { nome: "Pedri", selecao: "Espanha", gols: 0, assists: 0, amarelos: 0, vermelhos: 0 },
+  { nome: "Jude Bellingham", selecao: "Inglaterra", gols: 0, assists: 0, amarelos: 0, vermelhos: 0 },
+  { nome: "Rodri", selecao: "Espanha", gols: 0, assists: 0, amarelos: 0, vermelhos: 0 },
+  { nome: "Florian Wirtz", selecao: "Alemanha", gols: 0, assists: 0, amarelos: 0, vermelhos: 0 },
+  { nome: "Jamal Musiala", selecao: "Alemanha", gols: 0, assists: 0, amarelos: 0, vermelhos: 0 },
+  { nome: "Raphinha", selecao: "Brasil", gols: 0, assists: 0, amarelos: 0, vermelhos: 0 },
+  { nome: "Rodrygo", selecao: "Brasil", gols: 0, assists: 0, amarelos: 0, vermelhos: 0 },
+  { nome: "Julian Alvarez", selecao: "Argentina", gols: 0, assists: 0, amarelos: 0, vermelhos: 0 },
+  { nome: "Pedri", selecao: "Espanha", gols: 0, assists: 0, amarelos: 0, vermelhos: 0 },
+  { nome: "Sofiane Boufal", selecao: "Marrocos", gols: 0, assists: 0, amarelos: 0, vermelhos: 0 },
+  { nome: "Sadio Mané", selecao: "Senegal", gols: 0, assists: 0, amarelos: 0, vermelhos: 0 },
+  { nome: "Darwin Núñez", selecao: "Uruguai", gols: 0, assists: 0, amarelos: 0, vermelhos: 0 },
+  { nome: "Cody Gakpo", selecao: "Holanda", gols: 0, assists: 0, amarelos: 0, vermelhos: 0 },
+];
 
 const grupos = {
   A: ["México", "África do Sul", "Coreia do Sul", "República Tcheca"],
@@ -128,8 +154,10 @@ const jogos = [
 
 // ——— UTILS ——————————————————————————————————
 
-function flag(time) {
-  return bandeiras[time] || "🏳️";
+function flag(time, size = 24) {
+  const code = isoCodes[time];
+  if (!code) return `<span style="font-size:${size}px">🏳️</span>`;
+  return `<img src="https://flagcdn.com/w40/${code}.png" alt="${time}" class="flag-img" style="width:${size}px;height:${Math.round(size*0.67)}px;object-fit:cover;border-radius:3px;vertical-align:middle;flex-shrink:0">`;
 }
 
 function jogoTemPlacar(jogo) {
@@ -193,7 +221,7 @@ function renderGrupos() {
     const classificacao = calcularClassificacaoGrupo(g);
     const teamsHTML = classificacao.map(linha => `
       <div class="team-row">
-        <span class="team-flag">${flag(linha.time)}</span>
+        <span class="team-flag">${flag(linha.time, 26)}</span>
         <span class="team-name-card">${linha.time}</span>
         <span class="team-pts">${linha.pontos}</span>
       </div>
@@ -227,7 +255,7 @@ function abrirModalGrupo(grupo) {
   const rowsHTML = classificacao.map((l, i) => `
     <tr>
       <td>${i + 1}</td>
-      <td>${flag(l.time)} ${l.time}</td>
+      <td style="display:flex;align-items:center;gap:0.5rem">${flag(l.time, 20)} ${l.time}</td>
       <td>${l.jogos}</td>
       <td>${l.vitorias}</td>
       <td>${l.empates}</td>
@@ -243,7 +271,7 @@ function abrirModalGrupo(grupo) {
     const placar = jogoTemPlacar(j) ? `${j.golsCasa} – ${j.golsFora}` : null;
     return `
       <div class="modal-match">
-        <div class="match-teams">${flag(j.casa)} ${j.casa} <span style="color:var(--muted);font-weight:400">vs</span> ${flag(j.fora)} ${j.fora}</div>
+        <div class="match-teams">${flag(j.casa, 18)} ${j.casa} <span style="color:var(--muted);font-weight:400">vs</span> ${flag(j.fora, 18)} ${j.fora}</div>
         <span class="match-score-badge ${placar ? '' : 'pending'}">${placar || formatarData(j.data)}</span>
       </div>
     `;
@@ -304,7 +332,7 @@ function renderJogos() {
         </div>
         <div class="match-center">
           <div class="match-teams-row">
-            ${flag(j.casa)} ${j.casa} ${placar ? placar : '<span style="color:var(--muted);font-size:0.85rem">vs</span>'} ${flag(j.fora)} ${j.fora}
+            ${flag(j.casa, 22)} ${j.casa} ${placar ? placar : '<span style="color:var(--muted);font-size:0.85rem">vs</span>'} ${flag(j.fora, 22)} ${j.fora}
           </div>
           <div class="match-info">🕐 ${hora} &nbsp;·&nbsp; 📍 ${j.estadio || "A definir"}</div>
         </div>
@@ -349,7 +377,7 @@ function renderEstatisticas() {
   root.innerHTML = stats.map(t => `
     <article class="team-card">
       <div class="team-card-header">
-        <span class="team-card-flag">${flag(t.time)}</span>
+        <span class="team-card-flag">${flag(t.time, 32)}</span>
         <div>
           <div class="team-card-name">${t.time}</div>
           <div class="team-card-group">Grupo ${t.grupo}</div>
@@ -377,6 +405,45 @@ function iniciarTabs() {
       document.getElementById(`tab-${btn.dataset.tab}`).classList.add("active");
     });
   });
+}
+
+// ——— RENDER: ARTILHEIROS ————————————————————
+
+function renderArtListItem(jogador, campo, icone, cor) {
+  const val = jogador[campo];
+  return `
+    <li class="art-item">
+      <span class="art-rank"></span>
+      <span class="art-flag">${flag(jogador.selecao, 22)}</span>
+      <div class="art-info">
+        <span class="art-nome">${jogador.nome}</span>
+        <span class="art-selecao">${jogador.selecao}</span>
+      </div>
+      <span class="art-val" style="color:${cor}">${icone} ${val}</span>
+    </li>
+  `;
+}
+
+function renderArtilheiros() {
+  const sorted = (campo) => [...jogadores].sort((a, b) => b[campo] - a[campo]);
+
+  const makeList = (listId, campo, icone, cor) => {
+    const el = document.getElementById(listId);
+    const top = sorted(campo).slice(0, 10);
+    const semDados = top.every(j => j[campo] === 0);
+    if (semDados) {
+      el.innerHTML = '<li class="art-empty">A Copa ainda não começou.<br>Edite <code>script.js</code> para adicionar dados.</li>';
+      return;
+    }
+    el.innerHTML = top.map(j => renderArtListItem(j, campo, icone, cor)).join("");
+    // Add counter numbers via CSS counter reset
+    el.style.counterReset = "art-counter";
+  };
+
+  makeList("list-gols", "gols", "⚽", "var(--green)");
+  makeList("list-assists", "assists", "🎯", "var(--accent)");
+  makeList("list-amarelos", "amarelos", "🟨", "#f5c842");
+  makeList("list-vermelhos", "vermelhos", "🟥", "var(--red)");
 }
 
 // ——— INICIALIZAR ————————————————————————————
@@ -410,6 +477,7 @@ function inicializar() {
   renderGrupos();
   renderJogos();
   renderEstatisticas();
+  renderArtilheiros();
 }
 
 inicializar();
