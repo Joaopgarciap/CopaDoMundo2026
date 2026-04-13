@@ -289,7 +289,7 @@ const maiorArtilheiroHistorico = {
   selecao: "Alemanha",
   gols: 16,
   copas: "2002, 2006, 2010 e 2014",
-  foto: fallbackImagemJogador,
+  foto: "assets/miroslav-klose.jpg",
   descricao:
     "Maior artilheiro da história da Copa do Mundo, superando Ronaldo Fenômeno em 2014 no Brasil.",
 };
