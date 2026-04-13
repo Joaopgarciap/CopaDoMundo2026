@@ -358,6 +358,72 @@ const fatosCopa=[
   {num:"8",label:"Jogos até o título",desc:"Um a mais que edições anteriores",cor:"var(--purple)"},
 ];
 
+const imagemEstadioFallback="assets/stadium-placeholder.svg";
+const fotosEstadiosPorNome={
+  "Estádio Azteca":"assets/stadiums/est-dio-azteca.jpg",
+  "MetLife Stadium":"assets/stadiums/metlife-stadium.jpg",
+  "AT&T Stadium":"assets/stadiums/at-t-stadium.jpg",
+  "SoFi Stadium":"assets/stadiums/sofi-stadium.jpg",
+  "Mercedes-Benz Stadium":"assets/stadiums/mercedes-benz-stadium.jpg",
+  "Hard Rock Stadium":"assets/stadiums/hard-rock-stadium.jpg",
+  "BC Place":"assets/stadiums/bc-place.jpg",
+  "Estádio BBVA":"assets/stadiums/est-dio-bbva.jpg",
+};
+estadiosData.forEach((estadio)=>{
+  estadio.foto=fotosEstadiosPorNome[estadio.nome]||estadio.foto;
+});
+
+// ═══ HISTÓRIA DAS COPAS ═══
+const destaquesHistoricos=[
+  {titulo:"Maior campeão",valor:"Brasil",detalhe:"5 títulos: 1958, 1962, 1970, 1994 e 2002"},
+  {titulo:"Mais participações",valor:"Brasil",detalhe:"22 participações em 22 edições (1930-2022)"},
+  {titulo:"Seleção com mais gols",valor:"Brasil",detalhe:"237 gols marcados em Copas"},
+  {titulo:"Seleção com mais gols sofridos",valor:"México",detalhe:"101 gols sofridos em Copas"},
+  {titulo:"Seleção com mais jogos",valor:"Brasil",detalhe:"114 partidas em Copas"},
+];
+
+const maiorArtilheiroHistorico={
+  nome:"Miroslav Klose",
+  gols:16,
+  selecao:"Alemanha",
+  copas:"2002, 2006, 2010 e 2014",
+  foto:"assets/miroslav-klose.jpg",
+  descricao:"Maior artilheiro da história das Copas do Mundo, campeão em 2014 e referência de regularidade em Mundiais.",
+  carreira:[
+    {clube:"Kaiserslautern",periodo:"1999-2004",jogos:145,gols:52,titulos:"Bundesliga 1997-98"},
+    {clube:"Werder Bremen",periodo:"2004-2007",jogos:132,gols:53,titulos:"DFB-Ligapokal 2006"},
+    {clube:"Bayern de Munique",periodo:"2007-2011",jogos:150,gols:53,titulos:"Bundesliga 2007-08, 2009-10 · Copa da Alemanha 2007-08, 2009-10"},
+    {clube:"Lazio",periodo:"2011-2016",jogos:171,gols:63,titulos:"Copa da Itália 2012-13"},
+    {clube:"Alemanha",periodo:"2001-2014",jogos:137,gols:71,titulos:"Copa do Mundo 2014"},
+  ],
+};
+
+const topArtilheirosHistoricos=[
+  {nome:"Miroslav Klose",selecao:"Alemanha",gols:16,ativo:false},
+  {nome:"Ronaldo",selecao:"Brasil",gols:15,ativo:false},
+  {nome:"Gerd Müller",selecao:"Alemanha",gols:14,ativo:false},
+  {nome:"Just Fontaine",selecao:"França",gols:13,ativo:false},
+  {nome:"Lionel Messi",selecao:"Argentina",gols:13,ativo:true},
+  {nome:"Pelé",selecao:"Brasil",gols:12,ativo:false},
+  {nome:"Kylian Mbappé",selecao:"França",gols:12,ativo:true},
+  {nome:"Sándor Kocsis",selecao:"Hungria",gols:11,ativo:false},
+  {nome:"Jürgen Klinsmann",selecao:"Alemanha",gols:11,ativo:false},
+  {nome:"Gabriel Batistuta",selecao:"Argentina",gols:10,ativo:false},
+];
+
+const selecoesEstreantes2026=["Curaçao","Haiti","Uzbequistão","Jordânia","Bósnia e Herzegovina","Cabo Verde"];
+
+const rankingCampeoesCopas=[
+  {selecao:"Brasil",titulos:5,anos:"1958, 1962, 1970, 1994, 2002"},
+  {selecao:"Alemanha",titulos:4,anos:"1954, 1974, 1990, 2014"},
+  {selecao:"Itália",titulos:4,anos:"1934, 1938, 1982, 2006"},
+  {selecao:"Argentina",titulos:3,anos:"1978, 1986, 2022"},
+  {selecao:"França",titulos:2,anos:"1998, 2018"},
+  {selecao:"Uruguai",titulos:2,anos:"1930, 1950"},
+  {selecao:"Inglaterra",titulos:1,anos:"1966"},
+  {selecao:"Espanha",titulos:1,anos:"2010"},
+];
+
 // ═══════ FAVORITES ═══════
 const getFavorites=()=>JSON.parse(localStorage.getItem("copa_favorites")||'{"games":[],"teams":[]}');
 const saveFavorites=f=>localStorage.setItem("copa_favorites",JSON.stringify(f));
@@ -785,13 +851,61 @@ function renderFavoritos(){
   document.getElementById("favoritos-content").innerHTML=html;
 }
 
+function renderHistoriaCopas(){
+  const destaquesRoot=document.getElementById("history-summary-grid");
+  if(!destaquesRoot)return;
+  const topPlayerRoot=document.getElementById("history-top-player-card");
+  const topScorersRoot=document.getElementById("history-topscorers-list");
+  const debutantesRoot=document.getElementById("history-debutantes-list");
+  const campeoesRoot=document.getElementById("history-champions-list");
+
+  destaquesRoot.innerHTML=destaquesHistoricos.map((item)=>`<article class="history-summary-card">
+      <h3>${item.titulo}</h3>
+      <strong>${item.valor}</strong>
+      <p>${item.detalhe}</p>
+    </article>`).join("");
+
+  topPlayerRoot.innerHTML=`<div class="history-top-player-photo">
+      <img src="${maiorArtilheiroHistorico.foto}" alt="${maiorArtilheiroHistorico.nome}" onerror="this.onerror=null;this.src='assets/player-placeholder.svg'">
+    </div>
+    <div class="history-top-player-content">
+      <h3>#1 ${maiorArtilheiroHistorico.nome}</h3>
+      <p><strong>${maiorArtilheiroHistorico.gols} gols</strong> pela ${maiorArtilheiroHistorico.selecao} em Copas (${maiorArtilheiroHistorico.copas}).</p>
+      <p>${maiorArtilheiroHistorico.descricao}</p>
+      <ul class="history-career-list">
+        ${maiorArtilheiroHistorico.carreira.map((item)=>`<li><strong>${item.clube}</strong> (${item.periodo}) · ${item.jogos} jogos · ${item.gols} gols <br><span>${item.titulos}</span></li>`).join("")}
+      </ul>
+    </div>`;
+
+  topScorersRoot.innerHTML=topArtilheirosHistoricos.map((artilheiro,idx)=>`<li>
+      <div>
+        <strong>${idx+1}. ${artilheiro.nome}</strong>
+        <span>${artilheiro.selecao}</span>
+      </div>
+      <div>
+        <strong>${artilheiro.gols}</strong>
+        <span class="history-status ${artilheiro.ativo?"active":"inactive"}">${artilheiro.ativo?"Em atividade":"Aposentado"}</span>
+      </div>
+    </li>`).join("");
+
+  debutantesRoot.innerHTML=selecoesEstreantes2026.map((selecao)=>`<li>${flag(selecao,18)} ${selecao}</li>`).join("");
+
+  campeoesRoot.innerHTML=rankingCampeoesCopas.map((item)=>`<li>
+      <div>
+        <strong>${item.selecao}</strong>
+        <span>${item.anos}</span>
+      </div>
+      <strong>${item.titulos}x</strong>
+    </li>`).join("");
+}
+
 // ═══════ COPA 2026 ═══════
 let currentSlide=0;
 function renderEstadios(){
   const track=document.getElementById("stadium-track"),dots=document.getElementById("carousel-dots");
   if(!track)return;
   track.innerHTML=estadiosData.map(e=>`<div class="stadium-slide"><div class="stadium-card">
-    <div class="stadium-photo-wrap"><img class="stadium-photo" src="${e.foto}" alt="${e.nome}" loading="lazy" onerror="this.style.display='none'"><div class="stadium-photo-overlay"></div><div class="stadium-country-badge">${flag(e.pais,16)} ${e.pais}</div></div>
+    <div class="stadium-photo-wrap"><img class="stadium-photo" src="${e.foto}" alt="${e.nome}" loading="lazy" onerror="this.onerror=null;this.src='${imagemEstadioFallback}'"><div class="stadium-photo-overlay"></div><div class="stadium-country-badge">${flag(e.pais,16)} ${e.pais}</div></div>
     <div class="stadium-body"><div class="stadium-name">${e.nome}</div><div class="stadium-city">📍 ${e.cidade}</div>
     <div class="stadium-details-grid"><div class="stadium-detail"><div class="sd-label">Capacidade</div><div class="sd-val highlight">${e.capacidade}</div></div><div class="stadium-detail"><div class="sd-label">Jogos</div><div class="sd-val">${e.jogos}</div></div><div class="stadium-detail"><div class="sd-label">Gramado</div><div class="sd-val">${e.gramado}</div></div><div class="stadium-detail"><div class="sd-label">Inaugurado</div><div class="sd-val">${e.inaugurado}</div></div></div>
     <div style="margin-bottom:.5rem"><span style="background:rgba(245,200,66,.1);border:1px solid rgba(245,200,66,.25);color:var(--gold);border-radius:999px;padding:.2rem .75rem;font-size:.76rem;font-weight:700">${e.destaque}</span></div>
@@ -857,6 +971,7 @@ function inicializar(){
   renderArtilheiros();
   renderEstadios();
   renderFavoritos();
+  renderHistoriaCopas();
 }
 
 inicializar();

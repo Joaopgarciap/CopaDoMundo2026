@@ -86,6 +86,7 @@
       <button class="tab" data-tab="timeline">🗓️ Timeline</button>
       <button class="tab" data-tab="artilheiros">🥇 Artilheiros</button>
       <button class="tab" data-tab="favoritos">⭐ Favoritos</button>
+      <button class="tab" data-tab="historia">📚 História das Copas</button>
       <button class="tab" data-tab="copa">🏟️ Copa 2026</button>
     </div>
   </nav>
@@ -182,6 +183,34 @@
       <div id="favoritos-content"></div>
     </section>
 
+    <!-- HISTÓRIA DAS COPAS -->
+    <section class="tab-pane" id="tab-historia">
+      <div class="history-intro">
+        <h2>História das Copas</h2>
+        <p>Recordes históricos, maiores artilheiros e ranking de campeões mundiais.</p>
+      </div>
+
+      <div class="history-summary-grid" id="history-summary-grid"></div>
+
+      <div class="history-top-player-card" id="history-top-player-card"></div>
+
+      <div class="history-grid-2">
+        <div class="history-panel">
+          <h3>Top 10 artilheiros da história</h3>
+          <ol id="history-topscorers-list" class="history-list history-ordered"></ol>
+        </div>
+        <div class="history-panel">
+          <h3>Estreantes na Copa 2026</h3>
+          <ul id="history-debutantes-list" class="history-list"></ul>
+        </div>
+      </div>
+
+      <div class="history-panel">
+        <h3>Ranking de campeões por títulos</h3>
+        <ol id="history-champions-list" class="history-list history-ordered"></ol>
+      </div>
+    </section>
+
     <!-- COPA 2026 -->
     <section class="tab-pane" id="tab-copa">
       <div class="copa-section-title"><span class="copa-sec-icon">🏟️</span><div><h2>Estádios</h2><p>16 arenas em 3 países</p></div></div>
@@ -194,7 +223,7 @@
       <div class="copa-section-title" style="margin-top:3rem"><span class="copa-sec-icon">⚽</span><div><h2>Bola Oficial</h2><p>Adidas Trionda Pro</p></div></div>
       <div class="ball-card">
         <div class="ball-img-wrap">
-          <img src="https://assets.adidas.com/images/h_840,f_auto,q_auto,fl_lossy,c_fill,g_auto/jd8021_trionda/Bola-de-Futebol-Trionda-Pro-Copa-do-Mundo-FIFA-2026.jpg" alt="Trionda" class="ball-img" onerror="this.onerror=null;this.style.opacity='.2'"/>
+          <img src="assets/ball-official.png" alt="Trionda" class="ball-img" onerror="this.onerror=null;this.src='assets/ball-placeholder.svg'"/>
           <div class="ball-brand">adidas × FIFA</div>
         </div>
         <div class="ball-info">
