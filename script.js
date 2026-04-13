@@ -174,7 +174,57 @@ const estadiosData = [
   },
 ];
 
-const fallbackImagemEstadio = "assets/stadium-placeholder.svg";
+function svgDataUri(svgMarkup) {
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svgMarkup)}`;
+}
+
+const fallbackImagemEstadio = svgDataUri(`
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#122547"/>
+      <stop offset="100%" stop-color="#0a1328"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="700" fill="url(#g)"/>
+  <circle cx="600" cy="350" r="170" fill="none" stroke="#f5c842" stroke-width="6" opacity="0.55"/>
+  <rect x="120" y="520" width="960" height="110" rx="18" fill="#0f1d38" stroke="#2e4368"/>
+  <text x="600" y="275" fill="#f5c842" font-family="Arial,sans-serif" font-size="54" font-weight="700" text-anchor="middle">ESTADIO DA COPA 2026</text>
+  <text x="600" y="335" fill="#c8d3ea" font-family="Arial,sans-serif" font-size="24" text-anchor="middle">Imagem ilustrativa local</text>
+</svg>`);
+
+const fallbackImagemJogador = svgDataUri(`
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800">
+  <defs>
+    <linearGradient id="p" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#13284b"/>
+      <stop offset="100%" stop-color="#0a1428"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="800" fill="url(#p)"/>
+  <circle cx="400" cy="300" r="120" fill="#f5c842" opacity="0.8"/>
+  <rect x="250" y="430" width="300" height="210" rx="130" fill="#f5c842" opacity="0.7"/>
+  <text x="400" y="710" fill="#e7eefc" font-family="Arial,sans-serif" font-size="38" font-weight="700" text-anchor="middle">JOGADOR HISTORICO</text>
+</svg>`);
+
+const fallbackImagemBola = svgDataUri(`
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 900">
+  <defs>
+    <radialGradient id="b" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="70%" stop-color="#edf2ff"/>
+      <stop offset="100%" stop-color="#c7d4f5"/>
+    </radialGradient>
+  </defs>
+  <rect width="900" height="900" fill="#0b1831"/>
+  <circle cx="450" cy="450" r="290" fill="url(#b)" stroke="#f5c842" stroke-width="10"/>
+  <polygon points="450,290 515,340 490,420 410,420 385,340" fill="#1e2f53"/>
+  <polygon points="450,610 515,560 490,480 410,480 385,560" fill="#1e2f53"/>
+  <text x="450" y="820" fill="#f5c842" font-family="Arial,sans-serif" font-size="44" font-weight="700" text-anchor="middle">BOLA OFICIAL 2026</text>
+</svg>`);
+if (typeof window !== "undefined") {
+  window.__fallbackImagemBola = fallbackImagemBola;
+}
 
 // ——— FATOS DA COPA ———
 const fatosCopa = [
@@ -239,7 +289,7 @@ const maiorArtilheiroHistorico = {
   selecao: "Alemanha",
   gols: 16,
   copas: "2002, 2006, 2010 e 2014",
-  foto: "assets/player-placeholder.svg",
+  foto: fallbackImagemJogador,
   descricao:
     "Maior artilheiro da história da Copa do Mundo, superando Ronaldo Fenômeno em 2014 no Brasil.",
 };
@@ -716,7 +766,7 @@ function renderHistoriaCopas() {
         alt="${maiorArtilheiroHistorico.nome}"
         loading="lazy"
         referrerpolicy="no-referrer"
-        onerror="this.onerror=null;this.src='assets/player-placeholder.svg'"
+        onerror="this.onerror=null;this.src='${fallbackImagemJogador}'"
       />
       <div>
         <h3>${maiorArtilheiroHistorico.nome}</h3>
@@ -771,6 +821,9 @@ function iniciarTabs(){
 }
 
 function inicializar(){
+  const ballImg = document.getElementById("ball-img");
+  if (ballImg) ballImg.src = fallbackImagemBola;
+
   const faseSelect=document.getElementById("fase-select");
   const fases=[...new Set(jogos.map(j=>j.fase))];
   fases.forEach(f=>{const o=document.createElement("option");o.value=f;o.textContent=f;faseSelect.appendChild(o);});
